@@ -1,3 +1,8 @@
+/**
+ * Obtem o nome de todos os campos que se tem ObjectIds
+ * @param {*} dbSchema MongoseModel
+ * @returns Array de string de ObjectIds
+ */
 function getSchemaRefs(dbSchema) {
 	// Pegar schema do model passado
 	let schema = dbSchema;
@@ -12,7 +17,6 @@ function getSchemaRefs(dbSchema) {
 			populate.push(key);
 		}
 	}
-
 	return populate;
 }
 
