@@ -1,4 +1,4 @@
-const db = require("../models/index.js");
+const db = require("../../models/index.js");
 const Functions_system = db.functions_system;
 const fs = require('fs-extra');
 const path = require('path');
@@ -22,7 +22,7 @@ function saveFunctionsSystem() {
  * @returns Retorna a descrição da rota
  */
 function getDescription(className, method, routePath) {
-  var fullPath = path.join(__dirname, `../routes/${className}.routes.js`);
+  var fullPath = path.join(__dirname, `../../routes/${className}.routes.js`);
   const content = fs.readFileSync(fullPath, 'utf8');
   
   const RouteDescriptionRegex = /\/\/Description: *([^\n]+)/g;
@@ -79,7 +79,7 @@ function getDefaultDescription(className, method, path) {
 function readRoutes() {
   routes = [];
   // Diretório onde estão localizados os arquivos de rota
-  const dir = path.join(__dirname, '../routes');
+  const dir = path.join(__dirname, '../../routes');
   //Faz a leitura do diretório que contém as rotas
   const files = fs.readdirSync(dir);
 

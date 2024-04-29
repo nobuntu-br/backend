@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const db = require("../../models");
+const db = require("../../models/index.js");
 const axios = require("axios");
 const jwkToPem = require("jwk-to-pem");
 
