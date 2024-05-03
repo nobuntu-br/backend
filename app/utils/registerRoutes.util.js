@@ -1,5 +1,5 @@
 const db = require("../../models/index.js");
-const Functions_system = db.functionsSystem;
+const Functions_system = db.functions_system;
 const fs = require('fs-extra');
 const path = require('path');
 
