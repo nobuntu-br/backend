@@ -1,5 +1,5 @@
 const db = require("../../models/index.js");
-const Functions_system = db.functions_system;
+const Functions_system = db.functionsSystem;
 const fs = require('fs-extra');
 const path = require('path');
 
@@ -8,9 +8,9 @@ const path = require('path');
  */
 function saveFunctionsSystem() {
   var routesData = readRoutes();
-
+  // console.log(routesData);
   routesData.forEach(async (route) => {
-    await saveRoutesOnDatabase(getDescription(getPathName(route.path), route.method, route.path), route.method + "#" + route.path, getPathName(route.path));
+    await saveRoutesOnDatabase(getDescription(route.fileName, route.method, route.path), route.method + "#" + route.path, route.fileName);
   });
 }
 
@@ -103,7 +103,7 @@ function readRoutes() {
               const methods = Object.keys(layer.route.methods);
               const _path = path + layer.route.path;
               // console.log(`Path: ${_path}, Methods: ${methods}`);
-              routes.push({ path: _path, method: methods });
+              routes.push({ path: _path, method: methods , fileName: file.split(".")[0]});
             }
           });
         }
@@ -116,7 +116,7 @@ function readRoutes() {
 }
 
 async function saveRoutesOnDatabase(_description, _route, _classname) {
-
+// console.log(_description,_route,_classname)
   await Functions_system.findOneAndUpdate({ route: _route }, {name: _description, route: _route, classname: _classname}, {
     new: true,
     upsert: true //SE não tiver o registro, ele irá criar
