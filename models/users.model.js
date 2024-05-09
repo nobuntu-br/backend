@@ -12,7 +12,7 @@ module.exports = mongoose => {
       isAdministrator: Boolean,
       memberType: String,
         Roles: 
-         [{type: Schema.Types.ObjectId, ref: 'Roles'}], 
+         [{type: Schema.Types.ObjectId, ref: 'roles'}], 
     },
     { timestamps: true }
   );
@@ -23,6 +23,6 @@ module.exports = mongoose => {
     return object;
   });
 
-  const Users = mongoose.model("users", schema);
+  const Users = mongoose.model("user", schema);
   return Users;
 };
