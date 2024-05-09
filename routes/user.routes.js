@@ -1,7 +1,7 @@
 module.exports = app => {
     const user = require("../app/controllers/user.controller.js"); 
-    const checkIfDateIsOlder = require("../app/middlewares/checkIfDateIsOlder.middleware.js"); 
-    const verifyAccess = require("../app/middlewares/auth.middleware.js");
+    const checkIfDateIsOlder = require("../app/middleware/checkIfDateIsOlder.middleware.js"); 
+    const verifyAccess = require("../app/middleware/auth.middleware.js");
     const db = require("../models/index.js"); 
     const User = db.user; 
 

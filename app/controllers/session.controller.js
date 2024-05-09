@@ -1,7 +1,7 @@
 const db = require("../../models");
 const Session = db.session;
 const customQuery = require("./customQuery.util"); 
-const getSchemaRefs = require("./../../utils/populate.utils");
+const getSchemaRefs = require("./../middleware/checkIfDateIsOlder.middleware");
 validaCamposRequeridosSession = (req) => {
     const camposRequeridosEmpty = new Array();
     if (!req.body.userUID) {
