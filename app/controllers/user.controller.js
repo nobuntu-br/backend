@@ -1,6 +1,6 @@
 const db = require("../../models");
 const User = db.user;
-const customQuery = require("./customQuery.util");
+const findDataByCustomQuery = require("../utils/customQuery.util");
 const getSchemaRefs = require("./../middleware/checkIfDateIsOlder.middleware");
 
 validaCamposRequeridosUser = (req) => {
@@ -250,6 +250,17 @@ exports.findAllIsAdministrator = (req, res) => {
     });
 };
 
-exports.findCustom = (req, res) => {
-  findCustom(req, res, User);
+exports.findCustom = async (req, res) => {
+  const filterValues = req.body.filterValues;
+  const filterConditions = req.body.filterValues;
+
+  findDataByCustomQuery(filterValues, filterConditions, User).then(data => {
+    res.status(200).send(data);
+  })
+  .catch(error => {
+    res.status(500).send({
+      message:
+        error.message || "Algum erro desconhecido ocorreu ao buscar dados pela busca customizável"
+    });
+  });
 };

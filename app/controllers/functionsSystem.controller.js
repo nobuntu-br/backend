@@ -1,6 +1,6 @@
 const db = require("../../models");
 const FunctionsSystemRoles = db.functionsSystemRoles;
-const customQuery = require("./customQuery.util"); 
+const findDataByCustomQuery = require("../utils/customQuery.util"); 
 const getSchemaRefs = require("../utils/getSchemaRefs.utils"); 
 
 validaCamposRequeridosFunctionsSystemRoles = (req) => {
@@ -180,6 +180,17 @@ exports.findAllAuthorized = (req, res) => {
       });
 };
 
-exports.findCustom = (req, res) => { 
-  findCustom(req, res, FunctionsSystemRoles); 
+exports.findCustom = async (req, res) => {
+  const filterValues = req.body.filterValues;
+  const filterConditions = req.body.filterValues;
+
+  findDataByCustomQuery(filterValues, filterConditions, FunctionsSystemRoles).then(data => {
+    res.status(200).send(data);
+  })
+  .catch(error => {
+    res.status(500).send({
+      message:
+        error.message || "Algum erro desconhecido ocorreu ao buscar dados pela busca customizável"
+    });
+  });
 };

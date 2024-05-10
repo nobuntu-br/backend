@@ -1,6 +1,6 @@
 const db = require("../../models");
 const Session = db.session;
-const customQuery = require("./customQuery.util"); 
+const findDataByCustomQuery = require("../utils/customQuery.util"); 
 const getSchemaRefs = require("./../middleware/checkIfDateIsOlder.middleware");
 validaCamposRequeridosSession = (req) => {
     const camposRequeridosEmpty = new Array();
@@ -208,6 +208,17 @@ exports.findAllStayConnected = (req, res) => {
       });
 };
 
-exports.findCustom = (req, res) => { 
-  findCustom(req, res, Session); 
+exports.findCustom = async (req, res) => {
+  const filterValues = req.body.filterValues;
+  const filterConditions = req.body.filterValues;
+
+  findDataByCustomQuery(filterValues, filterConditions, Session).then(data => {
+    res.status(200).send(data);
+  })
+  .catch(error => {
+    res.status(500).send({
+      message:
+        error.message || "Algum erro desconhecido ocorreu ao buscar dados pela busca customizável"
+    });
+  });
 };
