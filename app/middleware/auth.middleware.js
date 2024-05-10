@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const db = require("../../models/index.js");
+const db = require("../../models");
 const axios = require("axios");
 const jwkToPem = require("jwk-to-pem");
 
@@ -59,7 +59,7 @@ async function verifyAccessTokenIsValid(access_token, res) {
   if (!access_token) {
     return null;
   }
-
+ 
   const JWKsUri = process.env.JWKsUri;
 
   const jwk = await getJWKS(JWKsUri);
@@ -74,7 +74,7 @@ async function verifyAccessTokenIsValid(access_token, res) {
   try {
     // ai passo o token e a key no formato pem aqui para decodificar o token e ai ele é decodificado
     let decoded = jwt.verify(access_token, pem);
-
+    
     const now = Math.floor(Date.now() / 1000);
     // Verifica se o token não expirou
     if (decoded.exp < now) {
@@ -107,7 +107,7 @@ async function isAuthorizedOnUrl(userOID, _method, _url) {
     return true;
   }
 
-  const user = await db.users.aggregate([
+  const user = await db.user.aggregate([
     // Filtrar pelo UID do usuário
     { $match: { UID: userOID } },
     // Fazer o lookup para obter os detalhes das roles
@@ -176,7 +176,7 @@ async function isAuthorizedOnUrl(userOID, _method, _url) {
 async function userIsAdmin(userOID) {
   try {
     //É pego da API o usuário com base no OID
-    const _user = await db.users.findOne({ UID: userOID }).exec();
+    const _user = await db.user.findOne({ UID: userOID }).exec();
 
     if (_user != null && _user.isAdministrator != null) {
       //Se o usuário é administrador
