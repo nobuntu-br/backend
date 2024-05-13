@@ -194,7 +194,7 @@ async function userIsAdmin(userOID) {
 
 async function isPublicRoute(_method, _url) {
 
-  const role = await db.roles.aggregate([
+  const role = await db.role.aggregate([
     { $match: { name: "guest" } },
 
     {
