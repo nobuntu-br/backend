@@ -1,7 +1,7 @@
 const db = require("../../models");
 const User = db.user;
 const findDataByCustomQuery = require("../utils/customQuery.util");
-const getSchemaRefs = require("./../middleware/checkIfDateIsOlder.middleware");
+const getSchemaRefs = require("./../utils/getSchemaRefs.utils");
 
 validaCamposRequeridosUser = (req) => {
   const camposRequeridosEmpty = new Array();
@@ -104,11 +104,13 @@ async function checkExistAnyUserAccount(){
 exports.findAll = (req, res) => {
   var condition = {};
 
-  let populate = getSchemaRefs(db.user.schema.obj);
-  let query = User.find();
-  if (populate.length > 0) {
-    query = query.populate(populate.join(" "));
-  }
+  let populate = getSchemaRefs(db.user.schema.obj); 
+
+  let query = User.find(); 
+    if(populate.length > 0){
+      query = query.populate(populate.join(" "));
+    }
+    
   query.then(data => {
     res.send(data);
   }).catch(err => {
