@@ -4,11 +4,12 @@ module.exports = app => {
     const verifyAccess = require("../app/middleware/auth.middleware.js");
     const db = require("../models/index.js"); 
     const User = db.user; 
+    const validateUser = require("../app/validators/user.validator.js")
 
     var router = require("express").Router(); 
 
     // Create a new user 
-    router.post("/", user.create); 
+    router.post("/", validateUser, user.create); 
     // Retrieve all user 
     router.get("/",verifyAccess.verifyAccess, user.findAll);
     // Retrieve a single user with id 
@@ -16,7 +17,7 @@ module.exports = app => {
     // Retrieve a single user with id 
     router.get("/:id", verifyAccess.verifyAccess, user.findOne); 
     // Update a user with id 
-    router.put("/:id", verifyAccess.verifyAccess, checkIfDateIsOlder(User), user.update); 
+    router.put("/:id", verifyAccess.verifyAccess, validateUser, checkIfDateIsOlder(User), user.update); 
     // Delete a user with id 
     router.delete("/:id", verifyAccess.verifyAccess, user.delete); 
     // Custom get user 
