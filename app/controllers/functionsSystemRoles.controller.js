@@ -3,35 +3,8 @@ const FunctionsSystemRoles = db.functionsSystemRoles;
 const findDataByCustomQuery = require("../utils/customQuery.util"); 
 const getSchemaRefs = require("../utils/getSchemaRefs.utils"); 
 
-validaCamposRequeridosFunctionsSystemRoles = (req) => {
-    const camposRequeridosEmpty = new Array();
-    if (!req.body.Roles) {
-        camposRequeridosEmpty.push("Roles");
-    }
-    if (!req.body.FunctionsSystem) {
-        camposRequeridosEmpty.push("FunctionsSystem");
-    }
-    if (!req.body.authorized) {
-        camposRequeridosEmpty.push("authorized");
-    }
-    return camposRequeridosEmpty;
-}
-
 // Cria e salva um novo documento para a entidade FunctionsSystemRoles
 exports.create = (req, res) => {
-    // Validate request
-    if (!req.body.Roles) {
-        res.status(400).send({ message: "Conteúdo não pode ser vazio!" });
-        return;
-    }
-
-    // Validate required fields
-    const camposRequeridosEmpty = validaCamposRequeridosFunctionsSystemRoles(req);
-    if (camposRequeridosEmpty.length > 0) {
-        res.status(400).send({ message: "Campos requeridos ("+camposRequeridosEmpty.join(",") + ") não podem ser vazios!" });
-        return;
-    }
-
     // Create a FunctionsSystemRoles
     const functionsSystemRoles = new FunctionsSystemRoles({
         Roles: req.body.Roles ? req.body.Roles : null,
@@ -97,14 +70,6 @@ exports.findOne = (req, res) => {
 
 // Altera uma entidade FunctionsSystemRoles
 exports.update = (req, res) => {
-
-    // Validate required fields
-    const camposRequeridosEmpty = validaCamposRequeridosFunctionsSystemRoles(req);
-    if (camposRequeridosEmpty.length > 0) {
-        res.status(400).send({ message: "Campos requeridos ("+camposRequeridosEmpty.join(",") + ") não podem ser vazios!" });
-        return;
-    }
-
     const id = req.params.id;
 
     FunctionsSystemRoles.findByIdAndUpdate(id, req.body, { useFindAndModify: false })

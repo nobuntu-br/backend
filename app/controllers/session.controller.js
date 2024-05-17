@@ -2,56 +2,9 @@ const db = require("../../models");
 const Session = db.session;
 const findDataByCustomQuery = require("../utils/customQuery.util"); 
 const getSchemaRefs = require("./../middleware/checkIfDateIsOlder.middleware");
-validaCamposRequeridosSession = (req) => {
-    const camposRequeridosEmpty = new Array();
-    if (!req.body.userUID) {
-        camposRequeridosEmpty.push("userUID");
-    }
-    if (!req.body.user) {
-        camposRequeridosEmpty.push("user");
-    }
-    if (!req.body.tenantUID) {
-        camposRequeridosEmpty.push("tenantUID");
-    }
-    if (!req.body.accessToken) {
-        camposRequeridosEmpty.push("accessToken");
-    }
-    if (!req.body.initialDate) {
-        camposRequeridosEmpty.push("initialDate");
-    }
-    if (!req.body.finishSessionDate) {
-        camposRequeridosEmpty.push("finishSessionDate");
-    }
-    if (!req.body.stayConnected) {
-        camposRequeridosEmpty.push("stayConnected");
-    }
-    if (!req.body.accessTokenExpirationDate) {
-        camposRequeridosEmpty.push("accessTokenExpirationDate");
-    }
-    if (!req.body.hashValidationLogin) {
-        camposRequeridosEmpty.push("hashValidationLogin");
-    }
-    if (!req.body.hashValidationLogout) {
-        camposRequeridosEmpty.push("hashValidationLogout");
-    }
-    return camposRequeridosEmpty;
-}
 
 // Cria e salva um novo documento para a entidade Session
 exports.create = (req, res) => {
-    // Validate request
-    if (!req.body.userUID) {
-        res.status(400).send({ message: "Conteúdo não pode ser vazio!" });
-        return;
-    }
-
-    // Validate required fields
-    const camposRequeridosEmpty = validaCamposRequeridosSession(req);
-    if (camposRequeridosEmpty.length > 0) {
-        res.status(400).send({ message: "Campos requeridos ("+camposRequeridosEmpty.join(",") + ") não podem ser vazios!" });
-        return;
-    }
-
     // Create a Session
     const session = new Session({
         userUID: req.body.userUID ? req.body.userUID : null,
@@ -124,14 +77,6 @@ exports.findOne = (req, res) => {
 
 // Altera uma entidade Session
 exports.update = (req, res) => {
-
-    // Validate required fields
-    const camposRequeridosEmpty = validaCamposRequeridosSession(req);
-    if (camposRequeridosEmpty.length > 0) {
-        res.status(400).send({ message: "Campos requeridos ("+camposRequeridosEmpty.join(",") + ") não podem ser vazios!" });
-        return;
-    }
-
     const id = req.params.id;
 
     Session.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
