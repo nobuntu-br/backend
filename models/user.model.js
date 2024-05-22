@@ -4,7 +4,11 @@ var Schema = mongoose.Schema;
 module.exports = mongoose => {
   var schema = mongoose.Schema(
     {
-      UID: String,
+      UID: {
+        type: String,
+        required: true,
+        unique: true
+      },
       TenantUID: String,
       username: String,
       firstName: String,
