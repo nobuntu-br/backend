@@ -1,5 +1,5 @@
 const axios = require("axios");
-
+require('dotenv').config();//adicionado
 /**
  * Função que irá gerar o access token para o usuário acessar essa API
  */
@@ -70,3 +70,45 @@ exports.generateAcessTokenByRefreshToken = async (req, res, next) => {
     });
   }
 };
+
+exports.getApplicationsFromDirectory = async (req, res) => {
+  const tokenUrl = 'https://login.microsoftonline.com/' + process.env.TENANT_ID + '/oauth2/v2.0/token';
+  const data = new URLSearchParams({
+    grant_type: 'client_credentials',
+    client_id: process.env.CLIENT_ID,
+    client_secret: process.env.CLIENT_SECRET,
+    scope: 'https://graph.microsoft.com/.default'
+  });
+
+  try {
+    // Obter o access token
+    const tokenResponse = await axios.post(tokenUrl, data.toString(), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    });
+
+    const accessToken = tokenResponse.data.access_token;
+
+    // Buscar todas as aplicações do tenant
+    const applicationsResponse = await axios.get('https://graph.microsoft.com/v1.0/applications', {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+
+    // Filtrar aplicações e remover 'b2c-extensions-app'
+    const applications = applicationsResponse.data.value.filter(app => app.displayName !== 'b2c-extensions-app. Do not modify. Used by AADB2C for storing user data.');
+    
+    // Extrair nomes e ícones das aplicações
+    const applicationDetails = applications.map(app => ({
+      name: app.displayName,
+      icon: app.info && app.info.logoUrl ? app.info.logoUrl : null
+    }));
+
+    // Retornar os nomes e ícones das aplicações na resposta
+    res.json(applicationDetails);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
