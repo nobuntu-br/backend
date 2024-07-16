@@ -29,25 +29,34 @@ async function verifyAccess(req, res, next) {
   }
 
   //Obtem o access_token do header
-  const access_token = req.headers["authorization"];
+  const authHeader = req.headers['authorization'];
 
-  //Verifica se o token é valido, assim retorna o OID do usuário
-  const userOID = await verifyAccessTokenIsValid(access_token, res);
+  try {
+    const access_token = authHeader.split(' ')[1]; // Obtém o token após "Bearer"
 
-  //Se não retornou o OID (não tem access_token)
-  if (userOID == null) {
-    res.status(401).send({ message: "Acesso não autorizado" });
-  } else {
-    //Se tem o OID verifica se tem permissao pra rota
-    if (await isAuthorizedOnUrl(userOID, req.method, req.originalUrl) == true) {
-      next();
-    } else {
-      console.log("não é autorizado")
+    //Verifica se o token é valido, assim retorna o OID do usuário
+    const userOID = await verifyAccessTokenIsValid(access_token, res);
+
+    //Se não retornou o OID (não tem access_token)
+    if (userOID == null) {
       res.status(401).send({ message: "Acesso não autorizado" });
+    } else {
+      //Se tem o OID verifica se tem permissao pra rota
+      if (await isAuthorizedOnUrl(userOID, req.method, req.originalUrl) == true) {
+        next();
+      } else {
+        console.log("não é autorizado")
+        res.status(401).send({ message: "Acesso não autorizado" });
+      }
     }
-  }
 
-  return;
+    return;
+
+  } catch (error) {
+    res.status(401).send({ message: "Acesso não autorizado" });
+    return;
+  }
+  
 }
 
 /**
@@ -59,7 +68,6 @@ async function verifyAccessTokenIsValid(access_token, res) {
   if (!access_token) {
     return null;
   }
- 
   const JWKsUri = process.env.JWKsUri;
 
   const jwk = await getJWKS(JWKsUri);
@@ -74,7 +82,7 @@ async function verifyAccessTokenIsValid(access_token, res) {
   try {
     // ai passo o token e a key no formato pem aqui para decodificar o token e ai ele é decodificado
     let decoded = jwt.verify(access_token, pem);
-    
+
     const now = Math.floor(Date.now() / 1000);
     // Verifica se o token não expirou
     if (decoded.exp < now) {
