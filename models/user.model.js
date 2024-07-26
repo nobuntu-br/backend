@@ -16,7 +16,13 @@ module.exports = mongoose => {
       isAdministrator: Boolean,
       memberType: String,
         Roles: 
-         [{type: Schema.Types.ObjectId, ref: 'roles'}], 
+        [
+          {
+            type: Schema.Types.ObjectId,
+            ref: 'roles',
+            default: [] // Define um array vazio como valor padrão
+          }
+        ], 
     },
     { timestamps: true }
   );
