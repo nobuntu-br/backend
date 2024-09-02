@@ -24,7 +24,7 @@ export default function defineModel(sequelize: Sequelize){
     },
     dbPort: {
       type: DataTypes.STRING(100),
-      allowNull: false,
+      allowNull: true,
     },
     dbConfig: {
       type: DataTypes.STRING(100),

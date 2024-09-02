@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { BaseController } from "./base.controller";
 import { TenantCredentialService } from "../services/tenantCredential.service";
 import { TenantCredential } from "../models/tenantCredential.model";
-import { RegisterTenantCredentialUseCase } from "../useCases/registerTenantCredential/registerTenantCredential.useCase";
+import { RegisterTenantCredentialUseCase } from "../useCases/tenant/registerTenantCredential.useCase";
 
 export class TenantCredentialController {
 

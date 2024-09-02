@@ -35,7 +35,7 @@ export default async function changeTenant(req: Request, res: Response, next: Ne
 
   try {
     //Obtem a instância da conexão com banco de dados do usuário
-    const databaseConnection = await getTenantConnection(tenantId, decoded.oid);
+    const databaseConnection = await getTenantConnection(tenantId, decoded.sub);
 
     if (databaseConnection == null) {
       return res.status(404).json({ message: 'Tenant não encontrado' });

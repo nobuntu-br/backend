@@ -11,6 +11,7 @@ export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
 
   async create(data: any): Promise<T> {
     try {
+
       const newItem = await this.model.create(data);
       return this.jsonDataToResource(newItem);
     } catch (error: any) {
@@ -22,7 +23,7 @@ export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
 
       if (error.name === 'SequelizeValidationError') {
         // Para erros de validação, você pode retornar detalhes específicos
-        throw new Error("Erro to save data using sequelize. Validation Error.");
+        throw new Error("Erro to save data using sequelize. Validation Error. "+ error);
       }
 
       throw new Error("Error to save entity to database using sequelize.");

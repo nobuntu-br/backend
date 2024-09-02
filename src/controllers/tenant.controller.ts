@@ -4,6 +4,7 @@ import TenantService from "../services/tenant.service";
 import { Tenant } from "../models/tenant.model";
 import TenantConnection from "../models/tenantConnection.model";
 import UserTenantService from "../services/userTenant.service";
+import { GetUserTenantsUseCase } from "../useCases/tenant/getUserTenants.useCase";
 
 export class TenantController {
 
@@ -158,12 +159,14 @@ export class TenantController {
 
       const userTenantService: UserTenantService = new UserTenantService(req.databaseConnection.databaseType, req.databaseConnection.models["userTenant"]);
 
-      const tenants = await userTenantService.findMany({UserUID: req.params.UID});
+      // const tenants = await userTenantService.findMany({UserUID: req.params.UID});
+      const getUserTenantsUseCase : GetUserTenantsUseCase = new GetUserTenantsUseCase(userTenantService);
+      const usertenants = await getUserTenantsUseCase.execute(req.params.UID);
 
-      if (tenants == null) {
+      if (usertenants == null) {
         return res.status(404).json({ message: 'Usuário não possui tenant que pode acessar' });
       }
-      return res.status(200).send(tenants);
+      return res.status(200).send(usertenants);
     } catch (error) {
       return res.status(500).send({ message: "Ocorreu um erro desconhecido no servidor. " + error });
     }

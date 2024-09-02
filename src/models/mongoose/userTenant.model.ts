@@ -4,18 +4,23 @@ export default function defineModel(mongooseConnection: Mongoose) {
 
   const schema = new mongoose.Schema(
     {
-      user: {
+      UserUID: {
         type: Schema.Types.ObjectId, ref: 'user',
+        required: false,
+      },
+      TenantCredentialId: {
+        type: Schema.Types.ObjectId, ref: 'tenantCredential',
         required: true,
       },
-      tenant: {
+      TenantId: {
         type: Schema.Types.ObjectId, ref: 'tenant',
         required: true,
       },
       isAdmin: {
         type: Boolean,
-        required: true
+        required: false
       },
+      
 
       dbConfig: Object,
     },

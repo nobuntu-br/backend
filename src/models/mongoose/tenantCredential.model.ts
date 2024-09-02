@@ -26,7 +26,7 @@ export default function defineModel(mongooseConnection: Mongoose) {
       },
       dbPort: {
         type: String,
-        required: true
+        required: false
       },
       dbConfig: Object,
     },

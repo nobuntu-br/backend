@@ -22,17 +22,13 @@ export default class UserTenantService extends BaseService<UserTenant> {
         return true;
       }
 
-      // Continue with the verification logic
-      const userTenant = await this.repository.findOne({ "UserUID": userUID, "TenantId": tenantId });
+      const userTenant = await this.getUserTenantsWithDefaultTenant(userUID);
 
       if (userTenant == null) {
         return false;
       }
 
-      console.log("Tenant do usuário: ", userTenant);
-
       this.saveUserAcessToTenantOnCache(userUID, tenantId, userTenant);
-      console.log("deu")
       return true;
 
     } catch (error) {
@@ -58,5 +54,13 @@ export default class UserTenantService extends BaseService<UserTenant> {
   //TODO  um usuário X que deve ser administrador do tenant pode alterar quais usuários tem permissão no tenant. Ao ter feito alguma alteração, tem que ser alterado no cache.
   //TODO fazer a função que verifica se o usuário é admin do tenant para poder alterar a permissão dos outros ao tenant
   //TODO permitir o usuário passar o cargo de admin pra outra pessoa
+
+  async getUserTenantsWithDefaultTenant(UserUID: string){
+    try {
+      return this.userTenantRepository.getUserTenantsWithDefaultTenant(this.dbType, this.model, UserUID);
+    } catch (error) {
+      throw new Error("Erro ao obter userTenants com o tenant padrão");
+    }
+  }
 
 }

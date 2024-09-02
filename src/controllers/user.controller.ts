@@ -3,7 +3,7 @@ import { BaseController } from "./base.controller";
 import { UserService } from "../services/user.service";
 import { User } from "../models/user.model";
 import { UserDTO } from "../models/DTO/user.DTO";
-import { RegisterUserUseCase } from "../useCases/registerUser/registerUser.useCase";
+import { RegisterUserUseCase } from "../useCases/user/registerUser.useCase";
 import UserTenantService from "../services/userTenant.service";
 import TenantService from "../services/tenant.service";
 import { TenantCredentialService } from "../services/tenantCredential.service";

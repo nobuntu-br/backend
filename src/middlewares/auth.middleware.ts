@@ -107,7 +107,7 @@ async function verifyAccessTokenIsValid(accessToken: string, res: Response): Pro
       return null;
     }
 
-    return decoded.oid;
+    return decoded.sub;
   } catch (error) {
     console.error("Erro ao validar o token:", error);
     return null;

@@ -8,12 +8,20 @@ export default function defineModel(sequelize: Sequelize){
         model: 'Users',
         key: 'UID',
       },
-      primaryKey: true,
+      // primaryKey: true,
     },
     TenantCredentialId: {
       type: DataTypes.INTEGER,
       references: {
         model: 'TenantCredentials',
+        key: 'id',
+      },
+      primaryKey: true,
+    },
+    TenantId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Tenants',
         key: 'id',
       },
       primaryKey: true,
