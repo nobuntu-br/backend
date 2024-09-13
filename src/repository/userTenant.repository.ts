@@ -18,7 +18,7 @@ export default class UserTenantRepository extends BaseRepository<UserTenant>{
       try {
         const userTenants = await model.findAll({
           where: {
-            UserId: {
+            UserUID: {
               [Op.or]: [UserUID, null],
             },
           },
