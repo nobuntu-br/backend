@@ -3,7 +3,7 @@ import { DataTypes, Sequelize } from "sequelize";
 export default function defineModel(sequelize: Sequelize){
   const schema = sequelize.define('ComponentStructure', {
     structure: {
-      type: DataTypes.TEXT('long'),
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     componentName: {
