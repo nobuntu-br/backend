@@ -13,10 +13,10 @@ export default function defineModel(sequelize: Sequelize){
     username: {
       type: DataTypes.STRING,
     },
-    firstname: {
+    firstName: {
       type: DataTypes.STRING,
     },
-    lastname: {
+    lastName: {
       type: DataTypes.STRING,
     },
     isAdministrator: {
