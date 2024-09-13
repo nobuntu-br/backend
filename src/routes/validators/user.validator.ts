@@ -6,8 +6,8 @@ export const createNewUserValidator = [
   //TODO serão gerados com base no mapa mental
   check('UID').notEmpty().withMessage('UID is required'),
   check('username').notEmpty().withMessage('username is required'),
-  check('firstname').notEmpty().withMessage('firstname is required'),
-  check('lastname').notEmpty().withMessage('lastname is required'),
+  check('firstName').notEmpty().withMessage('firstName is required'),
+  check('lastName').notEmpty().withMessage('lastName is required'),
   check('isAdministrator').notEmpty().withMessage('isAdministrator is required'),
   check('memberType').notEmpty().withMessage('memberType is required')
 ]
