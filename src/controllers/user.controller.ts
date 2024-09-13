@@ -26,8 +26,15 @@ export class UserController {
 
       const registerUserUseCase: RegisterUserUseCase = new RegisterUserUseCase(userService, tenantService, tenantCredentialService, userTenantService);
 
-      //TODO usar o DTO para passar para o UseCase os dados corretamente
-      const user = await registerUserUseCase.execute(req.body);
+      
+      const user = await registerUserUseCase.execute({
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        isAdministrator: req.body.isAdministrator,
+        memberType: req.body.memberType,
+        TenantUID: req.body.TenantUID,
+        UID: req.body.UID,
+      });
 
       res.status(200).send(user);
 
