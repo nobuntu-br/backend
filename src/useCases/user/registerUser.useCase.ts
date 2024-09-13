@@ -1,3 +1,4 @@
+import { UserDTO } from "../../models/DTO/user.DTO";
 import { UserTenantDTO } from "../../models/DTO/userTenant.DTO";
 import { User } from "../../models/user.model";
 import TenantService from "../../services/tenant.service";
@@ -13,7 +14,7 @@ export class RegisterUserUseCase {
     private userTenantService: UserTenantService
   ) { }
 
-  async execute(user: User): Promise<User | Error> {
+  async execute(user: UserDTO): Promise<User | Error> {
     try {
 
       //Verifica se usuário já existe
