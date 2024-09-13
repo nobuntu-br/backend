@@ -102,7 +102,30 @@ export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
   }
 
   async update(id: string, data: Object): Promise<T | null> {
-    throw new Error("Method not implemented.");
+    try {
+      //Irá obter a quantidade de linhas alteradas
+      var [affectedCount] = await this.model.update(data, {
+        where: {
+          id: id,
+        },
+      });
+
+      //Se foi atualizado nenhum registro
+      if (affectedCount == 0) {
+        return null;
+      }
+
+      return this.jsonDataToResource(data);
+    } catch (error) {
+      console.warn(
+        "Error to update entities to database using sequelize. Details: " +
+        error
+      );
+      throw new Error(
+        "Error to update entities to database using sequelize. Details: " +
+        error
+      );
+    }
 
   }
 
