@@ -4,8 +4,8 @@ interface IUser {
   name?: string;
   UID?: string;
   username?: string;
-  firstname?: string;
-  lastname?: string;
+  firstName?: string;
+  lastName?: string;
   isAdministrator?: boolean;
   memberType?: string;
 }
@@ -14,8 +14,8 @@ export class User extends BaseResourceModel implements IUser {
   name?: string;
   UID?: string;
   username?: string;
-  firstname?: string;
-  lastname?: string;
+  firstName?: string;
+  lastName?: string;
   isAdministrator?: boolean;
   memberType?: string;
 
