@@ -12,18 +12,18 @@ export async function saveRoutes(databaseConnection: TenantConnection) {
   const functionSystemService: FunctionSystemService = new FunctionSystemService(databaseConnection.databaseType, databaseConnection.models["functionSystem"]);
 
   for (let routeIndex = 0; routeIndex < routesData.length; routeIndex++) {
-    const _description = getDescription(getPathName(routesData[routeIndex].path), routesData[routeIndex].method, routesData[routeIndex].path);
+    const _description = getDescription(routesData[routeIndex].fileName, routesData[routeIndex].method, routesData[routeIndex].path);
     // const _route = routesData[routeIndex].method + "#" + routesData[routeIndex].path;
     const _route = routesData[routeIndex].path;
-    const _className = getPathName(routesData[routeIndex].path);
+    const _classname = routesData[routeIndex].fileName;
     const _method = routesData[routeIndex].method[0];
 
     const route = await functionSystemService.findOne({ route: _route, method: _method });
 
     if (route != null) {
-      await functionSystemService.update(route.id!, { description: _description, route: _route, method: _method, className: _className });
+      await functionSystemService.update(route.id!, { description: _description, route: _route, method: _method, classname: _classname });
     } else {
-      const newRoute = await functionSystemService.create({ description: _description, route: _route, method: _method, className: _className });
+      const newRoute = await functionSystemService.create({ description: _description, route: _route, method: _method, className: _classname });
     }
   }
 
@@ -124,7 +124,9 @@ function readRoutes() {
               //Irá obter o nome do método da rota
               const methods = Object.keys(layer.route.methods);
               const _path = path + layer.route.path;
-              routes.push({ path: _path, method: methods });
+              let fileName = filePath.lastIndexOf('/') > -1 ? filePath.substring(filePath.lastIndexOf('/') + 1, filePath.lastIndexOf('.')) : filePath.substring(filePath.lastIndexOf('\\') + 1, filePath.lastIndexOf('.'));
+              fileName = fileName.replace('.route', '');
+              routes.push({ path: _path, method: methods, fileName: fileName });
             }
           });
         }
@@ -135,20 +137,6 @@ function readRoutes() {
   });
 
   return routes;
-}
-
-/**
- * Obtem o nome dentro do url usado nas rotas.
- * @example "/api/opcional/:id" pegará o "opcional"
- * @param {*} url 
- * @returns Retorna um trecho contido dentro da url.
- */
-function getPathName(url: string) {
-  // Divide a URL em partes usando '/' como separador
-  const urlParts = url.split('/');
-
-  //Pega a terceira parte. "0/1/2" de "/api/dados"
-  return urlParts[2];
 }
 
 /**
