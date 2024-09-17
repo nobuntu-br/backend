@@ -9,6 +9,7 @@ import functionSystemRoleModel from "./functionSystemRole.model";
 import userRoleModel from "./userRole.model";
 import componentStructureModel from "./componentStructure.model";
 import componentStructureRoleModel from "./componentStructureRole.model";
+import verificationEmailModel from "./verificationEmail.model";
 
 /**
  * Define os modelos que serão usados pelos usuários da aplicação
@@ -25,6 +26,8 @@ export default async function setModels(mongooseConnection: Mongoose) {
   const functionSystemRole = functionSystemRoleModel(mongooseConnection);
   const componentStructure = componentStructureModel(mongooseConnection);
   const componentStructureRole = componentStructureRoleModel(mongooseConnection);
+  const verificationEmail = verificationEmailModel(mongooseConnection);
+
   //TODO precisará ser gerado várias linhas como essa abaixo, com o model diferente
 
   const models = {
@@ -35,7 +38,8 @@ export default async function setModels(mongooseConnection: Mongoose) {
     functionSystem,
     functionSystemRole,
     componentStructure,
-    componentStructureRole
+    componentStructureRole,
+    verificationEmail,
     //Precisará ser gerado aqui os nomes das variáveis de cada model
   }
 

@@ -1,8 +1,8 @@
 export interface IBaseService<T> {
-  create(data: Object): Promise<T>;
+  create(data: T): Promise<T>;
   findAll(limitPerPage: number, offset: number): Promise<T[] | null>;
-  findOne(query: Object): Promise<T | null>;
-  findMany(query: Object): Promise<T[] | null>;
+  findOne(query: T): Promise<T | null>;
+  findMany(query: T): Promise<T[] | null>;
   findById(id: string): Promise<T | null>;
   getCount(): Promise<number | null>;
   update(id: string, data: Object): Promise<T | null>;

@@ -14,7 +14,7 @@ export default function defineModel(sequelize: Sequelize){
       type: DataTypes.STRING,
       allowNull: false,
     },
-    classname: {
+    className: {
       type: DataTypes.STRING,
       allowNull: false,
     },

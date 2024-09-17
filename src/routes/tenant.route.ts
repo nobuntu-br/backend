@@ -12,6 +12,8 @@ export default function defineRoute(app: Application) {
   const controller: TenantController = new TenantController();
   const router: Router = Router();
 
+  //Get tenant user is admin
+  router.get('/isAdmin/uid/:UID', [getSecurityTenant], controller.findTenantsUserIsAdmin);
   //Create a new
   router.post('/', [getSecurityTenant, ...createNewTenantValidator, validateHeaders], controller.create);
   //Find all
@@ -21,13 +23,13 @@ export default function defineRoute(app: Application) {
   //Find by UserUID
   router.get('/uid/:UID', [getSecurityTenant, validateHeaders], controller.findByUserUID);
   //Find by id
-  router.get('/:id', controller.findById);
+  router.get('/:id', [getSecurityTenant], controller.findById);
   //Update
-  router.put('/:id', controller.update);
+  router.put('/:id', [getSecurityTenant], controller.update);
   //Delete all
-  router.delete('/all', controller.deleteAll);
+  router.delete('/all', [getSecurityTenant], controller.deleteAll);
   //Delete
-  router.delete('/:id', controller.delete);
+  router.delete('/:id', [getSecurityTenant], controller.delete);
 
   app.use('/api/tenant', router);
 } 

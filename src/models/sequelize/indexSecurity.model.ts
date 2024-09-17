@@ -1,15 +1,11 @@
-import { ModelStatic, Sequelize } from "sequelize";
+import { Sequelize } from "sequelize";
 
 //TODO precisará ser gerada as importações
 import userModel from "./user.model";
-import roleModel from "./role.model";
 import tenantModel from "./tenant.model";
 import userTenantModel from "./userTenant.model";
 import tenantCredentialModel from "./tenantCredential.model";
-import functionSystemModel from "./functionSystem.model";
-import functionSystemRoleModel from "./functionSystemRole.model";
-import userRoleModel from "./userRole.model";
-
+import verificationEmailModel from "./verificationEmail.model";
 /**
  * Define os modelos do banco de dados que serão usados pela parte de controle de acesso aos tenants 
  * @param sequelize Instância da conexão com o banco de dados usando a biblioteca sequelize
@@ -21,6 +17,7 @@ export default async function setModels(sequelize: Sequelize) {
   const tenant = tenantModel(sequelize);
   const userTenant = userTenantModel(sequelize);
   const tenantCredential = tenantCredentialModel(sequelize);
+  const verificationEmail = verificationEmailModel(sequelize);
 
   //Relação de muitos pra muitos de User para Tenant
   user.belongsToMany(tenant, { through: userTenant });
@@ -33,6 +30,7 @@ export default async function setModels(sequelize: Sequelize) {
     tenant,
     userTenant,
     tenantCredential,
+    verificationEmail
     //Precisará ser gerado aqui os nomes das variáveis de cada model
   }
 

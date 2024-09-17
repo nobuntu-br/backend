@@ -3,6 +3,7 @@ import { CreateUserInDirectoryUseCase } from "../useCases/userDirectory/createUs
 import { GetUserPrincipalNameUseCase } from "../useCases/userDirectory/getUserPrincipalName.useCase";
 import { ChangeUserPasswordUseCase } from "../useCases/userDirectory/changeUserPassword.useCase";
 import { EditUserDetailsUseCase } from "../useCases/userDirectory/editUserDetails.caseUse";
+import { UserDirectoryDTO } from "../models/DTO/userDirectory.DTO";
 
 export class UserDirectoryController {
 
@@ -11,7 +12,7 @@ export class UserDirectoryController {
       const createUserUseCase: CreateUserInDirectoryUseCase = new CreateUserInDirectoryUseCase();
 
       // Obter os dados do usuário do corpo da requisição
-      const userDetails = {
+      const userDetails : UserDirectoryDTO = {
         displayName: req.body.displayName,
         surname: req.body.surname,
         givenName: req.body.givenName,

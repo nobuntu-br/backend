@@ -41,7 +41,7 @@ export default async function changeTenant(req: Request, res: Response, next: Ne
       return res.status(404).json({ message: 'Tenant não encontrado' });
     }
 
-    req.databaseConnection = databaseConnection;
+    req.body.databaseConnection = databaseConnection;
 
     next();
   } catch (error) {
@@ -54,7 +54,7 @@ export async function getSecurityTenant(req: Request, res: Response, next: NextF
   try {
     //TODO fazer uma verificação de permissão
 
-    req.databaseConnection = await getSecurityTenantConnection();
+    req.body.databaseConnection = await getSecurityTenantConnection();
 
     next();
   } catch (error) {

@@ -1,17 +1,10 @@
 import axios from 'axios';
+import { UserDirectoryDTO } from '../../models/DTO/userDirectory.DTO';
 
 export class CreateUserInDirectoryUseCase {
   constructor() {}
 
-  async execute(userDetails: {
-    displayName: string;
-    surname: string;
-    givenName: string;
-    mailNickname: string;
-    userPrincipalName: string;
-    password: string;
-    email: string;
-  }): Promise<{ success: boolean, data?: any, error?: any }> {
+  async execute(userDirectory: UserDirectoryDTO): Promise<{ success: boolean, data?: any, error?: any }> {
     const tokenUrl = `https://login.microsoftonline.com/${process.env.TENANT_ID}/oauth2/v2.0/token`;
 
     const clientId = process.env.CLIENT_ID;
@@ -51,23 +44,23 @@ export class CreateUserInDirectoryUseCase {
       // Dados para criação do usuário
       const userData = {
         accountEnabled: true,
-        displayName: userDetails.displayName,
-        surname: userDetails.surname,
-        givenName: userDetails.givenName,
-        mailNickname: userDetails.mailNickname,
-        userPrincipalName: userDetails.userPrincipalName,
+        displayName: userDirectory.displayName,
+        surname: userDirectory.surname,
+        givenName: userDirectory.givenName,
+        mailNickname: userDirectory.mailNickname,
+        userPrincipalName: userDirectory.userPrincipalName,
         passwordProfile: {
           forceChangePasswordNextSignIn: false,
-          password: userDetails.password
+          password: userDirectory.password
         },
         identities: [
           {
             signInType: "emailAddress",
             issuer: domainName,
-            issuerAssignedId: userDetails.email
+            issuerAssignedId: userDirectory.email
           }
         ],
-        mail: userDetails.email
+        mail: userDirectory.email
       };
 
       // Requisição para criar o usuário no Azure AD

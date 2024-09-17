@@ -10,7 +10,7 @@ export class MongooseAdapter<T> implements IDatabaseAdapter<T> {
   }
   
 
-  async create(data: Object): Promise<T> {
+  async create(data: any): Promise<T> {
     try {
       
       const item = new this.model(data);
@@ -52,7 +52,7 @@ export class MongooseAdapter<T> implements IDatabaseAdapter<T> {
     }
   }
 
-  findMany(query: Object): Promise<T[] | null> {
+  findMany(query: any): Promise<T[] | null> {
     throw new Error("Method not implemented.");
   }
 

@@ -41,5 +41,14 @@ export default function defineModel(mongooseConnection: Mongoose) {
     }
   });
 
+  schema.set('toObject', {
+    virtuals: true,
+    versionKey: false,
+    transform: (doc, ret) => {
+      ret.id = ret._id.toHexString();
+      delete ret._id;
+    }
+  });
+
   return mongooseConnection.model("userTenant", schema);
 };

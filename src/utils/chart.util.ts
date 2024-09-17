@@ -173,8 +173,8 @@ async function dateFilter(filter: IFilter, query: string): Promise<IChartSeries[
 async function queryRaw(query: string): Promise<any[]> {
     try {
         throw new Error("Método não implementado");
-        const data = await prisma.$queryRaw(query);
-        return data;
+        // const data = await prisma.$queryRaw(query);
+        // return data;
 
     } catch (error) {
         throw new Error((error as Error).message);

@@ -15,14 +15,14 @@ export default function defineRoute(app: Application) {
   // Rota para criar um novo usuário no diretório
   router.post('/create-user', controller.createUserInDirectory);
 
- // Rota para obter o UserPrincipalName do usuário pelo email
- router.post('/get-user-principal-name', controller.getUserPrincipalName);
+  // Rota para obter o UserPrincipalName do usuário pelo email
+  router.post('/get-user-principal-name', controller.getUserPrincipalName);
 
- // Rota para alterar a senha do usuário
- router.post('/change-password', controller.changeUserPassword);
+  // Rota para alterar a senha do usuário
+  router.post('/change-password', controller.changeUserPassword);
 
- // Rota para editar os detalhes do usuário
- router.put('/edit-user-details', controller.editUserDetails);
+  // Rota para editar os detalhes do usuário
+  router.put('/edit-user-details', controller.editUserDetails);
 
   app.use('/api/userDirectory', router);
 }

@@ -6,7 +6,7 @@ import functionSystemModel from "./functionSystem.model";
 import functionSystemRoleModel from "./functionSystemRole.model";
 import componentStructureModel from "./componentStructure.model";
 import componentStructureRoleModel from "./componentStructureRole.model";
-
+import verificationEmailModel from "./verificationEmail.model";
 /**
  * Define os modelos que serão usados pelos usuários da aplicação
  * @param sequelize Instância da conexão com o banco de dados usando a biblioteca sequelize
@@ -21,6 +21,7 @@ export default async function setModels(sequelize: Sequelize) {
   const functionSystemRole = functionSystemRoleModel(sequelize);
   const componentStructure = componentStructureModel(sequelize);
   const componentStructureRole = componentStructureRoleModel(sequelize);
+  const verificationEmail = verificationEmailModel(sequelize);
 
   //Relação de muitos pra muitos de User para Role
   user.belongsToMany(role, {through: userRole});
@@ -35,7 +36,8 @@ export default async function setModels(sequelize: Sequelize) {
   role.belongsToMany(componentStructure, {through: componentStructureRole});
 
   //TODO precisará ser gerado várias linhas como essa abaixo, com o model diferente
-
+  await sequelize.sync();
+  
   const models = {
     user,
     role,
@@ -43,7 +45,8 @@ export default async function setModels(sequelize: Sequelize) {
     functionSystem,
     functionSystemRole,
     componentStructure,
-    componentStructureRole
+    componentStructureRole,
+    verificationEmail
     //Precisará ser gerado aqui os nomes das variáveis de cada model
   }
   return models;

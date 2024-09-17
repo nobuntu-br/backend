@@ -1,8 +1,9 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { BaseController } from "./base.controller";
 import TenantConnection from "../models/tenantConnection.model";
 import { FunctionSystemService } from "../services/functionSystem.service";
 import { FunctionSystem } from "../models/functionSystem.model";
+import { NotFoundError } from "../errors/notFound.error";
 
 export class FunctionSystemController {
 
@@ -10,124 +11,117 @@ export class FunctionSystemController {
 
   }
 
-  async create(req: Request, res: Response) {
+  async create(req: Request, res: Response, next: NextFunction) {
 
     try {
 
-      if(req.databaseConnection == undefined){
-        console.warn("Erro ao obter dados da conexão com tenant");
-        return res.status(500).send({ message: "Ocorreu um erro desconhecido no servidor" });
+      if (req.body.databaseConnection == undefined) {
+        throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.databaseConnection.databaseType, req.databaseConnection.models["functionSystem"]);
+      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["functionSystem"]);
       const baseController: BaseController<FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
 
-      baseController.create(req, res);
+      baseController.create(req, res, next);
     } catch (error) {
-      return res.status(500).send({ message: "Ocorreu um erro desconhecido no servidor" });
+      next(error);
     }
   }
 
-  async findAll(req: Request, res: Response) {
+  async findAll(req: Request, res: Response, next: NextFunction) {
     try {
 
-      if(req.databaseConnection == undefined){
-        console.warn("Erro ao obter dados da conexão com tenant");
-        return res.status(500).send({ message: "Ocorreu um erro desconhecido no servidor" });
+      if (req.body.databaseConnection == undefined) {
+        throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.databaseConnection.databaseType, req.databaseConnection.models["functionSystem"]);
+      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["functionSystem"]);
       const baseController: BaseController<FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
 
-      baseController.findAll(req, res);
+      baseController.findAll(req, res, next);
     } catch (error) {
-      return res.status(500).send({ message: "Ocorreu um erro desconhecido no servidor" });
+      next(error);
     }
   }
 
-  async findById(req: Request, res: Response) {
+  async findById(req: Request, res: Response, next: NextFunction) {
     try {
 
-      if(req.databaseConnection == undefined){
-        console.warn("Erro ao obter dados da conexão com tenant");
-        return res.status(500).send({ message: "Ocorreu um erro desconhecido no servidor" });
+      if (req.body.databaseConnection == undefined) {
+        throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.databaseConnection.databaseType, req.databaseConnection.models["functionSystem"]);
+      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["functionSystem"]);
       const baseController: BaseController<FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
 
-      baseController.findById(req, res);
+      baseController.findById(req, res, next);
     } catch (error) {
-      return res.status(500).send({ message: "Ocorreu um erro desconhecido no servidor" });
+      next(error);
     }
 
   }
 
-  async getCount(req: Request, res: Response) {
+  async getCount(req: Request, res: Response, next: NextFunction) {
     try {
 
-      if(req.databaseConnection == undefined){
-        console.warn("Erro ao obter dados da conexão com tenant");
-        return res.status(500).send({ message: "Ocorreu um erro desconhecido no servidor" });
+      if (req.body.databaseConnection == undefined) {
+        throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.databaseConnection.databaseType, req.databaseConnection.models["functionSystem"]);
+      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["functionSystem"]);
       const baseController: BaseController<FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
 
-      baseController.getCount(req, res);
+      baseController.getCount(req, res, next);
     } catch (error) {
-      return res.status(500).send({ message: "Ocorreu um erro desconhecido no servidor" });
+      next(error);
     }
   }
 
-  async update(req: Request, res: Response) {
+  async update(req: Request, res: Response, next: NextFunction) {
     try {
 
-      if(req.databaseConnection == undefined){
-        console.warn("Erro ao obter dados da conexão com tenant");
-        return res.status(500).send({ message: "Ocorreu um erro desconhecido no servidor" });
+      if (req.body.databaseConnection == undefined) {
+        throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.databaseConnection.databaseType, req.databaseConnection.models["functionSystem"]);
+      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["functionSystem"]);
       const baseController: BaseController<FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
 
-      baseController.update(req, res);
+      baseController.update(req, res, next);
     } catch (error) {
-      return res.status(500).send({ message: "Ocorreu um erro desconhecido no servidor" });
+      next(error);
     }
   }
 
-  async delete(req: Request, res: Response) {
+  async delete(req: Request, res: Response, next: NextFunction) {
     try {
 
-      if(req.databaseConnection == undefined){
-        console.warn("Erro ao obter dados da conexão com tenant");
-        return res.status(500).send({ message: "Ocorreu um erro desconhecido no servidor" });
+      if (req.body.databaseConnection == undefined) {
+        throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.databaseConnection.databaseType, req.databaseConnection.models["functionSystem"]);
+      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["functionSystem"]);
       const baseController: BaseController<FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
 
-      baseController.delete(req, res);
+      baseController.delete(req, res, next);
     } catch (error) {
-      return res.status(500).send({ message: "Ocorreu um erro desconhecido no servidor" });
+      next(error);
     }
   }
 
-  async deleteAll(req: Request, res: Response) {
+  async deleteAll(req: Request, res: Response, next: NextFunction) {
     try {
 
-      if(req.databaseConnection == undefined){
-        console.warn("Erro ao obter dados da conexão com tenant");
-        return res.status(500).send({ message: "Ocorreu um erro desconhecido no servidor" });
+      if (req.body.databaseConnection == undefined) {
+        throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.databaseConnection.databaseType, req.databaseConnection.models["functionSystem"]);
+      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["functionSystem"]);
       const baseController: BaseController<FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
 
-      baseController.deleteAll(req, res);
+      baseController.deleteAll(req, res, next);
     } catch (error) {
-      return res.status(500).send({ message: "Ocorreu um erro desconhecido no servidor" });
+      next(error);
     }
   }
 

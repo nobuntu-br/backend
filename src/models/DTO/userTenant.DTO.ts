@@ -1,7 +1,7 @@
 export interface UserTenantDTO {
-  UserId: string;
+  UserId?: string;
   TenantId: string;
   TenantCredentialId: string;
   UserUID: string;
-  isAdmin: boolean;
+  isAdmin?: boolean;
 }

@@ -8,7 +8,7 @@ export default abstract class BaseRepository<T> implements IBaseRepository<T>{
     this.adapter = adapter;
   }
 
-  create(data: Object): Promise<T> {
+  create(data: T): Promise<T> {
     return this.adapter.create(data);
   }
 
@@ -16,11 +16,11 @@ export default abstract class BaseRepository<T> implements IBaseRepository<T>{
     return this.adapter.findAll(limitPerPage, offset);
   }
 
-  findOne(query: Object): Promise<T | null> {
+  findOne(query: T): Promise<T | null> {
     return this.adapter.findOne(query);
   }
 
-  findMany(query: Object): Promise<T[] | null> {
+  findMany(query: T): Promise<T[] | null> {
     return this.adapter.findMany(query);
   }
 

@@ -20,7 +20,7 @@ export default function defineModel(mongooseConnection: Mongoose) {
       type: String,
       required: true
     },
-    classname: {
+    className: {
       type: String,
       required: true
     },

@@ -13,7 +13,7 @@ export default function defineModel(mongooseConnection: Mongoose){
       unique: true
     },
     TenantUID: String,
-    username: String,
+    userName: String,
     firstName: String,
     lastName: String,
     isAdministrator: Boolean,
@@ -28,6 +28,15 @@ export default function defineModel(mongooseConnection: Mongoose){
       delete ret._id;
       delete ret.__v;
       return ret;
+    }
+  });
+
+  schema.set('toObject', {
+    virtuals: true,
+    versionKey: false,
+    transform: (doc, ret) => {
+      ret.id = ret._id.toHexString();
+      delete ret._id;
     }
   });
 

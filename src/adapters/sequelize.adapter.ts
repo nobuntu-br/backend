@@ -23,7 +23,7 @@ export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
 
       if (error.name === 'SequelizeValidationError') {
         // Para erros de validação, você pode retornar detalhes específicos
-        throw new Error("Erro to save data using sequelize. Validation Error. "+ error);
+        throw new Error("Erro to save data using sequelize. Validation Error. " + error);
       }
 
       throw new Error("Error to save entity to database using sequelize.");
@@ -37,6 +37,7 @@ export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
         limit: limitPerPage,
         offset: offset,
         order: [['createdAt', 'DESC']], // Ordenar por data de criação, por exemplo
+        include:[{all: true}]
       });
 
       return this.jsonDataToResources(items);
@@ -49,7 +50,7 @@ export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
 
   async findOne(query: any): Promise<T | null> {
     try {
-      const item = await this.model.findOne({ where: query });
+      const item = await this.model.findOne({ where: query, include: [{all: true}] });
 
       if (item == null) {
         return null;
@@ -82,7 +83,10 @@ export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
 
   async findById(id: string): Promise<T | null> {
     try {
-      const item = await this.model.findOne({ where: { id: id } });
+      const item = await this.model.findOne({ where: { id: id }, include: [{ all: true }]});
+      
+      this.replaceForeignKeyWithFields(item);
+
       return this.jsonDataToResource(item);
     } catch (error) {
       console.warn("Error to find by id entity to database using sequelize. Details: " + error);
@@ -169,6 +173,27 @@ export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
 
   protected jsonDataToResource(jsonData: any): T {
     return this.jsonDataToResourceFn(jsonData.dataValues);
+  }
+
+  /**
+   * Percorre os campos retornados das associações da entidade para substituir os campos que só ficam as chaves estrangeiras
+   * @param item 
+   */
+  private replaceForeignKeyWithFields(item: any){
+    //Percorre todas as variáveis do item
+    for(let variable in item){
+
+      if(variable.startsWith('ALIAS') && variable.endsWith('ALIAS')){
+        //Retira o campos "Alias" do no
+        let variableWithAlias = variable.replace('ALIAS', '');
+        variableWithAlias = variableWithAlias.replace('ALIAS', '');
+        for(let key2 in item.dataValues){
+          if(variableWithAlias === key2){
+            item.dataValues[key2] = item[variable];
+          }
+        }
+      }
+    }
   }
 
 }

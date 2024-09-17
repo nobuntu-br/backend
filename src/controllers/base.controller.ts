@@ -1,5 +1,5 @@
 
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { IBaseService } from "../services/IBase.service";
 import { IBaseController } from "./IBase.controller";
 
@@ -19,7 +19,7 @@ export class BaseController<T> implements IBaseController {
    * @param res Resposta da requisição
    * @returns Retorna um Object ou null
    */
-  public async create(req: Request, res: Response): Promise<Object | null> {
+  public async create(req: Request, res: Response, next: NextFunction): Promise<Object | null> {
     try {
       const data = await this.service.create(req.body);
 
@@ -36,7 +36,7 @@ export class BaseController<T> implements IBaseController {
    * @param res Resposta da requisição
    * @returns Retorna um Object ou null
    */
-  async findAll(req: Request, res: Response): Promise<Object | Object[] | null> {
+  async findAll(req: Request, res: Response, next: NextFunction): Promise<Object | Object[] | null> {
     try {
       //Obtem a página
       const page: number = parseInt(req.query.page as string) || 1;
@@ -58,7 +58,7 @@ export class BaseController<T> implements IBaseController {
    * @param res Resposta da requisição
    * @returns Retorna um Object ou null
    */
-  async findOne(req: Request, res: Response): Promise<Object | null> {
+  async findOne(req: Request, res: Response, next: NextFunction): Promise<Object | null> {
     try {
       const data = await this.service.findOne(req.body);
       if (!data){
@@ -77,7 +77,7 @@ export class BaseController<T> implements IBaseController {
    * @param res Resposta da requisição
    * @returns Retorna um Object ou null
    */
-  async findById(req: Request, res: Response): Promise<Object | null> {
+  async findById(req: Request, res: Response, next: NextFunction): Promise<Object | null> {
     try {
       const data = await this.service.findById(req.params.id);
       if (!data){
@@ -96,7 +96,7 @@ export class BaseController<T> implements IBaseController {
    * @param res Resposta da requisição
    * @returns Retorna um Object ou null
    */
-  async getCount(req: Request, res: Response): Promise<Object | null> {
+  async getCount(req: Request, res: Response, next: NextFunction): Promise<Object | null> {
     try {
       const data = await this.service.getCount();
       return res.status(200).send({"count" : data!.toString()});
@@ -111,7 +111,7 @@ export class BaseController<T> implements IBaseController {
    * @param res Resposta da requisição
    * @returns Retorna um Object ou null
    */
-  async update(req: Request, res: Response): Promise<Object | null> {
+  async update(req: Request, res: Response, next: NextFunction): Promise<Object | null> {
     try {
       const id = req.params.id;
       const newValues = req.body;
@@ -133,7 +133,7 @@ export class BaseController<T> implements IBaseController {
    * @param res Resposta da requisição
    * @returns Retorna um Object ou null
    */
-  async delete(req: Request, res: Response): Promise<Object> {
+  async delete(req: Request, res: Response, next: NextFunction): Promise<Object> {
     try {
       const id = req.params.id;
       const data = await this.service.delete(id);
@@ -153,7 +153,7 @@ export class BaseController<T> implements IBaseController {
    * @param res Resposta da requisição
    * @returns Retorna um Object ou null
    */
-  async deleteAll(req: Request, res: Response): Promise<Object> {
+  async deleteAll(req: Request, res: Response, next: NextFunction): Promise<Object> {
     try {
       const data = await this.service.deleteAll();
       return res.status(200).send({ message: `Todos as entidades `+this.entityName+` foram excluídas!` });
@@ -169,7 +169,7 @@ export class BaseController<T> implements IBaseController {
    * @param res Resposta da requisição
    * @returns Retorna um Object ou null
    */
-  async findCustom(req: Request, res: Response): Promise<Object> {
+  async findCustom(req: Request, res: Response, next: NextFunction): Promise<Object> {
     throw new Error("Method not implemented.");
   }
 

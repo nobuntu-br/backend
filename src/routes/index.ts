@@ -3,7 +3,7 @@ import userRoutes from './user.route';
 import tenantRoutes from './tenant.route';
 import roleRoutes from './role.route';
 import tenantCredentialRoutes from './tenantCredential.route';
-
+import userTenantRoutes from './userTenant.route';
 //TODO Essas importações precisarão ser geradas
 import tenantDirectoryRoutes from './tenantDirectory.route'
 import applicationRoutes from './application.route';
@@ -25,6 +25,8 @@ export function setRoutes(app: Application) {
   tenantCredentialRoutes(app);
 
   tenantRoutes(app);
+
+  userTenantRoutes(app);
 
   applicationRoutes(app);
 

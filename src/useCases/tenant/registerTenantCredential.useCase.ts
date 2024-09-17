@@ -1,43 +1,39 @@
 import { TenantCredentialService } from '../../services/tenantCredential.service';
-import { TenantCredential } from '../../models/tenantCredential.model';
-import { buildMongoDBURI, buildPostgresURI } from '../../adapters/database.config';
-import { DbType } from '../../adapters/createDb.adapter';
-import { connectToDatabase } from '../../adapters/databaseConnection.config';
+import { ITenantCredential, TenantCredential } from '../../models/tenantCredential.model';
+import { testConnectToDatabase } from '../../adapters/testConnectionDatabase.config';
+import { encryptDatabasePassword } from '../../utils/crypto.util';
+import { ValidationError } from '../../errors/validation.error';
 
 export class RegisterTenantCredentialUseCase {
   constructor(private tenantCredentialService: TenantCredentialService) { }
 
-  async execute(tenantCredential: TenantCredential): Promise<TenantCredential | Error> {
+  async execute(tenantCredential: ITenantCredential): Promise<TenantCredential | Error> {
 
     try {
+      //Testa a conexão com as credenciais
+      const isDatabaseConnectionWorks : boolean = await testConnectToDatabase(tenantCredential);
 
-      //TODO tem que alterara aqui, testar a conexão, encerrar e depois cadastrar e retornar para o usuário
-      //Reutilizar essa função no databaseDefault
-
-      var _databaseType: DbType;
-      var _uri: string;
-
-      if (tenantCredential.dbType === "mongodb") {
-        _databaseType = 'mongodb';
-        _uri = buildMongoDBURI(tenantCredential);
-      } else {
-        _databaseType = 'postgres';
-        _uri = buildPostgresURI(tenantCredential);
+      if(isDatabaseConnectionWorks == false){
+        throw new Error("Erro ao realizar a conexão com o banco de dados!");
       }
 
-      await connectToDatabase(
-        _databaseType,
-        _uri,
-        false
-      );
+      //Verificar se já pode ser registro repetido
 
+      //Criptografa a senha do tenant
+      const encriptedDatabasePassword : string | null = encryptDatabasePassword(tenantCredential.dbPassword!);
+      if(encriptedDatabasePassword == null){
+        throw new Error("Não foi possível incriptografara senha das novas credenciais de tenant");
+      }
+
+      tenantCredential.dbPassword = encriptedDatabasePassword;
+
+      //Registra as credenciais do tenant
       return await this.tenantCredentialService.create(tenantCredential);
 
     } catch (error) {
-      return Error("Erro ao conectar com o banco de dados");
+      throw error;
     }
 
   }
 
-  
 }

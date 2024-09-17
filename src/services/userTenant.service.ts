@@ -1,10 +1,10 @@
 import { DbType } from "../adapters/createDb.adapter";
 import { myCache } from "../adapters/database.config";
-import { UserTenant } from "../models/userTenant.model";
+import { IUserTenant, UserTenant } from "../models/userTenant.model";
 import UserTenantRepository from "../repository/userTenant.repository";
 import BaseService from "./base.service";
 
-export default class UserTenantService extends BaseService<UserTenant> {
+export default class UserTenantService extends BaseService<IUserTenant> {
   private userTenantRepository: UserTenantRepository;
 
   constructor(dbType: DbType, model: any) {

@@ -10,7 +10,7 @@ export default function defineModel(sequelize: Sequelize){
     TenantUID: {
       type: DataTypes.STRING,
     },
-    username: {
+    userName: {
       type: DataTypes.STRING,
     },
     firstName: {

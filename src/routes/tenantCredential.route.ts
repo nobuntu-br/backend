@@ -1,6 +1,8 @@
 import { Application, Router } from 'express';
 import { TenantCredentialController } from '../controllers/tenantCredential.controller';
 import { getSecurityTenant } from '../middlewares/tenant.middleware';
+import validateHeaders from './validators/index.validator';
+import { createNewTenantCredentialValidator, findAllTenantCredentialValidator } from './validators/tenantCredential.validator';
 
 /**
  * Irá definir as rotas da entidade
@@ -11,9 +13,9 @@ export default function defineRoute(app: Application) {
   const router: Router = Router();
 
   //Create a new
-  router.post('/', [getSecurityTenant], controller.create);
+  router.post('/', [getSecurityTenant, ...createNewTenantCredentialValidator, validateHeaders], controller.create);
   //Find all
-  router.get('/', [getSecurityTenant], controller.findAll);
+  router.get('/', [getSecurityTenant, ...findAllTenantCredentialValidator, validateHeaders], controller.findAll);
   //Find count
   router.get('/count', controller.getCount);
   //Find by id

@@ -9,7 +9,7 @@ import { TenantCredentialService } from "../services/tenantCredential.service";
 import { getSecurityTenantConnection } from "./databaseSecurity.config";
 import { ITenantCredential, TenantCredential, validateTenantCredential } from "../models/tenantCredential.model";
 import { saveRoutes } from "../utils/registerRoutes.util";
-import { connectToDatabase } from "./databaseConnection.config";
+import { buildURI, connectToDatabase } from "./databaseConnection.config";
 import { decryptDatabasePassword } from "../utils/crypto.util";
 
 const NodeCache = require("node-cache");
@@ -66,12 +66,11 @@ export async function getTenantConnection(tenantId: string, userUID: string): Pr
 
 /**
  * Realiza a conexão com o banco de dados de acordo com o tipo de banco de dados. Seta os models de acordo com o banco de dados.
- * @param tenantId
- * @param databaseType
- * @param dbURI
+ * @param tenantId 
+ * @param tenantCredential Dados de credenciais para realizar a conexão do banco de dados
  * @returns
  */
-export default async function connectTenant(tenantId: string, tenantCredential: ITenantCredential): Promise<TenantConnection> {
+export async function connectTenant(tenantId: string, tenantCredential: ITenantCredential): Promise<TenantConnection> {
 
   if (tenantCredential.dbType == undefined || tenantCredential.dbType == null || tenantCredential.dbPassword == null) {
     console.warn("Erro ao realizar a conexão com o banco de dados. Tipo de banco de dados não definido");
@@ -117,15 +116,10 @@ export async function connectSecurityTenant(tenantId: string): Promise<TenantCon
     if(validateTenantCredential(tenantCredential) == false ||  tenantId == undefined){
       throw new Error(`Dados ausentes ao realizar a conexão com o banco security`);
     }
-    // if (tenantCredential.dbType == undefined || tenantCredential.dbType == null || tenantCredential.dbPassword == null) {
-    //   console.warn("Erro ao realizar a conexão com o banco de dados. Tipo de banco de dados não definido");
-    //   throw new Error("Erro ao realizar a conexão com o banco de dados. Tipo de banco de dados não definido");
-    // }
 
     let tenantConnection: TenantConnection;
 
     const databaseURI: string = buildURI(tenantCredential);
-    // const databaseType: string = tenantCredential.dbType;
 
     tenantConnection = await connectToDatabase(tenantCredential.dbType!, databaseURI, true);
     tenantConnection.models = await getModelsSecurity(tenantCredential.dbType!, tenantConnection.connection);
@@ -153,8 +147,6 @@ function getModelsSecurity(databaseType: string, connection: any): any {
   } else {
     return getSequelizeSecurityModels(connection);
   }
-
-  return connection;
 }
 
 /**
@@ -169,51 +161,5 @@ function getModels(databaseType: string, connection: any): any {
   } else {
     return getSequelizeModels(connection);
   }
-
-  return connection;
 }
 
-/**
- * Faz a criação da string de conexão com o banco de dados
- * @param tenantCredential Dados de conexão com o banco de dados
- * @returns Retorna a string de conexão com o banco de dados
- */
-export function buildURI(tenantCredential: TenantCredential): string {
-  switch (tenantCredential.dbType) {
-    case 'mongodb':
-      return buildMongoDBURI(tenantCredential);
-    case 'postgres':
-      return buildPostgresURI(tenantCredential);
-    case 'mysql':
-      return buildMySQLURI(tenantCredential);
-    default:
-      return buildPostgresURI(tenantCredential);
-  }
-}
-
-/**
- * Realiza a contrução da string de conexão com o banco de dados mongodb
- * @param tenantCredential Dados para realizar a conexão com o banco de dados
- * @returns Retorna a string de conexão com o banco de dados mongodb
- */
-export function buildMongoDBURI(tenantCredential: TenantCredential): string {
-  return "mongodb+srv://" + tenantCredential.dbUsername + ":" + tenantCredential.dbPassword + "@" + tenantCredential.dbHost + "/" + tenantCredential.dbName + "?" + tenantCredential.dbConfig
-}
-
-/**
- * Realiza a contrução da string de conexão com o banco de dados postgres
- * @param tenantCredential Dados para realizar a conexão com o banco de dados
- * @returns Retorna a string de conexão com o banco de dados postgres
- */
-export function buildPostgresURI(tenantCredential: TenantCredential): string {
-  return "postgres://" + tenantCredential.dbUsername + ":" + tenantCredential.dbPassword + "@" + tenantCredential.dbHost + ":" + tenantCredential.dbPort + "/" + tenantCredential.dbName;
-}
-
-/**
- * Realiza a contrução da string de conexão com o banco de dados mysql
- * @param tenantCredential Dados para realizar a conexão com o banco de dados
- * @returns Retorna a string de conexão com o banco de dados postgres
- */
-export function buildMySQLURI(tenantCredential: TenantCredential): string {
-  return "mysql://" + tenantCredential.dbUsername + ":" + tenantCredential.dbPassword + "@" + tenantCredential.dbHost + ":" + tenantCredential.dbPort + "/" + tenantCredential.dbName;
-}

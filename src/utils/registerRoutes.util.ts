@@ -23,7 +23,7 @@ export async function saveRoutes(databaseConnection: TenantConnection) {
     if (route != null) {
       await functionSystemService.update(route.id!, { description: _description, route: _route, method: _method, classname: _classname });
     } else {
-      const newRoute = await functionSystemService.create({ description: _description, route: _route, method: _method, classname: _classname });
+      const newRoute = await functionSystemService.create({ description: _description, route: _route, method: _method, className: _classname });
     }
   }
 

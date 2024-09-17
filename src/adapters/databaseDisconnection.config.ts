@@ -1,6 +1,6 @@
 import TenantConnection from "../models/tenantConnection.model";
 
-export async function disconnectTenant(tenantConnection: TenantConnection){
+export async function disconnectDatabase(tenantConnection: TenantConnection){
   //TODO remover tenant da lista de tenans
   
   if (tenantConnection.databaseType === 'mongodb') {

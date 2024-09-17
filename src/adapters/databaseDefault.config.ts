@@ -7,8 +7,8 @@ import TenantService from "../services/tenant.service";
 import { TenantCredentialService } from "../services/tenantCredential.service";
 import UserTenantService from "../services/userTenant.service";
 import { encrypt, encryptDatabasePassword } from "../utils/crypto.util";
-import connectTenant, { tenantConnectionService } from "./database.config";
-import { disconnectTenant } from "./databaseDisconnection.config";
+import { connectTenant, tenantConnectionService } from "./database.config";
+import { disconnectDatabase } from "./databaseDisconnection.config";
 import { getSecurityTenantConnection } from "./databaseSecurity.config";
 
 /**
@@ -58,7 +58,7 @@ export async function getDefaultTenantConnection(): Promise<TenantConnection | E
       tenantCredential.dbPassword = encryptedDatabasePassword;
       const newTenantCredential = await saveDefaultTenantOnSecurityTenant(tenantCredential);
 
-      await disconnectTenant(tenantConnection);
+      await disconnectDatabase(tenantConnection);
 
       tenantConnection = await connectTenant(
         newTenantCredential.id!,//TODO verificar se pode ser null

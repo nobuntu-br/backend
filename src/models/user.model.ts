@@ -1,9 +1,10 @@
 import { BaseResourceModel } from "./base-resource.model";
 
-interface IUser {
+export interface IUser {
+  id?: string;
   name?: string;
   UID?: string;
-  username?: string;
+  userName?: string;
   firstName?: string;
   lastName?: string;
   isAdministrator?: boolean;
@@ -13,7 +14,7 @@ interface IUser {
 export class User extends BaseResourceModel implements IUser {
   name?: string;
   UID?: string;
-  username?: string;
+  userName?: string;
   firstName?: string;
   lastName?: string;
   isAdministrator?: boolean;

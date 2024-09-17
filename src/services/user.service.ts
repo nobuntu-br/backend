@@ -1,9 +1,9 @@
 import { DbType } from "../adapters/createDb.adapter";
-import { User } from "../models/user.model";
+import { IUser } from "../models/user.model";
 import UserRepository from "../repository/user.repository";
 import BaseService from "./base.service";
 
-export class UserService extends BaseService<User> {
+export class UserService extends BaseService<IUser> {
   private userRepository: UserRepository;
 
   constructor(dbType: DbType, model: any) {
