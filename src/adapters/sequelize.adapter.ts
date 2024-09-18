@@ -37,7 +37,7 @@ export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
         limit: limitPerPage,
         offset: offset,
         order: [['createdAt', 'DESC']], // Ordenar por data de criação, por exemplo
-        include:[{all: true}]
+        include: [{ all: true }]
       });
 
       return this.jsonDataToResources(items);
@@ -50,7 +50,7 @@ export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
 
   async findOne(query: any): Promise<T | null> {
     try {
-      const item = await this.model.findOne({ where: query, include: [{all: true}] });
+      const item = await this.model.findOne({ where: query, include: [{ all: true }] });
 
       if (item == null) {
         return null;
@@ -83,9 +83,9 @@ export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
 
   async findById(id: string): Promise<T | null> {
     try {
-      const item = await this.model.findOne({ where: { id: id }, include: [{ all: true }]});
-      
-      this.replaceForeignKeyWithFields(item);
+      const item = await this.model.findOne({ where: { id: id }, include: [{ all: true }] });
+
+      this.replaceForeignKeyFieldWithData(item);
 
       return this.jsonDataToResource(item);
     } catch (error) {
@@ -179,20 +179,36 @@ export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
    * Percorre os campos retornados das associações da entidade para substituir os campos que só ficam as chaves estrangeiras
    * @param item 
    */
-  private replaceForeignKeyWithFields(item: any){
+  private replaceForeignKeyFieldWithData(item: any) {
     //Percorre todas as variáveis do item
-    for(let variable in item){
+    for (let variable in item) {
 
-      if(variable.startsWith('ALIAS') && variable.endsWith('ALIAS')){
-        //Retira o campos "Alias" do no
-        let variableWithAlias = variable.replace('ALIAS', '');
-        variableWithAlias = variableWithAlias.replace('ALIAS', '');
-        for(let key2 in item.dataValues){
-          if(variableWithAlias === key2){
-            item.dataValues[key2] = item[variable];
+      const variableWithAlias : string | null = this.getClassNameWithAlias(variable);
+
+      if(variableWithAlias != null){
+        for (let key2 in item.dataValues) {
+          if (variableWithAlias === key2) {
+            item.dataValues[key2] = item[variable];//Substuí a variável da chave estrangeira pela que pega os valores
+            delete item.variable;//Remove a variável
           }
         }
       }
+
+    }
+  }
+
+  private getClassNameWithAlias(variableName: any): string | null {
+    // Define o padrão da expressão regular para encontrar o texto entre "ALIAS"
+    const pattern = /ALIAS(.*?)ALIAS/;
+
+    // Encontra a primeira correspondência no texto usando a expressão regular
+    const match = variableName.match(pattern);
+
+    if (match) {
+      // Retorna o texto encontrado entre os "ALIAS"
+      return match[1];
+    } else {
+      return null;
     }
   }
 
