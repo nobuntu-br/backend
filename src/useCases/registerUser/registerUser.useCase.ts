@@ -21,7 +21,8 @@ export class RegisterUserUseCase {
       if (isUserExist != null) {
         throw new Error("Usuário já existe");
       }
-
+      
+      user.isAdministrator = true;
       //Cria o usuário
       const newUser: User = await this.userService.create(user);
 
