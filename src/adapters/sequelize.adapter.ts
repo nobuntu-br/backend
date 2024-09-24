@@ -39,6 +39,8 @@ export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
         order: [['createdAt', 'DESC']], // Ordenar por data de criação, por exemplo
         include: [{ all: true }]
       });
+      
+      this.replaceForeignKeysFieldWithData(items);
 
       return this.jsonDataToResources(items);
 
@@ -180,22 +182,63 @@ export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
    * @param item 
    */
   private replaceForeignKeyFieldWithData(item: any) {
-    //Percorre todas as variáveis do item
-    for (let variable in item) {
+    const ifRegex = /^ALIAS.*ALIAS/;
+    const getRegex = /ALIAS(.*?)ALIAS/;
+    const manyRegex = /^(ALIAS)(.*?)ALIAS.*ALIAS$/;
+    for(let key in item){
+      if(ifRegex.test(key)){
+        const alias = key.match(getRegex);
+        const manyAlias = key.match(manyRegex);
 
-      const variableWithAlias : string | null = this.getClassNameWithAlias(variable);
+        //Se for uma associação de muitos para um
+        if(manyAlias?.[2]){
+          item.dataValues[manyAlias?.[2]] = item[key];
+          continue;
+        }
 
-      if(variableWithAlias != null){
-        for (let key2 in item.dataValues) {
-          if (variableWithAlias === key2) {
-            item.dataValues[key2] = item[variable];//Substuí a variável da chave estrangeira pela que pega os valores
-            delete item.variable;//Remove a variável
+        //Se for uma associação de um para um
+        for(let key2 in item.dataValues){
+          if(alias?.[1] === key2){
+            console.log("key2: ", key2);
+            item.dataValues[key2] = item[key];
           }
         }
       }
-
     }
   }
+
+  /**
+   * Percorre os campos retornados das associações da entidade para substituir os campos que só ficam as chaves estrangeiras de varias entidades
+   * @param variableName 
+   * @returns 
+  */
+ private replaceForeignKeysFieldWithData(items: any[]) {
+  const ifRegex = /^ALIAS.*ALIAS/;
+  const getRegex = /ALIAS(.*?)ALIAS/;
+  const manyRegex = /^(ALIAS)(.*?)ALIAS.*ALIAS$/;
+  for(let item of items){
+    for(let key in item){
+      if(ifRegex.test(key)){
+        const alias = key.match(getRegex);
+        const manyAlias = key.match(manyRegex);
+
+        //Se for uma associação de muitos para um
+        if(manyAlias?.[2]){
+          item.dataValues[manyAlias?.[2]] = item[key];
+          continue;
+        }
+
+        //Se for uma associação de um para um
+        for(let key2 in item.dataValues){
+          if(alias?.[1] === key2){
+            console.log("key2: ", key2);
+            item.dataValues[key2] = item[key];
+          }
+        }
+      }
+    }
+  }
+}
 
   private getClassNameWithAlias(variableName: any): string | null {
     // Define o padrão da expressão regular para encontrar o texto entre "ALIAS"
