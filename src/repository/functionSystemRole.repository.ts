@@ -5,9 +5,9 @@ import BaseRepository from "./base.repository";
 
 export default class FunctionSystemRoleRepository extends BaseRepository<FunctionSystemRole> {
 
-  constructor(dbType: DbType, model: any) {
+  constructor(dbType: DbType, model: any, databaseConnection: any) {
     const _adapter: IDatabaseAdapter<FunctionSystemRole> = createDbAdapter<FunctionSystemRole>(dbType, model, FunctionSystemRole.fromJson);
-    super(_adapter);
+    super(_adapter, databaseConnection);
   }
 
   async isUserHaveAccessToRoute(userOID: string, method: string, route: string, dbType: DbType): Promise<boolean | null> {

@@ -6,7 +6,7 @@ import { UserTenant } from "../models/userTenant.model";
 import TenantService from "../services/tenant.service";
 import { TenantCredentialService } from "../services/tenantCredential.service";
 import UserTenantService from "../services/userTenant.service";
-import { encrypt, encryptDatabasePassword } from "../utils/crypto.util";
+import { encryptDatabasePassword } from "../utils/crypto.util";
 import { connectTenant, tenantConnectionService } from "./database.config";
 import { disconnectDatabase } from "./databaseDisconnection.config";
 import { getSecurityTenantConnection } from "./databaseSecurity.config";
@@ -89,8 +89,8 @@ async function saveDefaultTenantOnSecurityTenant(tenantCredential: TenantCredent
 
   const securityTenantConnection: TenantConnection = await getSecurityTenantConnection();
 
-  const tenantCredentialService: TenantCredentialService = new TenantCredentialService(securityTenantConnection.databaseType, securityTenantConnection.models["tenantCredential"]);
-  const tenantService: TenantService = new TenantService(securityTenantConnection.databaseType, securityTenantConnection.models["tenant"]);
+  const tenantCredentialService: TenantCredentialService = new TenantCredentialService(securityTenantConnection.databaseType, securityTenantConnection.models["tenantCredential"], securityTenantConnection.connection);
+  const tenantService: TenantService = new TenantService(securityTenantConnection.databaseType, securityTenantConnection.models["tenant"], securityTenantConnection.connection);
 
   //Verificar se o tenant padrão foi criado, se não, criar
   var _tenant: Tenant | null = await tenantService.findOne({ name: defaultTenantName });
@@ -104,7 +104,7 @@ async function saveDefaultTenantOnSecurityTenant(tenantCredential: TenantCredent
     _tenantCredential = await tenantCredentialService.create(tenantCredential);
   }
 
-  const userTenantService: UserTenantService = new UserTenantService(securityTenantConnection.databaseType, securityTenantConnection.models["userTenant"]);
+  const userTenantService: UserTenantService = new UserTenantService(securityTenantConnection.databaseType, securityTenantConnection.models["userTenant"], securityTenantConnection.connection);
   var userTenant: UserTenant | null = await userTenantService.findOne({ TenantId: _tenant.id, TenantCredentialId: _tenantCredential.id });
   if (userTenant == null) {
     userTenantService.create({

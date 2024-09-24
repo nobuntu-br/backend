@@ -6,9 +6,9 @@ import BaseRepository from "./base.repository";
 
 export default class UserTenantRepository extends BaseRepository<UserTenant>{
 
-  constructor(dbType: DbType, model: any){
-    const _adapter : IDatabaseAdapter<UserTenant> = createDbAdapter<UserTenant>(dbType, model, UserTenant.fromJson)
-    super(_adapter);
+  constructor(dbType: DbType, model: any, databaseConnection: any){
+    const _adapter : IDatabaseAdapter<UserTenant> = createDbAdapter<UserTenant>(dbType, model, UserTenant.fromJson);
+    super(_adapter, databaseConnection);
   }
 
   async getUserTenantsWithDefaultTenant(dbType: DbType, model: any, UserUID: string): Promise<UserTenant[] | null>{

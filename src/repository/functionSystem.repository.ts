@@ -5,9 +5,9 @@ import BaseRepository from "./base.repository";
 
 export default class FunctionSystemRepository extends BaseRepository<FunctionSystem> {
 
-  constructor(dbType: DbType, model: any) {
+  constructor(dbType: DbType, model: any, databaseConnection: any) {
     const _adapter: IDatabaseAdapter<FunctionSystem> = createDbAdapter<FunctionSystem>(dbType, model, FunctionSystem.fromJson);
-    super(_adapter);
+    super(_adapter, databaseConnection);
   }
 
   async isPublicRoute(method: string, route: string, dbType: DbType): Promise<boolean> {

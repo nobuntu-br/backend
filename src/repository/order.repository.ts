@@ -5,9 +5,9 @@ import BaseRepository from "./base.repository";
 
 export default class OrderRepository extends BaseRepository<Order>{
 
-  constructor(dbType: DbType, model: any){
-    const _adapter : IDatabaseAdapter<Order> = createDbAdapter<Order>(dbType, model, Order.fromJson)
-    super(_adapter);
+  constructor(dbType: DbType, model: any, databaseConnection: any){
+    const _adapter : IDatabaseAdapter<Order> = createDbAdapter<Order>(dbType, model, Order.fromJson);
+    super(_adapter, databaseConnection);
   }
 
 }

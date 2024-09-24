@@ -9,14 +9,14 @@ export default class TenantService extends BaseService<Tenant> {
   private tenantRepository: TenantRepository;
   private userTenantRepository: UserTenantRepository;
 
-  constructor(dbType: DbType, model: any) {
+  constructor(dbType: DbType, model: any, databaseConnection: any) {
     //Cria o repositório com dados para obter o banco de dados
-    var repository : TenantRepository = new TenantRepository(dbType, model);
-    super(repository, dbType, model);
+    var repository : TenantRepository = new TenantRepository(dbType, model, databaseConnection);
+    super(repository, dbType, model, databaseConnection);
 
     this.tenantRepository = repository;
 
-    var userTenantRepository: UserTenantRepository = new UserTenantRepository(dbType, "userTenant");
+    var userTenantRepository: UserTenantRepository = new UserTenantRepository(dbType, "userTenant", databaseConnection);
     this.userTenantRepository = userTenantRepository;
   }
 

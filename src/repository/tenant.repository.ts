@@ -5,9 +5,9 @@ import BaseRepository from "./base.repository";
 
 export default class TenantRepository extends BaseRepository<Tenant>{
 
-  constructor(dbType: DbType, model: any){
-    const _adapter : IDatabaseAdapter<Tenant> = createDbAdapter<Tenant>(dbType, model, Tenant.fromJson)
-    super(_adapter);
+  constructor(dbType: DbType, model: any, databaseConnection: any){
+    const _adapter : IDatabaseAdapter<Tenant> = createDbAdapter<Tenant>(dbType, model, Tenant.fromJson);
+    super(_adapter, databaseConnection);
   }
 
 }

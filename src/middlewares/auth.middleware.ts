@@ -133,7 +133,7 @@ async function isAuthorizedUrl(userUID: string, method: string, url: string, dat
 }
 
 async function isUserHaveAccessToRoute(userUID: string, method: string, url: string, databaseConnection: TenantConnection): Promise<boolean | null>{
-  const functionSystemRoleService: FunctionSystemRoleService = new FunctionSystemRoleService(databaseConnection.databaseType, databaseConnection.models["functionSystemRole"]);
+  const functionSystemRoleService: FunctionSystemRoleService = new FunctionSystemRoleService(databaseConnection.databaseType, databaseConnection.models["functionSystemRole"], databaseConnection.connection);
   return await functionSystemRoleService.isUserHaveAccessToRoute(userUID, method, url);
 }
 
@@ -144,7 +144,7 @@ async function isUserHaveAccessToRoute(userUID: string, method: string, url: str
  * @returns Retorna se o usuário é administrador, sendo verdadeiro pra sim, falso pra não. Null caso der erros.
  */
 async function userIsAdmin(userUID: string, databaseConnection: TenantConnection): Promise<boolean | null> {
-  const userService: UserService = new UserService(databaseConnection.databaseType, databaseConnection.models["user"]);
+  const userService: UserService = new UserService(databaseConnection.databaseType, databaseConnection.models["user"], databaseConnection.connection);
   return await userService.isUserAdmin(userUID);
 }
 
@@ -156,7 +156,7 @@ async function userIsAdmin(userUID: string, databaseConnection: TenantConnection
  * @returns Retornará um valor booleano, sendo "True" se o a rota for pública, caso contrário retornará "False"
  */
 async function isPublicRoute(_method: string, _url: string, databaseConnection: TenantConnection): Promise<boolean | null> {
-  const functionSystemService: FunctionSystemService = new FunctionSystemService(databaseConnection.databaseType, databaseConnection.models["functionSystemService"]);
+  const functionSystemService: FunctionSystemService = new FunctionSystemService(databaseConnection.databaseType, databaseConnection.models["functionSystemService"], databaseConnection.connection);
   
   return await functionSystemService.isPublicRoute(_method, _url);
 }

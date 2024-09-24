@@ -5,9 +5,9 @@ import BaseRepository from "./base.repository";
 
 export default class ComponentStructureRoleRepository extends BaseRepository<ComponentStructureRole>{
 
-  constructor(dbType: DbType, model: any){
-    const _adapter : IDatabaseAdapter<ComponentStructureRole> = createDbAdapter<ComponentStructureRole>(dbType, model, ComponentStructureRole.fromJson)
-    super(_adapter);
+  constructor(dbType: DbType, model: any, databaseConnection: any){
+    const _adapter : IDatabaseAdapter<ComponentStructureRole> = createDbAdapter<ComponentStructureRole>(dbType, model, ComponentStructureRole.fromJson);
+    super(_adapter, databaseConnection);
   }
 
 }

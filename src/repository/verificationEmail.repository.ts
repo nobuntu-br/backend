@@ -5,9 +5,9 @@ import BaseRepository from "./base.repository";
 
 export default class VerificationEmailRepository extends BaseRepository<VerificationEmail>{
 
-  constructor(dbType: DbType, model: any){
+  constructor(dbType: DbType, model: any, databaseConnection: any){
     const _adapter : IDatabaseAdapter<VerificationEmail> = createDbAdapter<VerificationEmail>(dbType, model, VerificationEmail.fromJson);
-    super(_adapter);
+    super(_adapter, databaseConnection);
   }
 
 }

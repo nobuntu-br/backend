@@ -6,9 +6,9 @@ import BaseRepository from "./base.repository";
 
 export default class RoleRepository extends BaseRepository<Role>{
 
-  constructor(dbType: DbType, model: any){
-    const _adapter : IDatabaseAdapter<Role> = createDbAdapter<Role>(dbType, model, Role.fromJson)
-    super(_adapter);
+  constructor(dbType: DbType, model: any, databaseConnection: any){
+    const _adapter : IDatabaseAdapter<Role> = createDbAdapter<Role>(dbType, model, Role.fromJson);
+    super(_adapter, databaseConnection);
   }
 
 }

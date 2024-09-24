@@ -35,7 +35,7 @@ export async function getTenantConnection(tenantId: string, userUID: string): Pr
     const defaultTenantConnection: TenantConnection = await getSecurityTenantConnection();
 
     //Cria o serviço de UserTenant com base na conexão com o banco de dados
-    const userTenantService: UserTenantService = new UserTenantService(defaultTenantConnection.databaseType, defaultTenantConnection.models["userTenant"]);
+    const userTenantService: UserTenantService = new UserTenantService(defaultTenantConnection.databaseType, defaultTenantConnection.models["userTenant"], defaultTenantConnection.connection);
     //Verifica se o usuário tem acesso ao tenant
     if (await userTenantService.userHasAccessToTenant(userUID, tenantId) == false) {
       return null;
@@ -46,7 +46,7 @@ export async function getTenantConnection(tenantId: string, userUID: string): Pr
 
     if (tenantConnection == null) {
 
-      const tenantCredentialService: TenantCredentialService = new TenantCredentialService(defaultTenantConnection.databaseType, defaultTenantConnection.models["tenantCredential"]);
+      const tenantCredentialService: TenantCredentialService = new TenantCredentialService(defaultTenantConnection.databaseType, defaultTenantConnection.models["tenantCredential"], defaultTenantConnection.connection);
       const tenantCredential = await tenantCredentialService.findById(tenantId);
 
       if (tenantCredential == null || tenantCredential.dbType == null || tenantCredential.dbHost == null) {

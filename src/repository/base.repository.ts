@@ -3,9 +3,11 @@ import { IBaseRepository } from "./ibase.repository";
 
 export default abstract class BaseRepository<T> implements IBaseRepository<T>{
   public adapter: IDatabaseAdapter<T>;
+  public databaseConnection: any;
 
-  constructor(adapter: IDatabaseAdapter<T>){
+  constructor(adapter: IDatabaseAdapter<T>, databaseConnection: any){
     this.adapter = adapter;
+    this.databaseConnection = databaseConnection;
   }
 
   create(data: T): Promise<T> {
