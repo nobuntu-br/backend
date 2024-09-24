@@ -5,9 +5,9 @@ import BaseRepository from "./base.repository";
 
 export default class UserRepository extends BaseRepository<User>{
 
-  constructor(dbType: DbType, model: any){
+  constructor(dbType: DbType, model: any, databaseConnection: any){
     const _adapter : IDatabaseAdapter<User> = createDbAdapter<User>(dbType, model, User.fromJson);
-    super(_adapter);
+    super(_adapter, databaseConnection);
   }
 
 }

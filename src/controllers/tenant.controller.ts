@@ -17,7 +17,7 @@ export class TenantController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenant"]);
+      const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenant"], req.body.databaseConnection.connection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<Tenant> = new BaseController(tenantService, "Tenant");
 
@@ -36,7 +36,7 @@ export class TenantController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenant"]);
+      const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenant"], req.body.databaseConnection.connection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<Tenant> = new BaseController(tenantService, "Tenant");
 
@@ -55,7 +55,7 @@ export class TenantController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenant"]);
+      const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenant"], req.body.databaseConnection.connection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<Tenant> = new BaseController(tenantService, "Tenant");
 
@@ -74,7 +74,7 @@ export class TenantController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenant"]);
+      const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenant"], req.body.databaseConnection.connection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<Tenant> = new BaseController(tenantService, "Tenant");
 
@@ -93,7 +93,7 @@ export class TenantController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenant"]);
+      const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenant"], req.body.databaseConnection.connection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<Tenant> = new BaseController(tenantService, "Tenant");
 
@@ -112,7 +112,7 @@ export class TenantController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenant"]);
+      const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenant"], req.body.databaseConnection.connection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<Tenant> = new BaseController(tenantService, "Tenant");
 
@@ -131,7 +131,7 @@ export class TenantController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenant"]);
+      const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenant"], req.body.databaseConnection.connection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<Tenant> = new BaseController(tenantService, "Tenant");
 
@@ -149,7 +149,7 @@ export class TenantController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
-      const userTenantService: UserTenantService = new UserTenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["userTenant"]);
+      const userTenantService: UserTenantService = new UserTenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["userTenant"], req.body.databaseConnection.connection);
 
       // const tenants = await userTenantService.findMany({UserUID: req.params.UID});
       const getUserTenantsUseCase : GetUserTenantsUseCase = new GetUserTenantsUseCase(userTenantService);
@@ -175,7 +175,7 @@ export class TenantController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenant"]);
+      const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenant"], req.body.databaseConnection.connection);
 
       const tenantsUserIsAdmin : Tenant[] = await tenantService.findTenantsUserIsAdmin(req.body.userUID);
 

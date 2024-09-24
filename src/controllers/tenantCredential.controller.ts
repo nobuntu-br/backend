@@ -15,7 +15,7 @@ export class TenantCredentialController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantCredentialService: TenantCredentialService = new TenantCredentialService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenantCredential"]);
+      const tenantCredentialService: TenantCredentialService = new TenantCredentialService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenantCredential"], req.body.databaseConnection.connection);
       //Use case para realizar operações mais complexas
       const registerTenantCredentialUseCase: RegisterTenantCredentialUseCase = new RegisterTenantCredentialUseCase(tenantCredentialService);
 
@@ -44,7 +44,7 @@ export class TenantCredentialController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantCredentialService: TenantCredentialService = new TenantCredentialService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenantCredential"]);
+      const tenantCredentialService: TenantCredentialService = new TenantCredentialService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenantCredential"], req.body.databaseConnection.connection);
 
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<TenantCredential> = new BaseController(tenantCredentialService, "TenantCredential");
@@ -63,7 +63,7 @@ export class TenantCredentialController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantCredentialService: TenantCredentialService = new TenantCredentialService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenantCredential"]);
+      const tenantCredentialService: TenantCredentialService = new TenantCredentialService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenantCredential"], req.body.databaseConnection.connection);
 
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<TenantCredential> = new BaseController(tenantCredentialService, "TenantCredential");
@@ -81,7 +81,7 @@ export class TenantCredentialController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantCredentialService: TenantCredentialService = new TenantCredentialService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenantCredential"]);
+      const tenantCredentialService: TenantCredentialService = new TenantCredentialService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenantCredential"], req.body.databaseConnection.connection);
 
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<TenantCredential> = new BaseController(tenantCredentialService, "TenantCredential");
@@ -99,7 +99,7 @@ export class TenantCredentialController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantCredentialService: TenantCredentialService = new TenantCredentialService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenantCredential"]);
+      const tenantCredentialService: TenantCredentialService = new TenantCredentialService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenantCredential"], req.body.databaseConnection.connection);
 
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<TenantCredential> = new BaseController(tenantCredentialService, "TenantCredential");
@@ -117,7 +117,7 @@ export class TenantCredentialController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantCredentialService: TenantCredentialService = new TenantCredentialService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenantCredential"]);
+      const tenantCredentialService: TenantCredentialService = new TenantCredentialService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenantCredential"], req.body.databaseConnection.connection);
 
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<TenantCredential> = new BaseController(tenantCredentialService, "TenantCredential");
@@ -135,7 +135,7 @@ export class TenantCredentialController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantCredentialService: TenantCredentialService = new TenantCredentialService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenantCredential"]);
+      const tenantCredentialService: TenantCredentialService = new TenantCredentialService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["tenantCredential"], req.body.databaseConnection.connection);
 
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<TenantCredential> = new BaseController(tenantCredentialService, "TenantCredential");

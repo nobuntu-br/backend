@@ -7,10 +7,10 @@ import BaseService from "./base.service";
 export default class UserTenantService extends BaseService<IUserTenant> {
   private userTenantRepository: UserTenantRepository;
 
-  constructor(dbType: DbType, model: any) {
+  constructor(dbType: DbType, model: any, databaseConnection: any) {
     //Cria o repositório com dados para obter o banco de dados
-    var repository = new UserTenantRepository(dbType, model);
-    super(repository, dbType, model);
+    var repository = new UserTenantRepository(dbType, model, databaseConnection);
+    super(repository, dbType, model, databaseConnection);
 
     this.userTenantRepository = repository;
   }

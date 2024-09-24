@@ -6,10 +6,10 @@ import BaseService from "./base.service";
 export class FunctionSystemService extends BaseService<FunctionSystem> {
   private functionSystemRepository: FunctionSystemRepository;
 
-  constructor(dbType: DbType, model: any) {
+  constructor(dbType: DbType, model: any, databaseConnection: any) {
     //Cria o repositório com dados para obter o banco de dados
-    var repository: FunctionSystemRepository = new FunctionSystemRepository(dbType, model);
-    super(repository, dbType, model);
+    var repository: FunctionSystemRepository = new FunctionSystemRepository(dbType, model, databaseConnection);
+    super(repository, dbType, model, databaseConnection);
 
     this.functionSystemRepository = repository;
   }

@@ -38,7 +38,7 @@ async function connectToDatabaseWithMongoose(uri: string): Promise<Connection> {
     console.log("Conexão com banco de dados MongoDB feita!");
     return connection;
   } catch (error) {
-    throw new Error('Erro ao conectar com banco de dados com a biblioteca mongoose!');
+    throw new Error('Erro ao conectar com banco de dados com a biblioteca mongoose! '+error);
   }
 }
 
@@ -53,7 +53,7 @@ async function connectToDatabaseWithSequelize(databaseType: string, uri: string)
     console.log("Conexão com banco de dados "+databaseType+" feita");
     return sequelize;
   } catch (error) {
-    throw new Error('Erro ao conectar com banco de dados');
+    throw new Error('Erro ao conectar com banco de dados. '+error);
   }
 }
 

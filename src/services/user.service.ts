@@ -6,10 +6,10 @@ import BaseService from "./base.service";
 export class UserService extends BaseService<IUser> {
   private userRepository: UserRepository;
 
-  constructor(dbType: DbType, model: any) {
+  constructor(dbType: DbType, model: any, databaseConnection: any) {
     //Cria o repositório com dados para obter o banco de dados
-    var repository: UserRepository = new UserRepository(dbType, model);
-    super(repository, dbType, model);
+    var repository: UserRepository = new UserRepository(dbType, model, databaseConnection);
+    super(repository, dbType, model, databaseConnection);
     
     this.userRepository = repository;
   }
