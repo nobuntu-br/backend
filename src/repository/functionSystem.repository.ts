@@ -62,8 +62,10 @@ export default class FunctionSystemRepository extends BaseRepository<FunctionSys
         },
       ];
 
+      //TODO: implementar função
       // const role = await dbAdapter.findUsingQuery(isPublicRouteQuery);
-      const role = await this.findCustom(isPublicRouteQuery);
+      // const role = await this.findCustom(isPublicRouteQuery);
+      const role ='';
       if (role != null) {
         return true;
       }

@@ -74,13 +74,14 @@ export default class FunctionSystemRoleRepository extends BaseRepository<Functio
           },
         },
       ];
-
-      const role = await this.findCustom(isUserHaveAccessToRouteQuery);
-      if (role != null) {
-        return true;
-      }
-
+      //TODO: Implementar essa função
       return false;
+      // const role = await this.findCustom(isUserHaveAccessToRouteQuery);
+      // if (role != null) {
+      //   return true;
+      // }
+
+      // return false;
     } else {
       //TODO implementar verificação de permissão de rota com o sequelize
       return false;

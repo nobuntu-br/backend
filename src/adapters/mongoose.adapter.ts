@@ -1,5 +1,6 @@
 import { Model } from "mongoose";
 import { IDatabaseAdapter } from "./IDatabase.adapter";
+import findDataByCustomQuery from "../utils/mongoose/customQuery.util";
 
 export class MongooseAdapter<T> implements IDatabaseAdapter<T> {
 
@@ -105,8 +106,15 @@ export class MongooseAdapter<T> implements IDatabaseAdapter<T> {
     }
   }
 
-  async findCustom(query: any): Promise<T[] | null> {
-    return await this.model.aggregate(query);
+  async findCustom(filterValues: any[], filterConditions: string[], model: Model<any>): Promise<T[] | null> {
+    try{
+      const items = await findDataByCustomQuery(filterValues, filterConditions, model);
+
+      return this.jsonDataToResources(items);
+    } catch (error) {
+      console.warn("Error to find custom entity to database using sequelize. Details: " + error);
+      throw new Error("Error to find custom entity to database using sequelize.");
+    }
   }
 
   protected jsonDataToResources(jsonData: any[]): T[] {

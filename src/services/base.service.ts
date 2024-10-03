@@ -58,4 +58,8 @@ export default class BaseService<T> implements IBaseService<T> {
     return this.repository.deleteAll();    
   }
 
+  findCustom(filterValues: any[], filterConditions: string[], model: any): Promise<T[] | null> {
+    return this.repository.findCustom(filterValues, filterConditions, model);
+  }
+
 }

@@ -1,3 +1,6 @@
+import { Model } from "mongoose";
+import { FilterValue } from "../utils/mongoose/customQuery.util";
+
 export interface IBaseService<T> {
   create(data: T): Promise<T>;
   findAll(limitPerPage: number, offset: number): Promise<T[] | null>;
@@ -8,4 +11,5 @@ export interface IBaseService<T> {
   update(id: string, data: Object): Promise<T | null>;
   delete(id: string): Promise<T | null>;
   deleteAll(): Promise<void>;
+  findCustom(filterValues: FilterValue[], filterConditions: string[], model: Model<any> | typeof Model): Promise<T[] | null>;
 }

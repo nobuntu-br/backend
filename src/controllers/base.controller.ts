@@ -170,7 +170,17 @@ export class BaseController<T> implements IBaseController {
    * @returns Retorna um Object ou null
    */
   async findCustom(req: Request, res: Response, next: NextFunction): Promise<Object> {
-    throw new Error("Method not implemented.");
+    try {
+      const filterValues = req.body.filterValues; 
+      const filterConditions = req.body.filterValues; 
+      const model = req.body.databaseConnection.models[this.entityName];
+
+      const data = await this.service.findCustom(filterValues, filterConditions, model);
+
+      return res.status(200).send(data);
+    } catch (err) {
+      return res.status(500).send({ message: err || "Algum erro desconhecido ocorreu ao buscar "+this.entityName+"." });
+    }
   }
 
 }

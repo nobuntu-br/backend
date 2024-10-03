@@ -1,5 +1,8 @@
+import { Model } from "mongoose";
 import { IDatabaseAdapter } from "../adapters/IDatabase.adapter";
+import { FilterValue } from "../utils/mongoose/customQuery.util";
 import { IBaseRepository } from "./ibase.repository";
+import { ModelStatic } from "sequelize";
 
 export default abstract class BaseRepository<T> implements IBaseRepository<T>{
   public adapter: IDatabaseAdapter<T>;
@@ -46,8 +49,7 @@ export default abstract class BaseRepository<T> implements IBaseRepository<T>{
     return this.adapter.deleteAll();
   }
 
-  findCustom(query: any): Promise<T[] | null> {
-    return this.adapter.findCustom(query);
+  findCustom(filterValues: FilterValue[], filterConditions: string[], model: Model<any> | ModelStatic<any>): Promise<T[] | null>{
+    return this.adapter.findCustom(filterValues, filterConditions, model);
   }
-
 }
