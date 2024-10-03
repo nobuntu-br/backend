@@ -1,5 +1,8 @@
 import { ModelStatic } from "sequelize";
 import { IDatabaseAdapter } from "./IDatabase.adapter";
+import { FilterValue } from "../utils/mongoose/customQuery.util";
+import { Model } from "mongoose";
+import findDataByCustomQuery from "../utils/sequelize/customQuery.util";
 
 export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
 
@@ -161,9 +164,16 @@ export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
     }
   }
 
-  findCustom(query: any): Promise<T[] | null> {
-    throw new Error("Method not implemented.");
-  }
+  async findCustom(filterValues: FilterValue[], filterConditions: string[], model: ModelStatic<any>): Promise<T[] | null>{
+      try{
+        const items = await findDataByCustomQuery(filterValues, filterConditions, model);
+
+        return this.jsonDataToResources(items);
+      } catch (error) {
+        console.warn("Error to find custom entity to database using sequelize. Details: " + error);
+        throw new Error("Error to find custom entity to database using sequelize.");
+      }
+    }
 
   protected jsonDataToResources(jsonData: any[]): T[] {
     const resources: T[] = [];
@@ -199,7 +209,6 @@ export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
         //Se for uma associação de um para um
         for(let key2 in item.dataValues){
           if(alias?.[1] === key2){
-            console.log("key2: ", key2);
             item.dataValues[key2] = item[key];
           }
         }
@@ -231,7 +240,6 @@ export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
         //Se for uma associação de um para um
         for(let key2 in item.dataValues){
           if(alias?.[1] === key2){
-            console.log("key2: ", key2);
             item.dataValues[key2] = item[key];
           }
         }

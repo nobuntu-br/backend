@@ -1,3 +1,7 @@
+import { Model } from "mongoose";
+import { FilterValue } from "../utils/mongoose/customQuery.util";
+import { ModelStatic } from "sequelize";
+
 export interface IDatabaseAdapter<T> {
   create(data: any): Promise<T>;
   findAll(limitPerPage: number, offset: number): Promise<T[] | null>;
@@ -8,5 +12,5 @@ export interface IDatabaseAdapter<T> {
   update(id: string, data: Object): Promise<T | null>;
   delete(id: string): Promise<T | null>;
   deleteAll(): Promise<void>;
-  findCustom(query: any): Promise<T[] | null>;
+  findCustom(filterValues: FilterValue[], filterConditions: string[], model: Model<any> | ModelStatic<any>): Promise<T[] | null>;
 }
