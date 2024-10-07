@@ -172,7 +172,7 @@ export class BaseController<T> implements IBaseController {
   async findCustom(req: Request, res: Response, next: NextFunction): Promise<Object> {
     try {
       const filterValues = req.body.filterValues; 
-      const filterConditions = req.body.filterValues; 
+      const filterConditions = req.body.conditions; 
       const model = req.body.databaseConnection.models[this.entityName];
 
       const data = await this.service.findCustom(filterValues, filterConditions, model);
