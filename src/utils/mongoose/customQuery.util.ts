@@ -79,7 +79,6 @@ async function findDataByCustomQuery(
 
     let _filterQuerys = createQueryWithConditions(filterConditions, filterQuerys);
 
-    console.log("Dados da query:", _filterQuerys);
     try {
       const data = await model.find(_filterQuerys[0]);
       resolve(data);
@@ -149,7 +148,7 @@ function createQueryBasedToType(
       return createTextQuery(parameter, value1, variableName, options);
     case "number":
       return !isNaN(parseFloat(value1)) ? createNumberQuery(parameter, value1, value2, variableName) : null;
-    case "Date":
+    case "date":
       return createDateQuery(parameter, value1, value2, variableName);
     case "boolean":
       return createBooleanQuery(parameter, value1, variableName);
