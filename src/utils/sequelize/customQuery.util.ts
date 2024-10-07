@@ -1,4 +1,4 @@
-import { WhereOptions, Op, Model, ModelStatic } from 'sequelize';
+import { WhereOptions, Op, Model, ModelStatic, fn, col, where, literal } from 'sequelize';
 
 // Interfaces para tipar os filtros
 interface FilterParameter {
@@ -125,7 +125,7 @@ function createQueryBasedOnType(
       return createTextQuery(parameter, value1, variableName);
     case 'number':
       return !isNaN(parseFloat(value1)) ? createNumberQuery(parameter, value1, value2, variableName) : null;
-    case 'Date':
+    case 'date':
       return createDateQuery(parameter, value1, value2, variableName);
     case 'boolean':
       return createBooleanQuery(parameter, value1, variableName);
@@ -149,6 +149,18 @@ function createTextQuery(parameter: string, value: string, variableName: string)
     case 'dontContains':
       param[variableName] = { [Op.notLike]: `%${value}%` };
       break;
+    case 'startWith':
+      param[variableName] = { [Op.like]: `${value}%` };
+      break;
+    case 'endWith':
+      param[variableName] = { [Op.like]: `%${value}` };
+      break;
+    case 'dontContains':
+      param[variableName] = { [Op.notLike]: `%${value}%` };
+      break;
+    case 'match':
+      param[variableName] = { [Op.iLike]: `%${value}%` };
+      break;
     default:
       param[variableName] = { [Op.like]: `%${value}%` };
       break;
@@ -165,6 +177,22 @@ function createNumberQuery(parameter: string, value1: number, value2: number, va
     case 'between':
       param[variableName] = { [Op.between]: [value1, value2] };
       break;
+    case 'biggerThan':
+      param[variableName] = { [Op.gt]: value1 };
+      break;
+    case 'smallerThan':
+      param[variableName] = { [Op.lt]: value1 };
+      break;
+    case 'biggerOrEqualThan':
+      param[variableName] = { [Op.gte]: value1 };
+      break;
+    case 'smallerOrEqualThan':
+      param[variableName] = { [Op.lte]: value1 };
+      break;
+    case 'different':
+      param[variableName] = { [Op.ne]: value1 };
+      break
+
     default:
       param[variableName] = { [Op.eq]: value1 };
       break;
@@ -180,6 +208,37 @@ function createDateQuery(parameter: string, value1: string, value2: string, vari
   switch (parameter) {
     case 'between':
       param[variableName] = { [Op.between]: [date1, date2] };
+      break;
+    case 'beforeThan':
+      param[variableName] = { [Op.lt]: date1 };
+      break;
+    case 'afterThan':
+      param[variableName] = { [Op.gt]: date1 };
+      break;
+    case 'beforeOrEqualThan':
+      param[variableName] = { [Op.lte]: date1 };
+      break;
+    case 'afterOrEqualThan':
+      param[variableName] = { [Op.gte]: date1 };
+      break;
+    case 'day':
+      //TODO: Fazer a query para pegar o dia
+      const dayValue = parseInt(value1, 10);
+      param[variableName] = {
+        [Op.and]: where(fn('EXTRACT', literal('DAY FROM ' + variableName)), dayValue)
+      };
+      break;
+    case 'month':
+      const month = parseInt(value1, 10);
+      param[variableName] = {
+        [Op.and]: [ where(fn('EXTRACT', literal('MONTH FROM ' + variableName)), month)]
+      };
+      break;
+    case 'year':
+      param[variableName] = { [Op.eq]: value1 };
+      break;
+    case 'week':
+      param[variableName] = { [Op.eq]: value1 };
       break;
     default:
       param[variableName] = { [Op.eq]: date1 };
