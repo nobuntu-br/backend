@@ -168,6 +168,8 @@ export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
       try{
         const items = await findDataByCustomQuery(filterValues, filterConditions, model);
 
+        this.replaceForeignKeysFieldWithData(items);
+
         return this.jsonDataToResources(items);
       } catch (error) {
         console.warn("Error to find custom entity to database using sequelize. Details: " + error);
