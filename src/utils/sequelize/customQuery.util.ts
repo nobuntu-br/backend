@@ -66,7 +66,8 @@ async function findDataByCustomQuery<T extends Model>(
 
     try {
       const data = await (model as ModelStatic<Model>).findAll({
-        where: combinedQuery
+        where: combinedQuery,
+        include: [{ all: true }]
       });
       resolve(data as T[]);
     } catch (error) {
