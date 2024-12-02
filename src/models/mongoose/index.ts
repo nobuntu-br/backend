@@ -30,18 +30,30 @@ export default async function setModels(mongooseConnection: Mongoose) {
 
   //TODO precisará ser gerado várias linhas como essa abaixo, com o model diferente
 
-  const models = {
-    order,
-    user,
-    role,
-    userRole,
-    functionSystem,
-    functionSystemRole,
-    componentStructure,
-    componentStructureRole,
-    verificationEmail,
-    //Precisará ser gerado aqui os nomes das variáveis de cada model
-  }
+  const models = new Map<string, any>();
+  
+  models.set('User', user);
+  models.set('Role', role);
+  models.set('UserRole', userRole);
+  models.set('FunctionSystem', functionSystem);
+  models.set('FunctionSystemRole', functionSystemRole);
+  models.set('ComponentStructure', componentStructure);
+  models.set('ComponentStructureRole', componentStructureRole);
+  models.set('VerificationEmail', verificationEmail);
+
+  //Precisará ser gerado aqui os nomes das variáveis de cada model
+  // const models = {
+  //   order,
+  //   user,
+  //   role,
+  //   userRole,
+  //   functionSystem,
+  //   functionSystemRole,
+  //   componentStructure,
+  //   componentStructureRole,
+  //   verificationEmail,
+  //   //Precisará ser gerado aqui os nomes das variáveis de cada model
+  // }
 
   return models;
 }

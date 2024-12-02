@@ -18,7 +18,7 @@ export class FunctionSystemController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["functionSystem"], req.body.databaseConnection.connection);
+      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
       const baseController: BaseController<FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
 
       baseController.create(req, res, next);
@@ -34,7 +34,7 @@ export class FunctionSystemController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["functionSystem"], req.body.databaseConnection.connection);
+      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
       const baseController: BaseController<FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
 
       baseController.findAll(req, res, next);
@@ -50,7 +50,7 @@ export class FunctionSystemController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["functionSystem"], req.body.databaseConnection.connection);
+      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
       const baseController: BaseController<FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
 
       baseController.findById(req, res, next);
@@ -67,7 +67,7 @@ export class FunctionSystemController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["functionSystem"], req.body.databaseConnection.connection);
+      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
       const baseController: BaseController<FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
 
       baseController.getCount(req, res, next);
@@ -83,7 +83,7 @@ export class FunctionSystemController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["functionSystem"], req.body.databaseConnection.connection);
+      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
       const baseController: BaseController<FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
 
       baseController.update(req, res, next);
@@ -99,7 +99,7 @@ export class FunctionSystemController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["functionSystem"], req.body.databaseConnection.connection);
+      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
       const baseController: BaseController<FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
 
       baseController.delete(req, res, next);
@@ -115,7 +115,7 @@ export class FunctionSystemController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["functionSystem"], req.body.databaseConnection.connection);
+      const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
       const baseController: BaseController<FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
 
       baseController.deleteAll(req, res, next);

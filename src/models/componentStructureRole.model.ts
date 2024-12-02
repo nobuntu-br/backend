@@ -1,13 +1,13 @@
-import { BaseResourceModel } from "./base-resource.model";
+import { BaseResourceModel } from "./baseResource.model";
 
 export interface IComponentStructureRole {
-  RoleId?: string;
-  ComponentStructureId?: string;
+  roleId?: string;
+  componentStructureId?: string;
 }
 
 export class ComponentStructureRole extends BaseResourceModel implements IComponentStructureRole {
-  RoleId?: string;
-  ComponentStructureId?: string;
+  roleId?: string;
+  componentStructureId?: string;
 
   static fromJson(jsonData: any) : ComponentStructureRole {
     return Object.assign(new ComponentStructureRole(), jsonData);

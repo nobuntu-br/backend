@@ -1,12 +1,27 @@
-import { Sequelize } from "sequelize";
+import { DataTypes, Sequelize } from "sequelize";
 
 export default function defineModel(sequelize: Sequelize) {
-  const schema = sequelize.define('ComponentStructureRole', {}, {
+  const schema = sequelize.define('ComponentStructureRole', {
+    roleId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Roles',
+        key: 'id',
+      },
+    },
+    componentStructureId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'ComponentStructures',
+        key: 'id',
+      },
+    },
+  }, {
     timestamps: true,
     indexes: [
       {
         unique: true,
-        fields: ['RoleId', 'ComponentStructureId'],
+        fields: ['roleId', 'componentStructureId'],
       },
     ],
   });

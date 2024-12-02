@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { getTenantConnection } from "../adapters/database.config";
+import { getTenantConnection } from "../config/database.config";
 import TenantConnection from "../models/tenantConnection.model";
-import { getSecurityTenantConnection } from "../adapters/databaseSecurity.config";
+import { GetSecurityTenantConnectionUseCase } from "../useCases/tenant/getSecurityTenantConnection.useCase";
 var jwt = require('jsonwebtoken');
 
 declare global {
@@ -54,7 +54,9 @@ export async function getSecurityTenant(req: Request, res: Response, next: NextF
   try {
     //TODO fazer uma verificação de permissão
 
-    req.body.databaseConnection = await getSecurityTenantConnection();
+    const getSecurityTenantConnectionUseCase: GetSecurityTenantConnectionUseCase = new GetSecurityTenantConnectionUseCase();
+
+    req.body.databaseConnection = await getSecurityTenantConnectionUseCase.execute();
 
     next();
   } catch (error) {

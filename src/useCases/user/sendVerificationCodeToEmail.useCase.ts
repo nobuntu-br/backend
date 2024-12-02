@@ -1,34 +1,61 @@
 import { VerificationEmailService } from '../../services/verificationEmail.service';
 import { EmailService } from '../../services/email.service';
-import { NodemailerAdapter } from '../../adapters/nodeMailer.adapter';
+import { IVerificationEmail } from '../../models/verificationEmail.model';
+import { SendVerificationCodeToEmailDTO } from '../../models/DTO/sendVerificationCodeToEmail.DTO';
+import { ConflictError } from '../../errors/confict.error';
+import { TooManyRequestsError } from '../../errors/tooManyRequests.error';
 
 export class SendVerificationCodeToEmailUseCase {
   constructor(
     private verificationEmailService: VerificationEmailService
   ) { }
 
-  // async execute(email: string): Promise<{ success: boolean, message: string, error?: any }> {
-  async execute(email: string): Promise<boolean> {
-    const verificationCode : string = Math.floor(100000 + Math.random() * 900000).toString(); // Gera um código de 6 dígitos
+  async execute(input: SendVerificationCodeToEmailDTO): Promise<boolean> {
 
     try {
 
-      //Adapter do nodeMailer
-      const emailAdapter: NodemailerAdapter = new NodemailerAdapter();
-      const emailService: EmailService = new EmailService(emailAdapter);
+      const verificationEmail: IVerificationEmail | null = await this.verificationEmailService.findOne({
+        email: input.email
+      });
 
-      await emailService.sendEmail(email, "Seu Código de Verificação", `Seu código de verificação é: ${verificationCode}`)
-      
-      // Armazenar o código de verificação em uma variável global
+      if (verificationEmail != null) {
+        if (await this.verificationEmailService.checkIfExpired(input.email, new Date()) == true) {
+          await this.verificationEmailService.delete(verificationEmail.id!);
+        } else {
+
+          if(verificationEmail.isVerified == true){
+            throw new ConflictError("Código já enviado para esse email");
+          } else {
+            throw new TooManyRequestsError("O e-mail de verificação já foi enviado recentemente. Aguarde antes de solicitar novamente");
+          }
+          
+        }
+      }
+
+      const verificationCode: string = Math.floor(100000 + Math.random() * 900000).toString(); // Gera um código de 6 dígitos
+
+      const emailService: EmailService = new EmailService();
+
+      //TODO mensagem tem que ser com o idioma de acordo com o que foi definido na aplicação
+      await emailService.sendEmailWithDefaultEmail({
+        subject: "Seu Código de Verificação",
+        text: `Seu código de verificação é: ${verificationCode}`,
+        to: input.email
+      });
+
+      const currentTime: Date = new Date();
+
       await this.verificationEmailService.create({
         verificationCode: verificationCode,
-        email: email,
+        email: input.email,
+        isVerified: false,
+        expirationDate: new Date(currentTime.getTime() + 10 * 60 * 1000)//Adiciona 10 minutos
       });
 
       return true;
 
     } catch (error) {
-      throw new Error("Erro ao enviar código de verificação. "+error);
+      throw error;
     }
   }
 }

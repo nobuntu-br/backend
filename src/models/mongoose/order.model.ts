@@ -45,5 +45,5 @@ export default function defineModel(mongooseConnection: Mongoose) {
     }
   });
 
-  return mongooseConnection.model<Order>("order", schema);
+  return mongooseConnection.model<Order>("Order", schema);
 };

@@ -24,30 +24,49 @@ export default async function setModels(sequelize: Sequelize) {
   const verificationEmail = verificationEmailModel(sequelize);
 
   //Relação de muitos pra muitos de User para Role
-  user.belongsToMany(role, {through: userRole});
-  role.belongsToMany(user, {through: userRole});
+  user.belongsToMany(role, {through: userRole, foreignKey: "userId", otherKey: "roleId"});
+  role.belongsToMany(user, {through: userRole, foreignKey: "roleId", otherKey: "userId"});
 
-  //Relação de muitos pra muitos entre Role e FunctionsSystem
-  role.belongsToMany(functionSystem, { through: functionSystemRole });
-  functionSystem.belongsToMany(role, { through: functionSystemRole });
+  //Relação para o controle de acesso as rotas
+  // role.hasOne(functionSystemRole, {foreignKey: "roleId"});
+  // functionSystemRole.belongsTo(role, {foreignKey: "roleId"});
+
+  // functionSystem.hasOne(functionSystemRole, {foreignKey: "functionSystemId"});
+  // functionSystemRole.belongsTo(functionSystem, {foreignKey: "functionSystemId"});
+
+  role.belongsToMany(functionSystem, {through: functionSystemRole, foreignKey: "roleId", otherKey: "functionSystemId"});
+  functionSystem.belongsToMany(role, {through: functionSystemRole, foreignKey: "functionSystemId", otherKey: "roleId"});
 
   //Relação de muitos para muitos entre ComponentStructure e Role
-  componentStructure.belongsToMany(role, {through: componentStructureRole});
-  role.belongsToMany(componentStructure, {through: componentStructureRole});
+  componentStructure.belongsToMany(role, {through: componentStructureRole, foreignKey: "componentStructureId", otherKey: "roleId"});
+  role.belongsToMany(componentStructure, {through: componentStructureRole, foreignKey: "roleId", otherKey: "componentStructureId"});
 
   //TODO precisará ser gerado várias linhas como essa abaixo, com o model diferente
   await sequelize.sync();
   
-  const models = {
-    user,
-    role,
-    userRole,
-    functionSystem,
-    functionSystemRole,
-    componentStructure,
-    componentStructureRole,
-    verificationEmail
-    //Precisará ser gerado aqui os nomes das variáveis de cada model
-  }
+  const models = new Map<string, any>();
+  
+  models.set('User', user);
+  models.set('Role', role);
+  models.set('UserRole', userRole);
+  models.set('FunctionSystem', functionSystem);
+  models.set('FunctionSystemRole', functionSystemRole);
+  models.set('ComponentStructure', componentStructure);
+  models.set('ComponentStructureRole', componentStructureRole);
+  models.set('VerificationEmail', verificationEmail);
+
+  //Precisará ser gerado aqui os nomes das variáveis de cada model
+
+  // const models = {
+  //   user,
+  //   role,
+  //   userRole,
+  //   functionSystem,
+  //   functionSystemRole,
+  //   componentStructure,
+  //   componentStructureRole,
+  //   verificationEmail
+  //   //Precisará ser gerado aqui os nomes das variáveis de cada model
+  // }
   return models;
 }

@@ -1,10 +1,10 @@
-import UserTenantService from '../../services/userTenant.service';
-import { IUserTenant } from '../../models/userTenant.model';
+import UserTenantService from '../../services/databasePermission.service';
+import { DatabasePermission } from '../../models/databasePermission.model';
 
 export class DeleteTenantPermissionUseCase {
   constructor(private userTenantService: UserTenantService) { }
 
-  async execute(userTenantId: string): Promise<IUserTenant | Error> {
+  async execute(userTenantId: string): Promise<DatabasePermission | Error> {
 
     try {
 

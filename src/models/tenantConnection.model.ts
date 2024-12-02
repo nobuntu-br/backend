@@ -1,30 +1,30 @@
 import { Connection } from "mongoose";
 import { Sequelize } from "sequelize";
-import { DbType } from "../adapters/createDb.adapter";
+import { DatabaseType } from "../adapters/createDb.adapter";
 
 export default class TenantConnection {
-  models: any;
+  _models: Map<string, any> | null;
   _connection: Connection | Sequelize;
-  databaseType: DbType;
+  databaseType: DatabaseType;
   expireAt: Date;
   isDefaultConnection: boolean;
   tenantId: any;
 
-  constructor(databaseType: DbType, connection: Connection | Sequelize, isDefaultConnection: boolean) {
+  constructor(databaseType: DatabaseType, connection: Connection | Sequelize, isDefaultConnection: boolean) {
     this._connection = connection;
     this.databaseType = databaseType;
     this.expireAt = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
     this.isDefaultConnection = isDefaultConnection;
-    this.models = {};
+    this._models = null;
   }
 
-  setModels(models: any): void {
-    this.models = models;
+  get models(): Map<string, any> | null {
+    return this._models;
   }
 
-  getModels(): any {
-    return this.models;
-  }
+  set models(models: Map<string, any>){
+    this._models = models;
+  } 
 
   get connection(): Connection | Sequelize {
     return this._connection;

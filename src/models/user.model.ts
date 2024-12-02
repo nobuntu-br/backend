@@ -1,26 +1,35 @@
-import { BaseResourceModel } from "./base-resource.model";
+import { BaseResourceModel } from "./baseResource.model";
 
 export interface IUser {
   id?: string;
-  name?: string;
   UID?: string;
+  tenantUID?: string;
   userName?: string;
   firstName?: string;
   lastName?: string;
   isAdministrator?: boolean;
   memberType?: string;
+  email?: string;
+  password?: string;
+
 }
 
 export class User extends BaseResourceModel implements IUser {
-  name?: string;
+  password?: string | undefined;
   UID?: string;
+  tenantUID?: string;
   userName?: string;
   firstName?: string;
   lastName?: string;
   isAdministrator?: boolean;
   memberType?: string;
+  email?: string;
 
   static fromJson(jsonData: any) : User {
     return Object.assign(new User(), jsonData);
   }
+
+  // getFullName(){
+  //   return this.firstName+' '+this.lastName; 
+  // }
 }

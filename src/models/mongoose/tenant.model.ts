@@ -21,5 +21,5 @@ export default function defineModel(mongooseConnection: Mongoose) {
     }
   });
 
-  return mongooseConnection.model('tenant', schema);
+  return mongooseConnection.model('Tenant', schema);
 };

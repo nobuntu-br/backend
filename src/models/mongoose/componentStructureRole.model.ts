@@ -9,11 +9,11 @@ export default function defineModel(mongooseConnection: Mongoose) {
 
   const schema = new mongoose.Schema(
     {
-      ComponentStructureId: {
+      componentStructureId: {
         type: Schema.Types.ObjectId, ref: 'componentStructure',
         required: true,
       },
-      RoleId: {
+      roleId: {
         type: Schema.Types.ObjectId, ref: 'role',
         required: true,
       },
@@ -37,5 +37,5 @@ export default function defineModel(mongooseConnection: Mongoose) {
     }
   });
 
-  return mongooseConnection.model("componentStructureRole", schema);
+  return mongooseConnection.model("ComponentStructureRole", schema);
 };

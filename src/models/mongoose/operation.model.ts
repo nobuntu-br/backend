@@ -9,7 +9,7 @@ export default function defineModel(mongooseConnection: Mongoose) {
   var schema = new mongoose.Schema(
     {
       user: {
-        type: Schema.Types.ObjectId, ref: 'user',
+        type: Schema.Types.ObjectId, ref: 'User',
         required: true,
       },
       operationType: {
@@ -17,7 +17,7 @@ export default function defineModel(mongooseConnection: Mongoose) {
         required: true,
       },
       tenant: {
-        type: Schema.Types.ObjectId, ref: 'tenant',
+        type: Schema.Types.ObjectId, ref: 'Tenant',
         required: true,
       },
       ipAddress: {
@@ -50,5 +50,5 @@ export default function defineModel(mongooseConnection: Mongoose) {
     }
   });
 
-  return mongooseConnection.model("operation", schema);
+  return mongooseConnection.model("Operation", schema);
 };

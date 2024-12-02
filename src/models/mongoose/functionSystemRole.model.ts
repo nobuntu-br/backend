@@ -23,5 +23,5 @@ export default function defineModel(mongooseConnection: Mongoose) {
     }
   });
 
-  return mongooseConnection.model('functionSystemRole', schema);
+  return mongooseConnection.model('FunctionSystemRole', schema);
 };

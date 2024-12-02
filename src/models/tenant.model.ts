@@ -1,6 +1,7 @@
-import { BaseResourceModel } from "./base-resource.model";
+import { BaseResourceModel } from "./baseResource.model";
 
 export interface ITenant {
+  id?: string;
   name?: string;
 }
 

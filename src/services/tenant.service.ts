@@ -1,23 +1,23 @@
-import { DbType } from "../adapters/createDb.adapter";
-import { Tenant } from "../models/tenant.model";
-import { UserTenant } from "../models/userTenant.model";
-import TenantRepository from "../repository/tenant.repository";
-import UserTenantRepository from "../repository/userTenant.repository";
+import { DatabaseType } from "../adapters/createDb.adapter";
+import { ITenant, Tenant } from "../models/tenant.model";
+import { DatabasePermission } from "../models/databasePermission.model";
+import TenantRepository from "../repositories/tenant.repository";
+import DatabasePermissionRepository from "../repositories/databasePermission.repository";
 import BaseService from "./base.service";
 
 export default class TenantService extends BaseService<Tenant> {
   private tenantRepository: TenantRepository;
-  private userTenantRepository: UserTenantRepository;
+  private databasePermissionRepository: DatabasePermissionRepository;
 
-  constructor(dbType: DbType, model: any, databaseConnection: any) {
+  constructor(databaseType: DatabaseType, databaseConnection: any) {
     //Cria o repositório com dados para obter o banco de dados
-    var repository : TenantRepository = new TenantRepository(dbType, model, databaseConnection);
-    super(repository, dbType, model, databaseConnection);
+    var repository : TenantRepository = new TenantRepository(databaseType, databaseConnection);
+    super(repository, databaseType, databaseConnection);
 
     this.tenantRepository = repository;
 
-    var userTenantRepository: UserTenantRepository = new UserTenantRepository(dbType, "userTenant", databaseConnection);
-    this.userTenantRepository = userTenantRepository;
+    var databasePermissionRepository: DatabasePermissionRepository = new DatabasePermissionRepository(databaseType, databaseConnection);
+    this.databasePermissionRepository = databasePermissionRepository;
   }
 
   /**
@@ -25,9 +25,9 @@ export default class TenantService extends BaseService<Tenant> {
    * @param {*} userUID identificador universal do usuário
    * @returns "True" caso usuário for adminitrador, caso contrário, retorna "False"
    */
-  async findTenantsUserIsAdmin(userUID: string): Promise<Tenant[]> {
+  async findTenantsUserIsAdmin(userUID: string): Promise<ITenant[]> {
     try {
-      const userTenantsUserIsAdmin : UserTenant[] | null = await this.userTenantRepository.findMany({UserUID: userUID, isAdmin: true});
+      const userTenantsUserIsAdmin : DatabasePermission[] | null = await this.databasePermissionRepository.findMany({userUID: userUID, isAdmin: true});
 
       if(userTenantsUserIsAdmin == null){
         throw new Error("O usuário não tem nenhum tenant que é administrador");
@@ -36,7 +36,7 @@ export default class TenantService extends BaseService<Tenant> {
       const tenantsUserIsAdmin : Tenant[] = [];
 
       //TODO tirar isso e fazer em uma query só
-      userTenantsUserIsAdmin.forEach(async (userTenantUserIsAdmin : UserTenant) => {
+      userTenantsUserIsAdmin.forEach(async (userTenantUserIsAdmin : DatabasePermission) => {
         const _tenantUserIsAdmin = await this.tenantRepository.findOne({id: userTenantUserIsAdmin.id})
 
         if(_tenantUserIsAdmin != null){

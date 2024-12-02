@@ -1,24 +1,18 @@
-import { DbType } from "../adapters/createDb.adapter";
-import { IBaseRepository } from "../repository/ibase.repository";
+import { DatabaseType } from "../adapters/createDb.adapter";
+import { IBaseRepository } from "../repositories/ibase.repository";
 import { IBaseService } from "./IBase.service";
 
 export default class BaseService<T> implements IBaseService<T> {
-  dbType: DbType;
-  model: any;
+  databaseType: DatabaseType;
   repository: IBaseRepository<T>;
   databaseConnection: any;
 
   /**
-   * 
-   * @param repository Interface do repository com base no modelo usado
-   * @param dbType Tipo de banco de dados que foi feito a conexão
-   * @param model Modelo
    * @param databaseConnection Instância da conexão com banco de dados 
    */
-  constructor(repository: IBaseRepository<T>, dbType: DbType, model: any, databaseConnection: any) {
+  constructor(repository: IBaseRepository<T>, databaseType: DatabaseType, databaseConnection: any) {
     this.repository = repository;
-    this.dbType = dbType;
-    this.model = model;
+    this.databaseType = databaseType;
     this.databaseConnection = databaseConnection;
   }
 

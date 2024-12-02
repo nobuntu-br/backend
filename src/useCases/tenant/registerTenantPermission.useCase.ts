@@ -1,24 +1,24 @@
-import UserTenantService from '../../services/userTenant.service';
-import { IUserTenant, UserTenant } from '../../models/userTenant.model';
+import UserTenantService from '../../services/databasePermission.service';
+import { IDatabasePermission } from '../../models/databasePermission.model';
 import { UserService } from '../../services/user.service';
-import { UserTenantDTO } from '../../models/DTO/userTenant.DTO';
+import { DatabasePermissionDTO } from '../../models/DTO/databasePermission.DTO';
 
 export class RegisterTenantPermissionUseCase {
   constructor(private userTenantService: UserTenantService, private userService: UserService) { }
 
-  async execute(userTenantDTO: UserTenantDTO): Promise<IUserTenant> {
+  async execute(userTenantDTO: DatabasePermissionDTO): Promise<IDatabasePermission> {
 
     try {
 
       //Verificar se a permissão existe
-      const userTenant = await this.userTenantService.findOne({ TenantId: userTenantDTO.TenantId, UserUID: userTenantDTO.UserUID, TenantCredentialId: userTenantDTO.TenantCredentialId });
+      const userTenant = await this.userTenantService.findOne({ tenantId: userTenantDTO.tenantId, userUID: userTenantDTO.userUID, databaseCredentialId: userTenantDTO.databaseCredentialId });
       //Se permissão nÃo existir, crie
       if (userTenant == null) {
         throw new Error("Erro ao registrar novo UserTenant. Registro já existente!");
       }
 
       //Obter o ID do usuário pelo UID pra registrar
-      const user = await this.userService.findOne({UID: userTenantDTO.UserUID});
+      const user = await this.userService.findOne({UID: userTenantDTO.userUID});
 
       if(user == null){
         throw new Error("Erro ao registrar novo UserTenant. Usuário não existe!");
@@ -27,10 +27,10 @@ export class RegisterTenantPermissionUseCase {
       return await this.userTenantService.create(
         {
           isAdmin: false,
-          TenantCredentialId: userTenantDTO.TenantCredentialId,
-          TenantId: userTenantDTO.TenantId,
-          UserId: user.UID,
-          UserUID: userTenantDTO.UserUID
+          databaseCredentialId: userTenantDTO.databaseCredentialId,
+          tenantId: userTenantDTO.tenantId,
+          userId: user.UID,
+          userUID: userTenantDTO.userUID
         }
       );
 

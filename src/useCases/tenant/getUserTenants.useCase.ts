@@ -1,15 +1,22 @@
-import { UserTenant } from "../../models/userTenant.model";
-import UserTenantService from "../../services/userTenant.service";
+import { NotFoundError } from "../../errors/notFound.error";
+import { DatabasePermissionDetailOutputDTO } from "../../models/DTO/databasePermission.DTO";
+import UserTenantRepository from "../../repositories/databasePermission.repository";
 
 export class GetUserTenantsUseCase {
   constructor(
-    private userTenantService: UserTenantService
+    private userTenantRepository: UserTenantRepository,
   ) { }
 
-  async execute(UserUID: string): Promise<UserTenant[] | null> {
+  async execute(userUID: string): Promise<DatabasePermissionDetailOutputDTO[]> {
     try {
-      const userTenants = await this.userTenantService.getUserTenantsWithDefaultTenant(UserUID);
-      return userTenants;
+      
+      const tenants : DatabasePermissionDetailOutputDTO[] = await this.userTenantRepository.getTenantsWithDefaultTenantByUserUID(userUID);
+      
+      if(tenants == null || tenants.length == 0){
+        throw new NotFoundError("Não foram encontrados tenants que pertencem a esse usuário");
+      }
+      
+      return tenants;
     } catch (error) {
       throw error;
     }

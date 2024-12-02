@@ -14,7 +14,7 @@ export class OrderController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const orderService: OrderService = new OrderService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["order"], req.body.databaseConnection.connection);
+      const orderService: OrderService = new OrderService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<Order> = new BaseController(orderService, "Order");
 
@@ -31,7 +31,7 @@ export class OrderController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const orderService: OrderService = new OrderService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["order"], req.body.databaseConnection.connection);
+      const orderService: OrderService = new OrderService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<Order> = new BaseController(orderService, "Order");
 
@@ -48,7 +48,7 @@ export class OrderController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const orderService: OrderService = new OrderService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["order"], req.body.databaseConnection.connection);
+      const orderService: OrderService = new OrderService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<Order> = new BaseController(orderService, "Order");
 
@@ -65,7 +65,7 @@ export class OrderController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const orderService: OrderService = new OrderService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["order"], req.body.databaseConnection.connection);
+      const orderService: OrderService = new OrderService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<Order> = new BaseController(orderService, "Order");
 
@@ -82,7 +82,7 @@ export class OrderController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const orderService: OrderService = new OrderService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["order"], req.body.databaseConnection.connection);
+      const orderService: OrderService = new OrderService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<Order> = new BaseController(orderService, "Order");
 
@@ -99,7 +99,7 @@ export class OrderController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const orderService: OrderService = new OrderService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["order"], req.body.databaseConnection.connection);
+      const orderService: OrderService = new OrderService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<Order> = new BaseController(orderService, "Order");
 
@@ -116,7 +116,7 @@ export class OrderController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const orderService: OrderService = new OrderService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["order"], req.body.databaseConnection.connection);
+      const orderService: OrderService = new OrderService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<Order> = new BaseController(orderService, "Order");
 

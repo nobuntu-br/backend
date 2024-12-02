@@ -29,5 +29,5 @@ export default function defineModel(mongooseConnection: Mongoose) {
     }
   });
 
-  return mongooseConnection.model('componentStructure', schema);
+  return mongooseConnection.model('ComponentStructure', schema);
 };

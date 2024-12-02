@@ -1,4 +1,4 @@
-import { BaseResourceModel } from "./base-resource.model";
+import { BaseResourceModel } from "./baseResource.model";
 
 interface IFunctionSystemRole {
   Role?: string;

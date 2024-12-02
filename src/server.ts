@@ -1,16 +1,18 @@
-import { getDefaultTenantConnection } from './adapters/databaseDefault.config';
-import { getSecurityTenantConnection } from './adapters/databaseSecurity.config';
 import app from './app';
 import showTime from './utils/showTime.util';
+import { GetDefaultTenantConnectionUseCase } from './useCases/tenant/getDefaultTenantConnection.useCase';
+import { GetSecurityTenantConnectionUseCase } from './useCases/tenant/getSecurityTenantConnection.useCase';
 
 const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, async () => {
   //Realiza conexão no banco de dados de segurança
-  await getSecurityTenantConnection();
+  const getSecurityTenantConnectionUseCase = new GetSecurityTenantConnectionUseCase();
+  await getSecurityTenantConnectionUseCase.execute();
 
   //Realiza conexão no banco de dados padrão
-  await getDefaultTenantConnection();
+  const getDefaultTenantConnectionUseCase = new GetDefaultTenantConnectionUseCase();
+  await getDefaultTenantConnectionUseCase.execute();
 
   showTime();
   console.log(`Servidor está rodando na porta ${PORT}`);

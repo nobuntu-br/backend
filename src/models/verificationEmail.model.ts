@@ -1,9 +1,12 @@
-import { BaseResourceModel } from "./base-resource.model";
+import { BaseResourceModel } from "./baseResource.model";
 
 export interface IVerificationEmail {
   id?: string;
   email?: string;
   verificationCode?: string;
+  isVerified?: boolean;
+  verifiedDate?: Date;
+  expirationDate?: Date;
   createdAt?: Date;
 }
 
@@ -11,6 +14,9 @@ export class VerificationEmail extends BaseResourceModel implements IVerificatio
   id?: string;
   email?: string;
   verificationCode?: string;
+  isVerified?: boolean;
+  verifiedDate?: Date;
+  expirationDate?: Date;
   createdAt?: Date;
 
   static fromJson(jsonData: any) : VerificationEmail {

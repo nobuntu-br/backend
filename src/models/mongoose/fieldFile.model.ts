@@ -1,26 +1,26 @@
 import mongoose, { Mongoose, Schema } from "mongoose";
 import { FieldFile } from "../fieldFile.model";
 
-export default function defineModel(mongooseConnection: Mongoose) { 
+export default function defineModel(mongooseConnection: Mongoose) {
 
-  if (mongooseConnection.models.fieldFile) { 
-    return mongooseConnection.models.fieldFile; 
-  } 
+  if (mongooseConnection.models.fieldFile) {
+    return mongooseConnection.models.fieldFile;
+  }
 
-  var schema = new mongoose.Schema<FieldFile>( 
+  var schema = new mongoose.Schema<FieldFile>(
     {
-        fieldType: {
+      fieldType: {
         type: String,
         alias: "entityType"
-        },
-        user: {
+      },
+      user: {
         type: Schema.Types.ObjectId,
-        ref: "user"
-        },
-        files: [{
+        ref: "User"
+      },
+      files: [{
         type: Schema.Types.ObjectId,
-        ref: "file"
-        }]
+        ref: "File"
+      }]
     },
     { timestamps: true }
   );
@@ -34,5 +34,5 @@ export default function defineModel(mongooseConnection: Mongoose) {
     }
   });
 
-  return mongooseConnection.model<FieldFile>("estrutura_orcamento", schema); 
+  return mongooseConnection.model<FieldFile>("FieldFile", schema);
 };

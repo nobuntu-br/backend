@@ -12,7 +12,7 @@ export class FieldFileController {
         throw new NotFoundError("Não foi definido tenant para uso.");
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
-    const  fieldFileService : FieldFileService = new FieldFileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["fieldFile"], req.body.databaseConnection.connection); 
+    const  fieldFileService : FieldFileService = new FieldFileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
     const baseController : BaseController<FieldFile> = new BaseController(fieldFileService,  "fieldFile"); 
 
     baseController.create(req, res, next); 
@@ -27,7 +27,7 @@ export class FieldFileController {
         throw new NotFoundError("Não foi definido tenant para uso.");
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
-    const  fieldFileService : FieldFileService = new FieldFileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["fieldFile"], req.body.databaseConnection.connection); 
+    const  fieldFileService : FieldFileService = new FieldFileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
     const baseController : BaseController<FieldFile> = new BaseController(fieldFileService,  "fieldFile"); 
 
     baseController.findAll(req, res, next); 
@@ -42,7 +42,7 @@ export class FieldFileController {
         throw new NotFoundError("Não foi definido tenant para uso.");
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
-    const  fieldFileService : FieldFileService = new FieldFileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["fieldFile"], req.body.databaseConnection.connection); 
+    const  fieldFileService : FieldFileService = new FieldFileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
     const baseController : BaseController<FieldFile> = new BaseController(fieldFileService,  "fieldFile"); 
 
     baseController.findById(req, res, next); 
@@ -57,7 +57,7 @@ export class FieldFileController {
         throw new NotFoundError("Não foi definido tenant para uso.");
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
-    const  fieldFileService : FieldFileService = new FieldFileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["fieldFile"], req.body.databaseConnection.connection); 
+    const  fieldFileService : FieldFileService = new FieldFileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
     const baseController : BaseController<FieldFile> = new BaseController(fieldFileService,  "fieldFile"); 
 
     baseController.update(req, res, next); 
@@ -72,7 +72,7 @@ export class FieldFileController {
         throw new NotFoundError("Não foi definido tenant para uso.");
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
-    const  fieldFileService : FieldFileService = new FieldFileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["fieldFile"], req.body.databaseConnection.connection); 
+    const  fieldFileService : FieldFileService = new FieldFileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
     const baseController : BaseController<FieldFile> = new BaseController(fieldFileService,  "fieldFile"); 
 
     baseController.getCount(req, res, next); 
@@ -87,7 +87,7 @@ export class FieldFileController {
         throw new NotFoundError("Não foi definido tenant para uso.");
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
-    const  fieldFileService : FieldFileService = new FieldFileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["fieldFile"], req.body.databaseConnection.connection); 
+    const  fieldFileService : FieldFileService = new FieldFileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
     const baseController : BaseController<FieldFile> = new BaseController(fieldFileService,  "fieldFile"); 
 
     baseController.delete(req, res, next); 
@@ -102,7 +102,7 @@ export class FieldFileController {
         throw new NotFoundError("Não foi definido tenant para uso.");
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
-    const  fieldFileService : FieldFileService = new FieldFileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["fieldFile"], req.body.databaseConnection.connection); 
+    const  fieldFileService : FieldFileService = new FieldFileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
     const baseController : BaseController<FieldFile> = new BaseController(fieldFileService,  "fieldFile"); 
 
       baseController.findCustom(req, res, next); 
@@ -117,7 +117,7 @@ export class FieldFileController {
         throw new NotFoundError("Não foi definido tenant para uso.");
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
-    const  fieldFileService : FieldFileService = new FieldFileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["fieldFile"], req.body.databaseConnection.connection); 
+    const  fieldFileService : FieldFileService = new FieldFileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
 
     // Extrair apenas a parte desejada
     const { fieldType, files } = req.body;

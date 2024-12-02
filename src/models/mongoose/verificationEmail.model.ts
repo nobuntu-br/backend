@@ -12,12 +12,21 @@ export default function defineModel(mongooseConnection: Mongoose) {
         type: String,
         required: false,
       },
+      isVerified: Boolean,
+      verifiedDate: {
+        type: Date,
+        required: false
+      },
+      expirationDate: {
+        type: Date,
+        required: true
+      }
     },
     { timestamps: true }
   );
 
   schema.index(
-    { email: 1, verificationCode: 1 },
+    { email: 1 },
     { unique: true }
   );
 
@@ -39,5 +48,5 @@ export default function defineModel(mongooseConnection: Mongoose) {
     }
   });
 
-  return mongooseConnection.model("verificationEmail", schema);
+  return mongooseConnection.model("VerificationEmail", schema);
 };

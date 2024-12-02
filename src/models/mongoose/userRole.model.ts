@@ -10,14 +10,13 @@ export default function defineModel(mongooseConnection: Mongoose) {
   const schema = new mongoose.Schema(
     {
       UserId: {
-        type: Schema.Types.ObjectId, ref: 'user',
+        type: Schema.Types.ObjectId, ref: 'User',
         required: true,
       },
       RoleId: {
-        type: Schema.Types.ObjectId, ref: 'role',
+        type: Schema.Types.ObjectId, ref: 'Role',
         required: true,
       },
-
       dbConfig: Object,
     },
     { timestamps: true }
@@ -47,5 +46,5 @@ export default function defineModel(mongooseConnection: Mongoose) {
   });
 
 
-  return mongooseConnection.model("userRole", schema);
+  return mongooseConnection.model("UserRole", schema);
 };

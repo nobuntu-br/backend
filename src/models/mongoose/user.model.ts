@@ -12,13 +12,31 @@ export default function defineModel(mongooseConnection: Mongoose){
       required: true,
       unique: true
     },
-    TenantUID: String,
-    userName: String,
-    firstName: String,
-    lastName: String,
-    isAdministrator: Boolean,
+    tenantUID: {
+      type: String,
+      required: true
+    },
+    userName: {
+      type: String,
+      required: true
+    },
+    firstName: {
+      type: String,
+      required: true
+    },
+    lastName: {
+      type: String,
+      required: true
+    },
+    isAdministrator: {
+      type: Boolean,
+      required: true
+    },
     memberType: String,
-    Roles: [{ type: Schema.Types.ObjectId, ref: 'roles' }],
+    email: {
+      type: String,
+      required: true
+    },
   },
     { timestamps: true });
 
@@ -40,5 +58,5 @@ export default function defineModel(mongooseConnection: Mongoose){
     }
   });
 
-  return mongooseConnection.model("user", schema);
+  return mongooseConnection.model("User", schema);
 };

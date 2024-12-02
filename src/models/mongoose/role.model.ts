@@ -11,7 +11,6 @@ export default function defineModel(mongooseConnection: Mongoose) {
   var schema = new mongoose.Schema<Role>(
     {
       name: String,
-
     },
     { timestamps: true }
   );
@@ -25,5 +24,5 @@ export default function defineModel(mongooseConnection: Mongoose) {
     }
   });
 
-  return mongooseConnection.model<Role>("role", schema);
+  return mongooseConnection.model<Role>("Role", schema);
 };

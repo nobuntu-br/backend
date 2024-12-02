@@ -1,22 +1,21 @@
-import { BaseResourceModel } from "./base-resource.model" 
+import { BaseResourceModel } from "./baseResource.model"
 
+interface IFile {
+  name?: string,
+  size?: number,
+  extension?: string,
+  dataBlob?: Blob,
+  fieldFile?: number
 
-interface IFile { 
-    name?: string,
-    size?: number,
-    extension?: string,
-    dataBlob?: Blob,
-    fieldFile?: number
+}
+export class File extends BaseResourceModel implements IFile {
+  name?: string;
+  size?: number;
+  extension?: string;
+  dataBlob?: Blob;
+  fieldFile?: number;
 
-} 
-export class File extends BaseResourceModel implements IFile{ 
-    name?: string;
-    size?: number;
-    extension?: string;
-    dataBlob?: Blob;
-    fieldFile?: number;
-
-  static fromJson(jsonData: any) : File { 
-    return Object.assign(new File(), jsonData); 
-  } 
+  static fromJson(jsonData: any): File {
+    return Object.assign(new File(), jsonData);
+  }
 }

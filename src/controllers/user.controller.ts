@@ -1,16 +1,21 @@
 import { NextFunction, Request, Response } from "express";
 import { BaseController } from "./base.controller";
 import { UserService } from "../services/user.service";
-import { User } from "../models/user.model";
+import { IUser } from "../models/user.model";
 import { RegisterUserUseCase } from "../useCases/user/registerUser.useCase";
-import UserTenantService from "../services/userTenant.service";
-import TenantService from "../services/tenant.service";
-import { TenantCredentialService } from "../services/tenantCredential.service";
 import { NotFoundError } from "../errors/notFound.error";
 import { CheckEmailExistUseCase } from "../useCases/user/checkEmailExist.useCase";
 import { SendVerificationCodeToEmailUseCase } from "../useCases/user/sendVerificationCodeToEmail.useCase";
-import { VerifyCodeSendToEmailUseCase } from "../useCases/user/verifyCodeSentToEmail.useCase";
 import { VerificationEmailService } from "../services/verificationEmail.service";
+import { ChangeUserPasswordUseCase } from "../useCases/user/changeUserPassword.useCase";
+import { AzureADService } from "../services/azureAD.service";
+import { SignInUseCase } from "../useCases/user/signIn.useCase";
+import { ValidateEmailVerificationCodeUseCase } from "../useCases/user/validateEmailVerificationCode.useCase";
+import { SendChangeUserPasswordLinkToEmailUseCase } from "../useCases/user/sendChangeUserPasswordLinkToEmail.useCase";
+import { EmailService } from "../services/email.service";
+import { InviteUserToApplicationUseCase } from "../useCases/user/inviteUserToApplication.useCase";
+import TenantService from "../services/tenant.service";
+import { TokenGenerator } from "../utils/tokenGenerator";
 
 export class UserController {
 
@@ -21,18 +26,23 @@ export class UserController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
+
+
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["user"], req.body.databaseConnection.connection);
+      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
+      const verificationEmailService: VerificationEmailService = new VerificationEmailService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
+      const azureADService: AzureADService = new AzureADService();
+      const tokenGenerator: TokenGenerator= new TokenGenerator();
 
-      const registerUserUseCase: RegisterUserUseCase = new RegisterUserUseCase(userService);
+      const registerUserUseCase: RegisterUserUseCase = new RegisterUserUseCase(userService, verificationEmailService, azureADService, tokenGenerator);
 
-      //TODO usar o DTO para passar para o UseCase os dados corretamente
       const user = await registerUserUseCase.execute({
-        UID: req.body.UID,
-        userName: req.body.userName,
+        email: req.body.email,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
-        memberType: req.body.memberType
+        password: req.body.password,
+        userName: req.body.userName,
+        invitedTenantsToken: req.body.invitedTenantsToken
       });
 
       res.status(200).send(user);
@@ -49,8 +59,8 @@ export class UserController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["user"], req.body.databaseConnection.connection);
-      const baseController: BaseController<User> = new BaseController(userService, "User");
+      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
+      const baseController: BaseController<IUser> = new BaseController(userService, "User");
 
       baseController.findAll(req, res, next);
     } catch (error) {
@@ -65,8 +75,8 @@ export class UserController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["user"], req.body.databaseConnection.connection);
-      const baseController: BaseController<User> = new BaseController(userService, "User");
+      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
+      const baseController: BaseController<IUser> = new BaseController(userService, "User");
 
       baseController.findById(req, res, next);
     } catch (error) {
@@ -81,8 +91,8 @@ export class UserController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["user"], req.body.databaseConnection.connection);
-      const baseController: BaseController<User> = new BaseController(userService, "User");
+      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
+      const baseController: BaseController<IUser> = new BaseController(userService, "User");
 
       baseController.getCount(req, res, next);
     } catch (error) {
@@ -96,8 +106,8 @@ export class UserController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["user"], req.body.databaseConnection.connection);
-      const baseController: BaseController<User> = new BaseController(userService, "User");
+      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
+      const baseController: BaseController<IUser> = new BaseController(userService, "User");
 
       baseController.update(req, res, next);
     } catch (error) {
@@ -112,8 +122,8 @@ export class UserController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["user"], req.body.databaseConnection.connection);
-      const baseController: BaseController<User> = new BaseController(userService, "User");
+      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
+      const baseController: BaseController<IUser> = new BaseController(userService, "User");
 
       baseController.delete(req, res, next);
     } catch (error) {
@@ -128,8 +138,8 @@ export class UserController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["user"], req.body.databaseConnection.connection);
-      const baseController: BaseController<User> = new BaseController(userService, "User");
+      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
+      const baseController: BaseController<IUser> = new BaseController(userService, "User");
 
       baseController.deleteAll(req, res, next);
     } catch (error) {
@@ -144,7 +154,7 @@ export class UserController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["user"], req.body.databaseConnection.connection);
+      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
 
       const user = await userService.findOne({ UID: req.params.UID });
       if (!user) {
@@ -157,12 +167,16 @@ export class UserController {
   }
 
   async checkEmailExist(req: Request, res: Response, next: NextFunction) {
-    const { email } = req.body;
-
     try {
-      
-      const checkEmailExistUseCase: CheckEmailExistUseCase = new CheckEmailExistUseCase();
-      const emailIsValid = await checkEmailExistUseCase.execute(email);
+      if (req.body.databaseConnection == undefined) {
+        throw new NotFoundError("Não foi definido tenant para uso.")
+      }
+      //O Service será criado com base no tipo de banco de dados e o model usado
+      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
+
+      const azureADService: AzureADService = new AzureADService();
+      const checkEmailExistUseCase: CheckEmailExistUseCase = new CheckEmailExistUseCase(userService, azureADService);
+      const emailIsValid = await checkEmailExistUseCase.execute(req.body);
       
       return res.status(200).send(emailIsValid);
     } catch (error) {
@@ -171,17 +185,15 @@ export class UserController {
   }
   
   async sendVerificationEmailCodeToEmail(req: Request, res: Response, next: NextFunction) {
-    const { email } = req.body;
-
     try {
 
       if (req.body.databaseConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
-      const verificationEmailService: VerificationEmailService = new VerificationEmailService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["verificationEmail"], req.body.databaseConnection.connection);
+      const verificationEmailService: VerificationEmailService = new VerificationEmailService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
       const sendVerificationCodeUseCase : SendVerificationCodeToEmailUseCase = new SendVerificationCodeToEmailUseCase(verificationEmailService);
-      const result = await sendVerificationCodeUseCase.execute(email);
+      const result = await sendVerificationCodeUseCase.execute(req.body);
 
       return res.status(200).send(result);
     
@@ -191,17 +203,17 @@ export class UserController {
   }
 
   async validateVerificationEmailCode(req: Request, res: Response, next: NextFunction){
-    const { email, verificationEmailCode } = req.body;
-    
     try {
 
       if (req.body.databaseConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       
-      const verificationEmailService: VerificationEmailService = new VerificationEmailService(req.body.databaseConnection.databaseType, req.body.databaseConnection.models["verificationEmail"], req.body.databaseConnection.connection);
-      const verifyCodeSendToEmailUseCase: VerifyCodeSendToEmailUseCase = new VerifyCodeSendToEmailUseCase(verificationEmailService);
-      const result = await verifyCodeSendToEmailUseCase.execute(email, verificationEmailCode);
+      const verificationEmailService: VerificationEmailService = new VerificationEmailService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
+      const validateEmailVerificationCodeUseCase: ValidateEmailVerificationCodeUseCase = new ValidateEmailVerificationCodeUseCase(verificationEmailService);
+      const result = await validateEmailVerificationCodeUseCase.execute({
+        verificationEmailCode: String(req.body.verificationEmailCode)
+      });
 
       return res.status(200).send(result);
     } catch (error) {
@@ -209,4 +221,96 @@ export class UserController {
     }
   }
   
+  async createUserForSpecificTenant(req: Request, res: Response, next: NextFunction){
+    try {
+
+      if (req.body.databaseConnection == undefined) {
+        throw new NotFoundError("Não foi definido tenant para uso.")
+      }
+      
+      throw new Error("Função não finalizada");
+      
+      // return res.status(200).send(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Faz envio de um link para o email do usuário para ele realizar a alteração de senha na pagina da aplicação
+   */
+  async sendChangeUserPasswordLinkToEmail(req: Request, res: Response, next: NextFunction){
+    try {
+
+      //Definir o servico de email que será usado
+      const emailService: EmailService = new EmailService();
+      const sendChangeUserPasswordLinkToEmailUseCase : SendChangeUserPasswordLinkToEmailUseCase = new SendChangeUserPasswordLinkToEmailUseCase(emailService);
+      const result = await sendChangeUserPasswordLinkToEmailUseCase.execute({
+        email: req.body.email
+      });
+      
+      return res.status(200).send(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async changePassword(req: Request, res: Response, next: NextFunction){
+    try {
+
+      const azureADService: AzureADService = new AzureADService();
+      const changeUserPasswordUseCase: ChangeUserPasswordUseCase = new ChangeUserPasswordUseCase(azureADService);
+      const result = await changeUserPasswordUseCase.execute({email: req.body.email, password: req.body.password});
+      
+      return res.status(200).send(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async signin(req: Request, res: Response, next: NextFunction){
+    try {
+
+      const azureADService: AzureADService = new AzureADService();
+      const signInUseCase: SignInUseCase = new SignInUseCase(azureADService);
+      const result = await signInUseCase.execute({email: req.body.email, password: req.body.password});
+      
+      return res.status(200).send(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getUserImage(){
+
+  }
+
+  async inviteUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      if (req.body.databaseConnection == undefined) {
+        throw new NotFoundError("Não foi definido tenant para uso.")
+      }
+      //O Service será criado com base no tipo de banco de dados e o model usado
+      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
+      //Definir o servico de email que será usado
+      const emailService: EmailService = new EmailService();
+      //Serviço de geração de token
+      const tokenGenerator = new TokenGenerator();
+      //O Service será criado com base no tipo de banco de dados e o model usado
+      const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
+
+      const inviteUserToApplicationUseCase: InviteUserToApplicationUseCase = new InviteUserToApplicationUseCase(emailService, userService, tokenGenerator, tenantService);
+
+      const response = await inviteUserToApplicationUseCase.execute({
+        invitedUserEmail: req.body.invitedUserEmail,
+        invitedUserTenantIds: req.body.invitedUserTenantIds,
+        invitingUserEmail: req.body.invitingUserEmail,
+        invitingUserUID: req.body.invitingUserUID
+      });
+
+      return res.status(200).send(response);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

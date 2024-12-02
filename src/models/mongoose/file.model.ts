@@ -1,30 +1,30 @@
 import mongoose, { Mongoose, Schema } from "mongoose";
 import { File } from "../file.model";
 
-export default function defineModel(mongooseConnection: Mongoose) { 
+export default function defineModel(mongooseConnection: Mongoose) {
 
-  if (mongooseConnection.models.file) { 
-    return mongooseConnection.models.file; 
-  } 
+  if (mongooseConnection.models.file) {
+    return mongooseConnection.models.file;
+  }
 
-  var schema = new mongoose.Schema<File>( 
+  var schema = new mongoose.Schema<File>(
     {
-        name: {
-            type: String,
-            required: true
-        },
-        size: {
-            type: Number,
-            required: true
-        },
-        extension: {
-            type: String,
-            required: true
-        },
-        dataBlob: {
-            type: Buffer,
-            required: true
-        }
+      name: {
+        type: String,
+        required: true
+      },
+      size: {
+        type: Number,
+        required: true
+      },
+      extension: {
+        type: String,
+        required: true
+      },
+      dataBlob: {
+        type: Buffer,
+        required: true
+      }
     },
     { timestamps: true }
   );
@@ -38,5 +38,5 @@ export default function defineModel(mongooseConnection: Mongoose) {
     }
   });
 
-  return mongooseConnection.model<File>("estrutura_orcamento", schema); 
+  return mongooseConnection.model<File>("File", schema);
 };

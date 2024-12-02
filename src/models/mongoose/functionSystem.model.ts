@@ -42,5 +42,5 @@ export default function defineModel(mongooseConnection: Mongoose) {
     }
   });
 
-  return mongooseConnection.model('functionSystem', schema);
+  return mongooseConnection.model('FunctionSystem', schema);
 };
