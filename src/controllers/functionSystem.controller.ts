@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { BaseController } from "./base.controller";
 import { FunctionSystemService } from "../services/functionSystem.service";
-import { FunctionSystem } from "../models/functionSystem.model";
+import { FunctionSystem, IFunctionSystem } from "../models/functionSystem.model";
 import { NotFoundError } from "../errors/notFound.error";
 
 export class FunctionSystemController {
@@ -19,7 +19,7 @@ export class FunctionSystemController {
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
       const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
-      const baseController: BaseController<FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
+      const baseController: BaseController<IFunctionSystem, FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
 
       baseController.create(req, res, next);
     } catch (error) {
@@ -35,7 +35,7 @@ export class FunctionSystemController {
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
       const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
-      const baseController: BaseController<FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
+      const baseController: BaseController<IFunctionSystem, FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
 
       baseController.findAll(req, res, next);
     } catch (error) {
@@ -51,7 +51,7 @@ export class FunctionSystemController {
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
       const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
-      const baseController: BaseController<FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
+      const baseController: BaseController<IFunctionSystem, FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
 
       baseController.findById(req, res, next);
     } catch (error) {
@@ -68,7 +68,7 @@ export class FunctionSystemController {
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
       const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
-      const baseController: BaseController<FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
+      const baseController: BaseController<IFunctionSystem, FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
 
       baseController.getCount(req, res, next);
     } catch (error) {
@@ -84,7 +84,7 @@ export class FunctionSystemController {
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
       const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
-      const baseController: BaseController<FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
+      const baseController: BaseController<IFunctionSystem, FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
 
       baseController.update(req, res, next);
     } catch (error) {
@@ -100,7 +100,7 @@ export class FunctionSystemController {
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
       const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
-      const baseController: BaseController<FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
+      const baseController: BaseController<IFunctionSystem, FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
 
       baseController.delete(req, res, next);
     } catch (error) {
@@ -116,7 +116,7 @@ export class FunctionSystemController {
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
       const functionSystemService: FunctionSystemService = new FunctionSystemService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
-      const baseController: BaseController<FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
+      const baseController: BaseController<IFunctionSystem, FunctionSystem> = new BaseController(functionSystemService, "FunctionSystem");
 
       baseController.deleteAll(req, res, next);
     } catch (error) {

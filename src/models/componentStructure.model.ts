@@ -1,6 +1,6 @@
 import { BaseResourceModel } from "./baseResource.model";
 
-export interface IComponentStructure {
+export interface IComponentStructure extends BaseResourceModel {
   structure?: string;
   componentName?: string;
   createdAt?: string;

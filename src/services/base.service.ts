@@ -2,49 +2,49 @@ import { DatabaseType } from "../adapters/createDb.adapter";
 import { IBaseRepository } from "../repositories/ibase.repository";
 import { IBaseService } from "./IBase.service";
 
-export default class BaseService<T> implements IBaseService<T> {
+export default class BaseService<TInterface, TClass> implements IBaseService<TInterface, TClass> {
   databaseType: DatabaseType;
-  repository: IBaseRepository<T>;
+  repository: IBaseRepository<TInterface, TClass>;
   databaseConnection: any;
 
   /**
    * @param databaseConnection Instância da conexão com banco de dados 
    */
-  constructor(repository: IBaseRepository<T>, databaseType: DatabaseType, databaseConnection: any) {
+  constructor(repository: IBaseRepository<TInterface, TClass>, databaseType: DatabaseType, databaseConnection: any) {
     this.repository = repository;
     this.databaseType = databaseType;
     this.databaseConnection = databaseConnection;
   }
 
-  create(data: T): Promise<T> {
+  create(data: TClass): Promise<TClass> {
     return this.repository.create(data);
   }
 
-  findAll(limitPerPage: number, offset: number): Promise<T[] | null> {
+  findAll(limitPerPage: number, offset: number): Promise<TClass[] | null> {
     return this.repository.findAll(limitPerPage, offset);
   }
 
-  findOne(query: T): Promise<T | null> {
+  findOne(query: TInterface): Promise<TClass> {
     return this.repository.findOne(query);
   }
 
-  findMany(query: T): Promise<T[] | null> {
+  findMany(query: TInterface): Promise<TClass[]> {
     return this.repository.findMany(query);
   }
 
-  findById(id: string): Promise<T | null> {
+  findById(id: number): Promise<TClass> {
     return this.repository.findById(id);
   }
 
-  getCount(): Promise<number | null> {
+  getCount(): Promise<number> {
     return this.repository.getCount();
   }
   
-  update(id: string, data: Object): Promise<T | null> {
+  update(id: number, data: Object): Promise<TClass | null> {
     return this.repository.update(id, data);
   }
 
-  delete(id: string): Promise<T | null> {
+  delete(id: number): Promise<TClass | null> {
     return this.repository.delete(id);
   }
 
@@ -52,7 +52,7 @@ export default class BaseService<T> implements IBaseService<T> {
     return this.repository.deleteAll();    
   }
 
-  findCustom(filterValues: any[], filterConditions: string[], model: any): Promise<T[] | null> {
+  findCustom(filterValues: any[], filterConditions: string[], model: any): Promise<TClass[] | null> {
     return this.repository.findCustom(filterValues, filterConditions, model);
   }
 

@@ -7,12 +7,12 @@ import { UnknownError } from "../errors/unknown.error";
 /**
  * Implementação das funcionalidades do banco de dados com uso da biblioteca Mongoose
  */
-export class MongooseAdapter<T> implements IDatabaseAdapter<T> {
+export class MongooseAdapter<TInterface, TClass> implements IDatabaseAdapter<TInterface, TClass> {
 
   private _model: Model<any>;
   private _databaseType: string;
 
-  constructor(model: Model<any>, databaseType: string, protected jsonDataToResourceFn: (jsonData: any) => T) {
+  constructor(model: Model<any>, databaseType: string, protected jsonDataToResourceFn: (jsonData: any) => TClass) {
     this._model = model;
     this._databaseType = databaseType;
   }
@@ -25,7 +25,7 @@ export class MongooseAdapter<T> implements IDatabaseAdapter<T> {
     return this._model;
   }
 
-  async create(data: any): Promise<T> {
+  async create(data: TClass): Promise<TClass> {
     try {
       const item = new this._model(data);
       const newItem = await item.save();
@@ -36,7 +36,7 @@ export class MongooseAdapter<T> implements IDatabaseAdapter<T> {
 
   }
 
-  async findAll(limitPerPage: number, offset: number): Promise<T[]> {
+  async findAll(limitPerPage: number, offset: number): Promise<TClass[]> {
     try {
       const returnedValues = await this._model.find({}).skip(offset).limit(limitPerPage);
 
@@ -47,10 +47,10 @@ export class MongooseAdapter<T> implements IDatabaseAdapter<T> {
     
   }
 
-  async findOne(query: any): Promise<T> {
+  async findOne(query: TInterface): Promise<TClass> {
 
     try {
-      const returnedValue = await this._model.findOne( query );
+      const returnedValue = await this._model.findOne( query! );
 
       if (returnedValue == null) {
         throw new NotFoundError("Not found document");
@@ -67,11 +67,11 @@ export class MongooseAdapter<T> implements IDatabaseAdapter<T> {
     }
   }
 
-  findMany(query: any): Promise<T[]> {
+  findMany(query: TInterface): Promise<TClass[]> {
     throw new Error("Method not implemented");
   }
 
-  async findById(id: string): Promise<T> {
+  async findById(id: string): Promise<TClass> {
     try {
       const returnedValue = await this._model.findById(id).exec();
 
@@ -98,7 +98,7 @@ export class MongooseAdapter<T> implements IDatabaseAdapter<T> {
     }
   }
 
-  async update(id: string, data: Object): Promise<T> {
+  async update(id: string, data: Object): Promise<TClass> {
     try {
       const returnedValue = await this._model.findByIdAndUpdate(id, data, { useFindAndModify: false, new: true });
 
@@ -117,7 +117,7 @@ export class MongooseAdapter<T> implements IDatabaseAdapter<T> {
     }
   }
 
-  async delete(id: string): Promise<T> {
+  async delete(id: string): Promise<TClass> {
     
     try {
       const returnedValue = await this._model.findByIdAndDelete(id);
@@ -145,7 +145,7 @@ export class MongooseAdapter<T> implements IDatabaseAdapter<T> {
     }
   }
 
-  async findCustom(filterValues: any[], filterConditions: string[], model: Model<any>): Promise<T[] | null> {
+  async findCustom(filterValues: any[], filterConditions: string[], model: Model<any>): Promise<TClass[] | null> {
     try{
       const items = await findDataByCustomQuery(filterValues, filterConditions, model);
 
@@ -155,7 +155,7 @@ export class MongooseAdapter<T> implements IDatabaseAdapter<T> {
     }
   }
 
-  async findUsingCustomQuery(query: any): Promise<T[]> {
+  async findUsingCustomQuery(query: any): Promise<TClass[]> {
     try {
       return await this._model.aggregate(query);
     } catch (error) {
@@ -163,15 +163,15 @@ export class MongooseAdapter<T> implements IDatabaseAdapter<T> {
     }
   }
 
-  protected jsonDataToResources(jsonData: any[]): T[] {
-    const resources: T[] = [];
+  protected jsonDataToResources(jsonData: any[]): TClass[] {
+    const resources: TClass[] = [];
     jsonData.forEach(
       element => resources.push(this.jsonDataToResourceFn(element.toObject()))
     );
     return resources;
   }
 
-  protected jsonDataToResource(jsonData: any): T {
+  protected jsonDataToResource(jsonData: any): TClass {
     return this.jsonDataToResourceFn(jsonData.toObject());
   }
 

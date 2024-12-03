@@ -49,8 +49,12 @@ export class TenantConnectionService {
     return this.tenantConnections;
   }
 
-  findOneConnection(tenantCredentialId: string): TenantConnection {
-    return this.tenantConnections.get(tenantCredentialId)!;
+  findOneConnection(tenantCredentialId: string): TenantConnection | null {
+    const tenantConnection: TenantConnection | undefined = this.tenantConnections.get(tenantCredentialId);
+    if(tenantConnection != undefined){
+      return this.tenantConnections.get(tenantCredentialId)!; 
+    }
+    return null;
   }
 
   removeConnection(tenantConnection: TenantConnection): TenantConnection | null {

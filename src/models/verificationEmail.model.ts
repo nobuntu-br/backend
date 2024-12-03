@@ -1,7 +1,6 @@
 import { BaseResourceModel } from "./baseResource.model";
 
-export interface IVerificationEmail {
-  id?: string;
+export interface IVerificationEmail extends BaseResourceModel{
   email?: string;
   verificationCode?: string;
   isVerified?: boolean;
@@ -11,7 +10,6 @@ export interface IVerificationEmail {
 }
 
 export class VerificationEmail extends BaseResourceModel implements IVerificationEmail {
-  id?: string;
   email?: string;
   verificationCode?: string;
   isVerified?: boolean;

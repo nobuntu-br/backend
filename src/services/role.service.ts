@@ -1,9 +1,9 @@
 import { DatabaseType } from "../adapters/createDb.adapter";
-import { Role } from "../models/role.model";
+import { IRole, Role } from "../models/role.model";
 import RoleRepository from "../repositories/role.repository";
 import BaseService from "./base.service";
 
-export default class RoleService extends BaseService<Role> {
+export default class RoleService extends BaseService<IRole, Role> {
   private roleRepository: RoleRepository;
 
   constructor(databaseType: DatabaseType, databaseConnection: any) {

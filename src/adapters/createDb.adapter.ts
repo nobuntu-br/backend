@@ -11,14 +11,14 @@ export type DatabaseType = "mongodb" | "postgres" | "mysql" | "sqlite" | "mariad
  * @param jsonDataToResourceFn Função para criar uma classe com base no JSON retornado das funções
  * @returns 
  */
-function createDbAdapter<T>(databaseType: DatabaseType, model: any, jsonDataToResourceFn: (jsonData: any) => T): IDatabaseAdapter<T> {
+function createDbAdapter<TInterface, TClass>(databaseType: DatabaseType, model: any, jsonDataToResourceFn: (jsonData: any) => TClass): IDatabaseAdapter<TInterface, TClass> {
   switch (databaseType) {
     case "mongodb":
-      return new MongooseAdapter<T>(model, databaseType, jsonDataToResourceFn);
+      return new MongooseAdapter<TInterface, TClass>(model, databaseType, jsonDataToResourceFn);
     case "firebird":
       throw new Error("Method not implemented");
     default:
-      return new SequelizeAdapter<T>(model, databaseType, jsonDataToResourceFn);
+      return new SequelizeAdapter<TInterface, TClass>(model, databaseType, jsonDataToResourceFn);
   }
 }
 

@@ -1,9 +1,9 @@
 import { DatabaseType } from "../adapters/createDb.adapter";
-import { FunctionSystemRole } from "../models/functionSystemRole.model";
+import { FunctionSystemRole, IFunctionSystemRole } from "../models/functionSystemRole.model";
 import FunctionSystemRoleRepository from "../repositories/functionSystemRole.repository";
 import BaseService from "./base.service";
 
-export class FunctionSystemRoleService extends BaseService<FunctionSystemRole> {
+export class FunctionSystemRoleService extends BaseService<IFunctionSystemRole, FunctionSystemRole> {
   private functionSystemRoleRepository: FunctionSystemRoleRepository;
 
   constructor(databaseType: DatabaseType, databaseConnection: any) {

@@ -1,9 +1,9 @@
 import { DatabaseType } from "../adapters/createDb.adapter";
-import { IVerificationEmail } from "../models/verificationEmail.model";
+import { IVerificationEmail, VerificationEmail } from "../models/verificationEmail.model";
 import VerificationEmailRepository from "../repositories/verificationEmail.repository";
 import BaseService from "./base.service";
 
-export class VerificationEmailService extends BaseService<IVerificationEmail> {
+export class VerificationEmailService extends BaseService<IVerificationEmail, VerificationEmail> {
   private verificationEmailRepository: VerificationEmailRepository;
 
   constructor(databaseType: DatabaseType, databaseConnection: any) {

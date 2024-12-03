@@ -1,6 +1,11 @@
-import { connectSecurityTenant } from "../../config/database.config";
+import { DatabaseType } from "../../adapters/createDb.adapter";
+import { connectToDatabase } from "../../config/databaseConnection.config";
+import { DatabaseCredential } from "../../models/databaseCredential.model";
 import TenantConnection from "../../models/tenantConnection.model";
 import { TenantConnectionService } from "../../services/tenantConnection.service";
+import { getEnvironmentNumber } from "../../utils/environmentGetters.util";
+import getMongooseSecurityModels from "../../models/mongoose/indexSecurity";
+import getSequelizeSecurityModels from "../../models/sequelize/indexSecurity.model";
 
 export class GetSecurityTenantConnectionUseCase {
   constructor() { }
@@ -16,19 +21,70 @@ export class GetSecurityTenantConnectionUseCase {
       throw new Error(`Dados ausentes ao realizar a conexão com o banco security`);
     }
 
+    const databaseCredential: DatabaseCredential = new DatabaseCredential({
+      name: process.env.SECURITY_TENANT_DATABASE_NAME,
+      type: process.env.SECURITY_TENANT_DATABASE_TYPE as DatabaseType,
+      username: process.env.SECURITY_TENANT_DATABASE_USERNAME,
+      password: process.env.SECURITY_TENANT_DATABASE_PASSWORD,
+      host: process.env.SECURITY_TENANT_DATABASE_HOST,
+      port: process.env.SECURITY_TENANT_DATABASE_PORT,
+      srvEnabled: process.env.SECURITY_TENANT_DATABASE_SRV_ENABLED === "true" ? true : false,
+      options: process.env.SECURITY_TENANT_DATABASE_OPTIONS,
+      storagePath: process.env.SECURITY_TENANT_DATABASE_STORAGE_PATH,
+      sslEnabled: process.env.SECURITY_TENANT_DATABASE_SSL_ENABLED === "true" ? true : false,
+      poolSize: getEnvironmentNumber("SECURITY_TENANT_DATABASE_POOLSIZE", 1),
+      timeOutTime: getEnvironmentNumber("SECURITY_TENANT_DATABASE_TIMEOUT", 3000),
+
+      //SSL data
+      sslCertificateAuthority: process.env.SECURITY_TENANT_DATABASE_SSL_CERTIFICATE_AUTHORITY,
+      sslPrivateKey: process.env.SECURITY_TENANT_DATABASE_SSL_PRIVATE_KEY,
+      sslCertificate: process.env.SECURITY_TENANT_DATABASE_SSL_CERTIFICATE
+    });
+
+    if (databaseCredential.checkDatabaseCredential(databaseCredential) == false || tenantId == undefined) {
+      throw new Error("Missing data on environment variables to connect Security Tenant.");
+    }
+
     try {
 
-      const tenantConnectionService: TenantConnectionService = TenantConnectionService.instance; 
+      const tenantConnectionService: TenantConnectionService = TenantConnectionService.instance;
 
-      const tenantConnection: TenantConnection = tenantConnectionService.findOneConnection(tenantId);
+      let tenantConnection: TenantConnection | null = tenantConnectionService.findOneConnection(tenantId);
+
       if (tenantConnection != null) {
         return tenantConnection;
       }
 
-      return await connectSecurityTenant(tenantId);
+      try {
+        tenantConnection = await connectToDatabase(databaseCredential, true);
+      } catch (error) {
+        throw new Error("Erro ao realizar a conexão com o banco de dados Security! Verifique se o banco de dados foi criado. Detail: " + error);
+      }
+
+      tenantConnection.models = await this.getModelsSecurity(databaseCredential.type!, tenantConnection.connection);
+
+      tenantConnectionService.setOnTenantConnectionPool(tenantId, tenantConnection);
+
+      console.log("Connection established with the Security database. Responsible for managing Tenants.");
+      return tenantConnection;
 
     } catch (error) {
       throw new Error(`Erro ao obter a instância da conexão com o banco de dados de controle de tenants: ${error}`);
+    }
+  }
+
+
+  /**
+   * Define os models da banco de dados Security na conexão
+   * @param databaseType Tipo de banco de dados
+   * @param connection Instância da conexão com o banco de dados
+   * @returns
+   */
+  getModelsSecurity(databaseType: string, connection: any): any {
+    if (databaseType === "mongodb") {
+      return getMongooseSecurityModels(connection);
+    } else {
+      return getSequelizeSecurityModels(connection);
     }
   }
 

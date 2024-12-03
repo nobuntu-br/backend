@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { BaseController } from "./base.controller";
 import { UserService } from "../services/user.service";
-import { IUser } from "../models/user.model";
+import { IUser, User } from "../models/user.model";
 import { RegisterUserUseCase } from "../useCases/user/registerUser.useCase";
 import { NotFoundError } from "../errors/notFound.error";
 import { CheckEmailExistUseCase } from "../useCases/user/checkEmailExist.useCase";
@@ -60,7 +60,7 @@ export class UserController {
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
       const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
-      const baseController: BaseController<IUser> = new BaseController(userService, "User");
+      const baseController: BaseController<IUser, User> = new BaseController(userService, "User");
 
       baseController.findAll(req, res, next);
     } catch (error) {
@@ -76,7 +76,7 @@ export class UserController {
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
       const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
-      const baseController: BaseController<IUser> = new BaseController(userService, "User");
+      const baseController: BaseController<IUser, User> = new BaseController(userService, "User");
 
       baseController.findById(req, res, next);
     } catch (error) {
@@ -92,7 +92,7 @@ export class UserController {
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
       const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
-      const baseController: BaseController<IUser> = new BaseController(userService, "User");
+      const baseController: BaseController<IUser, User> = new BaseController(userService, "User");
 
       baseController.getCount(req, res, next);
     } catch (error) {
@@ -107,7 +107,7 @@ export class UserController {
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
       const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
-      const baseController: BaseController<IUser> = new BaseController(userService, "User");
+      const baseController: BaseController<IUser, User> = new BaseController(userService, "User");
 
       baseController.update(req, res, next);
     } catch (error) {
@@ -123,7 +123,7 @@ export class UserController {
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
       const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
-      const baseController: BaseController<IUser> = new BaseController(userService, "User");
+      const baseController: BaseController<IUser, User> = new BaseController(userService, "User");
 
       baseController.delete(req, res, next);
     } catch (error) {
@@ -139,7 +139,7 @@ export class UserController {
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
       const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
-      const baseController: BaseController<IUser> = new BaseController(userService, "User");
+      const baseController: BaseController<IUser, User> = new BaseController(userService, "User");
 
       baseController.deleteAll(req, res, next);
     } catch (error) {

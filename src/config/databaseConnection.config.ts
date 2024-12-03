@@ -20,7 +20,7 @@ export async function connectToDatabase(databaseCredential: IDatabaseCredential,
     } else {
       _databaseConnection = await connectToDatabaseWithSequelize(databaseCredential, true);
     }
-    return new TenantConnection(databaseCredential.type , _databaseConnection, isTenantManagerDatabase);
+    return new TenantConnection(databaseCredential.type! , _databaseConnection, isTenantManagerDatabase);
   } catch (error) {
     throw new Error('Erro durante a conexão com o banco de dados. ' +error);
   }
@@ -29,6 +29,8 @@ export async function connectToDatabase(databaseCredential: IDatabaseCredential,
 async function connectToDatabaseWithMongoose(databaseCredential: IDatabaseCredential): Promise<Connection> {
   try {
     const uri: string = buildMongoDBURI(databaseCredential);
+
+    console.log("URI: ", uri);
 
     const connection = await mongoose.createConnection(uri).asPromise();
 
@@ -43,19 +45,28 @@ async function connectToDatabaseWithSequelize(databaseCredential: IDatabaseCrede
   try {
     const uri: string = buildSequelizeURI(databaseCredential);
 
-    const sequelize = new Sequelize(uri, {
-      dialect: databaseCredential.type as Dialect,
-      logging: false,
-      dialectOptions: {
-        ssl: {
-          require: databaseCredential.sslEnabled,
-          rejectUnauthorized: rejectUnauthorizedSSL, // Rejeita certificados não confiáveis (true se for banco em produção)
-          ca: databaseCredential.sslCertificateAuthority ? '' : databaseCredential.sslCertificateAuthority,
-          key: databaseCredential.sslPrivateKey ? '' : databaseCredential.sslPrivateKey,
-          cert: databaseCredential.sslCertificate ? '' : databaseCredential.sslCertificate,
-        },
-      }
-    });
+    let sequelize;
+    
+    if(databaseCredential.sslEnabled == true){
+      sequelize = new Sequelize(uri, {
+        dialect: databaseCredential.type as Dialect,
+        logging: false,
+        dialectOptions: {
+          ssl: {
+            require: false,
+            rejectUnauthorized: rejectUnauthorizedSSL, // Rejeita certificados não confiáveis (true se for banco em produção)
+            ca: databaseCredential.sslCertificateAuthority,
+            key: databaseCredential.sslPrivateKey,
+            cert: databaseCredential.sslCertificate,
+          },
+        }
+      });
+    } else {
+      sequelize = new Sequelize(uri, {
+        dialect: databaseCredential.type as Dialect,
+        logging: false,
+      });
+    }
 
     await sequelize.authenticate();
     console.log("Connected "+ databaseCredential.type + " database.");

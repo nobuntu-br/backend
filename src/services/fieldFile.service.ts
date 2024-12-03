@@ -1,10 +1,10 @@
 import { DatabaseType } from "../adapters/createDb.adapter";
 import FieldFileRepository from "../repositories/fieldFile.repository";
-import { FieldFile } from "../models/fieldFile.model"; 
+import { FieldFile, IFieldFile } from "../models/fieldFile.model"; 
 import BaseService from "./base.service";
 import { NextFunction, Request, Response } from "express";
 
-export class FieldFileService extends BaseService<FieldFile>{
+export class FieldFileService extends BaseService<IFieldFile, FieldFile>{
 
   fieldFileRepository: FieldFileRepository;
 

@@ -8,12 +8,12 @@ import { UnknownError } from "../errors/unknown.error";
 /**
  * Implementação das funcionalidades do banco de dados com uso da biblioteca Sequelize
  */
-export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
+export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TInterface, TClass> {
 
   private _model: ModelStatic<any>;
   private _databaseType: string;
 
-  constructor(model: any, databaseType: string, protected jsonDataToResourceFn: (jsonData: any) => T) {
+  constructor(model: any, databaseType: string, protected jsonDataToResourceFn: (jsonData: any) => TClass) {
     this._model = model;
     this._databaseType = databaseType;
   }
@@ -26,10 +26,10 @@ export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
     return this._model;
   }
 
-  async create(data: any): Promise<T> {
+  async create(data: TClass): Promise<TClass> {
     try {
 
-      const newItem = await this._model.create(data);
+      const newItem = await this._model.create(data!);
       return this.jsonDataToResource(newItem);
 
     } catch (error: any) {
@@ -48,7 +48,7 @@ export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
     }
   }
 
-  async findAll(limitPerPage: number, offset: number): Promise<T[]> {
+  async findAll(limitPerPage: number, offset: number): Promise<TClass[]> {
     try {
 
       const items = await this._model.findAll({
@@ -67,9 +67,11 @@ export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
     }
   }
 
-  async findOne(query: any): Promise<T> {
+  async findOne(query: TInterface): Promise<TClass> {
     try {
-      const item = await this._model.findOne({ where: query, include: [{ all: true }] });
+      console.log(query);
+
+      const item = await this._model.findOne({ where: query as any, include: [{ all: true }] });
 
       if (item == null) {
         throw new NotFoundError("Not found document");
@@ -86,9 +88,9 @@ export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
     }
   }
 
-  async findMany(query: any): Promise<T[]> {
+  async findMany(query: TInterface): Promise<TClass[]> {
     try {
-      const item = await this._model.findAll({ where: query, order: [['createdAt', 'DESC']] });
+      const item = await this._model.findAll({ where: query!, order: [['createdAt', 'DESC']] });
 
       if (item == null) {
         return [];
@@ -101,7 +103,7 @@ export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
 
   }
 
-  async findById(id: string): Promise<T> {
+  async findById(id: number): Promise<TClass> {
     try {
       const returnedValue = await this._model.findOne({ where: { id: id }, include: [{ all: true }] });
 
@@ -132,12 +134,13 @@ export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
 
   }
 
-  async update(id: string, data: Object): Promise<T> {
+  async update(id: number, data: Object): Promise<TClass> {
     try {
+
       //Irá obter a quantidade de linhas alteradas
       var [affectedCount] = await this._model.update(data, {
         where: {
-          id: id,
+          id: this.databaseType == "mongodb" ? id : Number(id),
         },
       });
 
@@ -164,7 +167,7 @@ export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
 
   }
 
-  async delete(id: string): Promise<T> {
+  async delete(id: number): Promise<TClass> {
 
     try {
       //Essa busca é feita para retornar o objeto que será reovido
@@ -197,7 +200,7 @@ export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
     }
   }
 
-  async findCustom(filterValues: FilterValue[], filterConditions: string[], model: ModelStatic<any>): Promise<T[] | null> {
+  async findCustom(filterValues: FilterValue[], filterConditions: string[], model: ModelStatic<any>): Promise<TClass[] | null> {
     try {
       const items = await findDataByCustomQuery(filterValues, filterConditions, model);
 
@@ -209,19 +212,19 @@ export class SequelizeAdapter<T> implements IDatabaseAdapter<T> {
     }
   }
 
-  async findUsingCustomQuery(query: any): Promise<T[]> {
+  async findUsingCustomQuery(query: any): Promise<TClass[]> {
     throw new Error("Function not implemented");
   }
 
-  protected jsonDataToResources(jsonData: any[]): T[] {
-    const resources: T[] = [];
+  protected jsonDataToResources(jsonData: any[]): TClass[] {
+    const resources: TClass[] = [];
     jsonData.forEach(
       element => resources.push(this.jsonDataToResourceFn(element.dataValues))
     );
     return resources;
   }
 
-  protected jsonDataToResource(jsonData: any): T {
+  protected jsonDataToResource(jsonData: any): TClass {
     return this.jsonDataToResourceFn(jsonData.dataValues);
   }
 

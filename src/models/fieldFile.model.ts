@@ -2,12 +2,12 @@ import { BaseResourceModel } from "./baseResource.model"
 import { File } from "./file.model";
 import { User } from "./user.model";
 
-
-interface IFieldFile {
+export interface IFieldFile {
   fieldType?: string;
   user?: User;
   files?: File[];
 }
+
 export class FieldFile extends BaseResourceModel implements IFieldFile {
   fieldType?: string;
   user?: User;

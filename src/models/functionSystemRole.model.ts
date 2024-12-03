@@ -1,6 +1,6 @@
 import { BaseResourceModel } from "./baseResource.model";
 
-interface IFunctionSystemRole {
+export interface IFunctionSystemRole extends BaseResourceModel{
   Role?: string;
   FunctionSystem?: string;
   authorized?: boolean;

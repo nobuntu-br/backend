@@ -5,7 +5,7 @@ import TenantRepository from "../repositories/tenant.repository";
 import DatabasePermissionRepository from "../repositories/databasePermission.repository";
 import BaseService from "./base.service";
 
-export default class TenantService extends BaseService<Tenant> {
+export default class TenantService extends BaseService<ITenant, Tenant> {
   private tenantRepository: TenantRepository;
   private databasePermissionRepository: DatabasePermissionRepository;
 
@@ -25,7 +25,7 @@ export default class TenantService extends BaseService<Tenant> {
    * @param {*} userUID identificador universal do usuário
    * @returns "True" caso usuário for adminitrador, caso contrário, retorna "False"
    */
-  async findTenantsUserIsAdmin(userUID: string): Promise<ITenant[]> {
+  async findTenantsUserIsAdmin(userUID: string): Promise<Tenant[]> {
     try {
       const userTenantsUserIsAdmin : DatabasePermission[] | null = await this.databasePermissionRepository.findMany({userUID: userUID, isAdmin: true});
 

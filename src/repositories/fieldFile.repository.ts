@@ -1,12 +1,12 @@
 import createDbAdapter, { DatabaseType } from "../adapters/createDb.adapter"; 
 import { IDatabaseAdapter } from "../adapters/IDatabase.adapter"; 
-import { FieldFile } from "../models/fieldFile.model"; 
+import { FieldFile, IFieldFile } from "../models/fieldFile.model"; 
 import BaseRepository from "./base.repository"; 
 
-export default class FieldFileRepository extends BaseRepository<FieldFile>{ 
+export default class FieldFileRepository extends BaseRepository<IFieldFile, FieldFile>{ 
 
   constructor(databaseType: DatabaseType, databaseConnection: any){ 
-    const _adapter : IDatabaseAdapter<FieldFile> = createDbAdapter<FieldFile>(databaseType, databaseConnection.models["FieldFile"], FieldFile.fromJson);
+    const _adapter : IDatabaseAdapter<IFieldFile, FieldFile> = createDbAdapter<IFieldFile, FieldFile>(databaseType, databaseConnection.models["FieldFile"], FieldFile.fromJson);
     super(_adapter, databaseConnection); 
     
   } 

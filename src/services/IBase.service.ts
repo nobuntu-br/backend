@@ -1,15 +1,15 @@
 import { Model } from "mongoose";
 import { FilterValue } from "../utils/mongoose/customQuery.util";
 
-export interface IBaseService<T> {
-  create(data: T): Promise<T>;
-  findAll(limitPerPage: number, offset: number): Promise<T[] | null>;
-  findOne(query: T): Promise<T | null>;
-  findMany(query: T): Promise<T[] | null>;
-  findById(id: string): Promise<T | null>;
+export interface IBaseService<TInterface, TClass> {
+  create(data: TClass): Promise<TClass>;
+  findAll(limitPerPage: number, offset: number): Promise<TClass[] | null>;
+  findOne(query: TInterface): Promise<TClass | null>;
+  findMany(query: TInterface): Promise<TClass[] | null>;
+  findById(id: number): Promise<TClass | null>;
   getCount(): Promise<number | null>;
-  update(id: string, data: Object): Promise<T | null>;
-  delete(id: string): Promise<T | null>;
+  update(id: number, data: Object): Promise<TClass | null>;
+  delete(id: number): Promise<TClass | null>;
   deleteAll(): Promise<void>;
-  findCustom(filterValues: FilterValue[], filterConditions: string[], model: Model<any> | typeof Model): Promise<T[] | null>;
+  findCustom(filterValues: FilterValue[], filterConditions: string[], model: Model<any> | typeof Model): Promise<TClass[] | null>;
 }

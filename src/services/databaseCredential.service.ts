@@ -1,9 +1,9 @@
 import { DatabaseType } from "../adapters/createDb.adapter";
-import { DatabaseCredential } from "../models/databaseCredential.model";
+import { DatabaseCredential, IDatabaseCredential } from "../models/databaseCredential.model";
 import DatabaseCredentialRepository from "../repositories/databaseCredential.repository";
 import BaseService from "./base.service";
 
-export class DatabaseCredentialService extends BaseService<DatabaseCredential> {
+export class DatabaseCredentialService extends BaseService<IDatabaseCredential, DatabaseCredential> {
   private tenantCredentialRepository: DatabaseCredentialRepository;
 
   constructor(databaseType: DatabaseType, databaseConnection: any) {

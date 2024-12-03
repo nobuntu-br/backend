@@ -1,9 +1,9 @@
 import { DatabaseType } from "../adapters/createDb.adapter";
-import { Order } from "../models/order.model";
+import { IOrder, Order } from "../models/order.model";
 import OrderRepository from "../repositories/order.repository";
 import BaseService from "./base.service";
 
-export default class OrderSercice extends BaseService<Order> {
+export default class OrderSercice extends BaseService<IOrder, Order> {
   private orderRepository: OrderRepository;
 
   constructor(databaseType: DatabaseType, databaseConnection: any) {

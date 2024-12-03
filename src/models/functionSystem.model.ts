@@ -1,6 +1,6 @@
 import { BaseResourceModel } from "./baseResource.model";
 
-export interface IFunctionSystem {
+export interface IFunctionSystem extends BaseResourceModel {
   description?: string;
   route?: string;
   method?: string;

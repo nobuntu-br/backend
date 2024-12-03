@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { BaseController } from "./base.controller";
 import { DatabaseCredentialService } from "../services/databaseCredential.service";
-import { DatabaseCredential } from "../models/databaseCredential.model";
+import { DatabaseCredential, IDatabaseCredential } from "../models/databaseCredential.model";
 import { RegisterTenantCredentialUseCase } from "../useCases/tenant/registerTenantCredential.useCase";
 import { NotFoundError } from "../errors/notFound.error";
 import DatabaseCredentialRepository from "../repositories/databaseCredential.repository";
@@ -63,7 +63,7 @@ export class DatabaseCredentialController {
       const tenantCredentialService: DatabaseCredentialService = new DatabaseCredentialService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
 
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<DatabaseCredential> = new BaseController(tenantCredentialService, "DatabaseCredential");
+      const baseController: BaseController<IDatabaseCredential, DatabaseCredential> = new BaseController(tenantCredentialService, "DatabaseCredential");
 
       baseController.findAll(req, res, next);
     } catch (error) {
@@ -82,7 +82,7 @@ export class DatabaseCredentialController {
       const tenantCredentialService: DatabaseCredentialService = new DatabaseCredentialService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
 
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<DatabaseCredential> = new BaseController(tenantCredentialService, "DatabaseCredential");
+      const baseController: BaseController<IDatabaseCredential, DatabaseCredential> = new BaseController(tenantCredentialService, "DatabaseCredential");
 
       baseController.findById(req, res, next);
     } catch (error) {
@@ -100,7 +100,7 @@ export class DatabaseCredentialController {
       const tenantCredentialService: DatabaseCredentialService = new DatabaseCredentialService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
 
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<DatabaseCredential> = new BaseController(tenantCredentialService, "DatabaseCredential");
+      const baseController: BaseController<IDatabaseCredential, DatabaseCredential> = new BaseController(tenantCredentialService, "DatabaseCredential");
 
       baseController.getCount(req, res, next);
     } catch (error) {
@@ -118,7 +118,7 @@ export class DatabaseCredentialController {
       const tenantCredentialService: DatabaseCredentialService = new DatabaseCredentialService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
 
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<DatabaseCredential> = new BaseController(tenantCredentialService, "DatabaseCredential");
+      const baseController: BaseController<IDatabaseCredential, DatabaseCredential> = new BaseController(tenantCredentialService, "DatabaseCredential");
 
       baseController.update(req, res, next);
     } catch (error) {
@@ -136,7 +136,7 @@ export class DatabaseCredentialController {
       const tenantCredentialService: DatabaseCredentialService = new DatabaseCredentialService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
 
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<DatabaseCredential> = new BaseController(tenantCredentialService, "DatabaseCredential");
+      const baseController: BaseController<IDatabaseCredential, DatabaseCredential> = new BaseController(tenantCredentialService, "DatabaseCredential");
 
       baseController.delete(req, res, next);
     } catch (error) {
@@ -154,7 +154,7 @@ export class DatabaseCredentialController {
       const tenantCredentialService: DatabaseCredentialService = new DatabaseCredentialService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
 
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<DatabaseCredential> = new BaseController(tenantCredentialService, "DatabaseCredential");
+      const baseController: BaseController<IDatabaseCredential, DatabaseCredential> = new BaseController(tenantCredentialService, "DatabaseCredential");
 
       baseController.deleteAll(req, res, next);
     } catch (error) {

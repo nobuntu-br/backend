@@ -4,37 +4,75 @@ export default function defineModel(mongooseConnection: Mongoose) {
 
   const schema = new mongoose.Schema(
     {
-      databaseName: {
+      name: {
         type: String,
         required: true
       },
-      databaseType: {
+      type: {
         type: String,
         required: true,
       },
-      databaseUsername: {
+      username: {
         type: String,
         required: true
       },
-      databasePassword: {
+      password: {
         type: String,
         required: true
       },
-      databaseHost: {
+      host: {
         type: String,
         required: true
       },
-      databasePort: {
+      port: {
         type: String,
         required: false
       },
-      databaseConfig: Object,
+      srvEnabled: {
+        type: Boolean,
+        required: true
+      },
+      options: {
+        type: String,
+        required: false
+      },
+      storagePath: {
+        type: String,
+        required: false
+      },
+      sslEnabled: {
+        type: Boolean,
+        required: true
+      },
+      poolSize: {
+        type: Number,
+        required: true,
+      },
+      timeOutTime: {
+        type: Number,
+        required: true,
+      },
+
+      //SSL data
+      sslCertificateAuthority: {
+        type: String,
+        required: false
+      },
+      sslPrivateKey: {
+        type: String,
+        required: false
+      },
+      sslCertificate: {
+        type: String,
+        required: false
+      },
+
     },
     { timestamps: true }
   );
 
   schema.index(
-    { databaseName: 1, databaseType: 1, databaseUsername: 1, databaseHost: 1, databasePort: 1 },
+    { name: 1, type: 1, username: 1, host: 1, port: 1 },
     { unique: true }
   );
 

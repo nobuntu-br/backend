@@ -1,13 +1,13 @@
 import createDbAdapter, { DatabaseType } from "../adapters/createDb.adapter";
 import { IDatabaseAdapter } from "../adapters/IDatabase.adapter";
-import { FunctionSystemRole } from "../models/functionSystemRole.model";
+import { FunctionSystemRole, IFunctionSystemRole } from "../models/functionSystemRole.model";
 import BaseRepository from "./base.repository";
 
-export default class FunctionSystemRoleRepository extends BaseRepository<FunctionSystemRole> {
+export default class FunctionSystemRoleRepository extends BaseRepository<IFunctionSystemRole ,FunctionSystemRole> {
   private databaseModels: any;
 
   constructor(databaseType: DatabaseType, databaseConnection: any) {
-    const _adapter: IDatabaseAdapter<FunctionSystemRole> = createDbAdapter<FunctionSystemRole>(databaseType, databaseConnection.models["FunctionSystemRole"], FunctionSystemRole.fromJson);
+    const _adapter: IDatabaseAdapter<IFunctionSystemRole ,FunctionSystemRole> = createDbAdapter<IFunctionSystemRole ,FunctionSystemRole>(databaseType, databaseConnection.models["FunctionSystemRole"], FunctionSystemRole.fromJson);
     super(_adapter, databaseConnection);
     this.databaseModels = databaseConnection.models;
   }

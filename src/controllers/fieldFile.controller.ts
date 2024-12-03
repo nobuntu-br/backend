@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { BaseController } from "./base.controller";
-import { FieldFile } from "../models/fieldFile.model"; 
+import { FieldFile, IFieldFile } from "../models/fieldFile.model"; 
 import { FieldFileService } from "../services/fieldFile.service";
 import { NotFoundError } from "../errors/notFound.error";
 
@@ -13,7 +13,7 @@ export class FieldFileController {
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
     const  fieldFileService : FieldFileService = new FieldFileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
-    const baseController : BaseController<FieldFile> = new BaseController(fieldFileService,  "fieldFile"); 
+    const baseController : BaseController<IFieldFile, FieldFile> = new BaseController(fieldFileService,  "fieldFile"); 
 
     baseController.create(req, res, next); 
     } catch (error) { 
@@ -28,7 +28,7 @@ export class FieldFileController {
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
     const  fieldFileService : FieldFileService = new FieldFileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
-    const baseController : BaseController<FieldFile> = new BaseController(fieldFileService,  "fieldFile"); 
+    const baseController : BaseController<IFieldFile, FieldFile> = new BaseController(fieldFileService,  "fieldFile"); 
 
     baseController.findAll(req, res, next); 
     } catch (error) { 
@@ -43,7 +43,7 @@ export class FieldFileController {
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
     const  fieldFileService : FieldFileService = new FieldFileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
-    const baseController : BaseController<FieldFile> = new BaseController(fieldFileService,  "fieldFile"); 
+    const baseController : BaseController<IFieldFile, FieldFile> = new BaseController(fieldFileService,  "fieldFile"); 
 
     baseController.findById(req, res, next); 
     } catch (error) { 
@@ -58,7 +58,7 @@ export class FieldFileController {
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
     const  fieldFileService : FieldFileService = new FieldFileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
-    const baseController : BaseController<FieldFile> = new BaseController(fieldFileService,  "fieldFile"); 
+    const baseController : BaseController<IFieldFile, FieldFile> = new BaseController(fieldFileService,  "fieldFile"); 
 
     baseController.update(req, res, next); 
     } catch (error) { 
@@ -73,7 +73,7 @@ export class FieldFileController {
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
     const  fieldFileService : FieldFileService = new FieldFileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
-    const baseController : BaseController<FieldFile> = new BaseController(fieldFileService,  "fieldFile"); 
+    const baseController : BaseController<IFieldFile, FieldFile> = new BaseController(fieldFileService,  "fieldFile"); 
 
     baseController.getCount(req, res, next); 
     } catch (error) { 
@@ -88,7 +88,7 @@ export class FieldFileController {
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
     const  fieldFileService : FieldFileService = new FieldFileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
-    const baseController : BaseController<FieldFile> = new BaseController(fieldFileService,  "fieldFile"); 
+    const baseController : BaseController<IFieldFile, FieldFile> = new BaseController(fieldFileService,  "fieldFile"); 
 
     baseController.delete(req, res, next); 
     } catch (error) { 
@@ -103,7 +103,7 @@ export class FieldFileController {
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
     const  fieldFileService : FieldFileService = new FieldFileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
-    const baseController : BaseController<FieldFile> = new BaseController(fieldFileService,  "fieldFile"); 
+    const baseController : BaseController<IFieldFile, FieldFile> = new BaseController(fieldFileService,  "fieldFile"); 
 
       baseController.findCustom(req, res, next); 
     } catch (error) { 

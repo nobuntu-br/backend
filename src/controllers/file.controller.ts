@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { BaseController } from "./base.controller";
-import { File } from "../models/file.model"; 
+import { File, IFile } from "../models/file.model"; 
 import { FileService } from "../services/file.service";
 import { NotFoundError } from "../errors/notFound.error";
 
@@ -13,7 +13,7 @@ export class FileController {
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
     const  fileService : FileService = new FileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
-    const baseController : BaseController<File> = new BaseController(fileService,  "file"); 
+    const baseController : BaseController<IFile, File> = new BaseController(fileService,  "file"); 
 
     baseController.create(req, res, next); 
     } catch (error) { 
@@ -28,7 +28,7 @@ export class FileController {
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
     const  fileService : FileService = new FileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
-    const baseController : BaseController<File> = new BaseController(fileService,  "file"); 
+    const baseController : BaseController<IFile, File> = new BaseController(fileService,  "file"); 
 
     baseController.findAll(req, res, next); 
     } catch (error) { 
@@ -43,7 +43,7 @@ export class FileController {
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
     const  fileService : FileService = new FileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
-    const baseController : BaseController<File> = new BaseController(fileService,  "file"); 
+    const baseController : BaseController<IFile, File> = new BaseController(fileService,  "file"); 
 
     baseController.findById(req, res, next); 
     } catch (error) { 
@@ -58,7 +58,7 @@ export class FileController {
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
     const  fileService : FileService = new FileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
-    const baseController : BaseController<File> = new BaseController(fileService,  "file"); 
+    const baseController : BaseController<IFile, File> = new BaseController(fileService,  "file"); 
 
     baseController.update(req, res, next); 
     } catch (error) { 
@@ -73,7 +73,7 @@ export class FileController {
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
     const  fileService : FileService = new FileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
-    const baseController : BaseController<File> = new BaseController(fileService,  "file"); 
+    const baseController : BaseController<IFile, File> = new BaseController(fileService,  "file"); 
 
     baseController.getCount(req, res, next); 
     } catch (error) { 
@@ -88,7 +88,7 @@ export class FileController {
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
     const  fileService : FileService = new FileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
-    const baseController : BaseController<File> = new BaseController(fileService,  "file"); 
+    const baseController : BaseController<IFile, File> = new BaseController(fileService,  "file"); 
 
     baseController.delete(req, res, next); 
     } catch (error) { 
@@ -103,7 +103,7 @@ export class FileController {
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
     const  fileService : FileService = new FileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
-    const baseController : BaseController<File> = new BaseController(fileService,  "file"); 
+    const baseController : BaseController<IFile, File> = new BaseController(fileService,  "file"); 
 
       baseController.findCustom(req, res, next); 
     } catch (error) { 

@@ -30,12 +30,12 @@ export class GetDefaultTenantConnectionUseCase {
       password: process.env.DEFAULT_TENANT_DATABASE_PASSWORD,
       host: process.env.DEFAULT_TENANT_DATABASE_HOST,
       port: process.env.DEFAULT_TENANT_DATABASE_PORT,
-      srvEnabled: process.env.SECURITY_TENANT_DATABASE_SRV_ENABLED === "true" ? true : false,
-      options: process.env.SECURITY_TENANT_DATABASE_OPTIONS,
-      storagePath: process.env.SECURITY_TENANT_DATABASE_STORAGE_PATH,
-      sslEnabled: process.env.SECURITY_TENANT_DATABASE_SSL_ENABLED === "true" ? true : false,
-      poolSize: getEnvironmentNumber("SECURITY_TENANT_DATABASE_POOLSIZE", 1),
-      timeOutTime: getEnvironmentNumber("SECURITY_TENANT_DATABASE_TIMEOUT", 3000),
+      srvEnabled: process.env.DEFAULT_TENANT_DATABASE_SRV_ENABLED === "true" ? true : false,
+      options: process.env.DEFAULT_TENANT_DATABASE_OPTIONS,
+      storagePath: process.env.DEFAULT_TENANT_DATABASE_STORAGE_PATH,
+      sslEnabled: process.env.DEFAULT_TENANT_DATABASE_SSL_ENABLED === "true" ? true : false,
+      poolSize: getEnvironmentNumber("DEFAULT_TENANT_DATABASE_POOLSIZE", 1),
+      timeOutTime: getEnvironmentNumber("DEFAULT_TENANT_DATABASE_TIMEOUT", 3000),
       
       //SSL data
       sslCertificateAuthority: process.env.SECURITY_TENANT_DATABASE_SSL_CERTIFICATE_AUTHORITY,
@@ -51,7 +51,7 @@ export class GetDefaultTenantConnectionUseCase {
 
       const tenantConnectionService: TenantConnectionService = TenantConnectionService.instance;
 
-      var tenantConnection: TenantConnection = tenantConnectionService.findOneConnection(process.env.DEFAULT_TENANT_DATABASE_ID!);
+      var tenantConnection: TenantConnection | null = tenantConnectionService.findOneConnection(process.env.DEFAULT_TENANT_DATABASE_ID!);
 
       //Se iniciou o servidor pela primeira vez, tem que registrar ele e conectar
 
@@ -106,14 +106,16 @@ export class GetDefaultTenantConnectionUseCase {
     }
 
     const databaseCredentialRepository: DatabaseCredentialRepository = new DatabaseCredentialRepository(securityTenantConnection.databaseType, securityTenantConnection.connection);
+    
     //Verificar se as credenciais do tenant padrão foram criadas, se não, criar
-
     let _databaseCredential: DatabaseCredential;
     try {
-      databaseCredential = await databaseCredentialRepository.findOne({ name: databaseCredential.name });
+      _databaseCredential = await databaseCredentialRepository.findOne({ name: databaseCredential.name });
+      console.log("databaseCredential obtido: ", _databaseCredential);
     } catch (error) {
       if (error instanceof NotFoundError) {
-        databaseCredential = await databaseCredentialRepository.create(databaseCredential);
+        _databaseCredential = new DatabaseCredential(await databaseCredentialRepository.create(databaseCredential));
+        console.log("databaseCredential criado: ", _databaseCredential);
       } else {
         throw new UnknownError("Unknown error on Save Default Tenant on Security Tenant function. Unknown error on create Database Credential. Detail: " + error);
       }
@@ -121,8 +123,10 @@ export class GetDefaultTenantConnectionUseCase {
 
     const databasePermissionRepository: DatabasePermissionRepository = new DatabasePermissionRepository(securityTenantConnection.databaseType, securityTenantConnection.connection);
 
+    console.log(_databaseCredential);
+
     try {
-      let databasePermission = await databasePermissionRepository.findOne({ tenantId: tenant.id, databaseCredentialId: databaseCredential.id });
+      let databasePermission = await databasePermissionRepository.findOne({ tenantId: tenant.id, databaseCredentialId: _databaseCredential.id });
     } catch (error) {
       if (error instanceof NotFoundError) {
         await databasePermissionRepository.create({

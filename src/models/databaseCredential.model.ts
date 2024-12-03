@@ -1,14 +1,14 @@
 import { DatabaseType } from "../adapters/createDb.adapter";
 import { BaseResourceModel } from "./baseResource.model";
 
-export interface IDatabaseCredential {
+export interface IDatabaseCredential extends BaseResourceModel{
   name?: string;
   type?: DatabaseType;
   username?: string;
   password?: string;
   host?: string;
   port?: string;
-  srvEnabled: boolean; // Indica se usa protocolo SRV (mongodb)
+  srvEnabled?: boolean; // Indica se usa protocolo SRV (mongodb)
   options?: string;
   storagePath?: string;
   sslEnabled?: boolean;
@@ -47,13 +47,22 @@ export class DatabaseCredential extends BaseResourceModel implements IDatabaseCr
 
   constructor(data: IDatabaseCredential) {
     super();
+    this.id = data?.id;
     this.name = data?.name || "";
+
+    if(data.type == undefined || data.type == null){
+      throw new Error("type field are not populated.");
+    }
     this.type = data.type;
-    
+
     this.username = data?.username || "";
     this.password = data?.password || "";
     this.host = data?.host || "";
     this.port = data?.port || "";
+
+    if(data.srvEnabled == undefined || data.srvEnabled == null){
+      throw new Error("srvEnabled field are not populated.");
+    }
     this.srvEnabled = data.srvEnabled;
     this.options = data?.options || "";
     this.storagePath = data?.storagePath || "";

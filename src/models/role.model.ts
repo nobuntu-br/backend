@@ -1,6 +1,6 @@
 import { BaseResourceModel } from "./baseResource.model";
 
-interface IRole {
+export interface IRole extends BaseResourceModel{
   name?: string;
 }
 

@@ -4,7 +4,7 @@ import { IUser, User } from "../models/user.model";
 import UserRepository from "../repositories/user.repository";
 import BaseService from "./base.service";
 
-export class UserService extends BaseService<User> {
+export class UserService extends BaseService<IUser, User> {
   private userRepository: UserRepository;
 
   constructor(databaseType: DatabaseType, databaseConnection: any) {
@@ -41,7 +41,7 @@ export class UserService extends BaseService<User> {
 
   async IfApplicationHasRegisteredUsers() {
     try {
-      const users: IUser[] = await this.repository.findAll(1, 1);
+      const users: User[] = await this.repository.findAll(1, 1);
 
       if (users.length == 0) {
         console.log("Já existe usuário cadastrado nessa aplicação!");

@@ -1,4 +1,4 @@
 export abstract class BaseResourceModel {
-  id?: string;
+  id?: number;
   updatedAt?: Date;
 }

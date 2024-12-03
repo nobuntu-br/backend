@@ -1,7 +1,6 @@
 import { BaseResourceModel } from "./baseResource.model";
 
-export interface IUser {
-  id?: string;
+export interface IUser extends BaseResourceModel{
   UID?: string;
   tenantUID?: string;
   userName?: string;

@@ -1,47 +1,81 @@
 import { DataTypes, Sequelize } from "sequelize";
 
-export default function defineModel(sequelize: Sequelize){
+export default function defineModel(sequelize: Sequelize) {
   const schema = sequelize.define('DatabaseCredential', {
-    databaseName: {
+    name: {
       type: DataTypes.STRING(100),
       allowNull: false,
     },
-    databaseType: {
+    type: {
       type: DataTypes.STRING(100),
       allowNull: false,
     },
-    databaseUsername: {
+    username: {
       type: DataTypes.STRING(100),
       allowNull: false,
     },
-    databasePassword: {
+    password: {
       type: DataTypes.STRING(100),
       allowNull: false,
     },
-    databaseHost: {
+    host: {
       type: DataTypes.STRING(100),
       allowNull: false,
     },
-    databasePort: {
+    port: {
       type: DataTypes.STRING(100),
       allowNull: true,
     },
-    databaseConfig: {
+    srvEnabled: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false
+    },
+    options: {
       type: DataTypes.STRING(100),
       allowNull: true,
+    },
+    storagePath: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+    sslEnabled: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false
+    },
+    poolSize: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    timeOutTime: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+
+    //SSL data
+    sslCertificateAuthority: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    sslPrivateKey: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    sslCertificate: {
+      type: DataTypes.TEXT,
+      allowNull: true
     },
   }, {
     timestamps: true,
     indexes: [
       {
         unique: true,
-        fields: ['databaseName', 'databaseType', 'databaseUsername', 'databaseHost', 'databasePort'],
+        fields: ['name', 'type', 'username', 'host', 'port'],
         name: 'unique_database_credential',
       },
     ],
   });
 
-  schema.prototype.toJSON = function() {
+  schema.prototype.toJSON = function () {
     const values = Object.assign({}, this.get());
 
     values.id = values.id;

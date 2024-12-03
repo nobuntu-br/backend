@@ -1,9 +1,9 @@
 import { DatabaseType } from "../adapters/createDb.adapter";
-import { ComponentStructureRole } from "../models/componentStructureRole.model";
+import { ComponentStructureRole, IComponentStructureRole } from "../models/componentStructureRole.model";
 import ComponentStructureRoleRepository from "../repositories/componentStructureRole.repository";
 import BaseService from "./base.service";
 
-export class ComponentStructureRoleService extends BaseService<ComponentStructureRole> {
+export class ComponentStructureRoleService extends BaseService<IComponentStructureRole, ComponentStructureRole> {
   private componentStructureRoleRepository: ComponentStructureRoleRepository;
 
   constructor(databaseType: DatabaseType, databaseConnection: any) {

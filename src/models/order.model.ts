@@ -1,6 +1,6 @@
 import { BaseResourceModel } from "./baseResource.model";
 
-interface IOrder {
+export interface IOrder extends BaseResourceModel{
   employee?: string;
   customer?: string;
   orderDate?: string; // ISO string para data

@@ -1,15 +1,15 @@
 import { Op } from "sequelize";
 import createDbAdapter, { DatabaseType } from "../adapters/createDb.adapter";
 import { IDatabaseAdapter } from "../adapters/IDatabase.adapter";
-import { DatabasePermission } from "../models/databasePermission.model";
+import { DatabasePermission, IDatabasePermission } from "../models/databasePermission.model";
 import BaseRepository from "./base.repository";
 import { DatabasePermissionDetailOutputDTO } from "../models/DTO/databasePermission.DTO";
 
-export default class DatabasePermissionRepository extends BaseRepository<DatabasePermission> {
+export default class DatabasePermissionRepository extends BaseRepository<IDatabasePermission, DatabasePermission> {
   private databaseModels: any;
 
   constructor(databaseType: DatabaseType, databaseConnection: any) {
-    const _adapter: IDatabaseAdapter<DatabasePermission> = createDbAdapter<DatabasePermission>(databaseType, databaseConnection.models["DatabasePermission"], DatabasePermission.fromJson);
+    const _adapter: IDatabaseAdapter<IDatabasePermission, DatabasePermission> = createDbAdapter<IDatabasePermission, DatabasePermission>(databaseType, databaseConnection.models["DatabasePermission"], DatabasePermission.fromJson);
     super(_adapter, databaseConnection);
     this.databaseModels = databaseConnection.models;
   }

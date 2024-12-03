@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { BaseController } from "./base.controller";
 import TenantService from "../services/tenant.service";
-import { Tenant } from "../models/tenant.model";
+import { ITenant, Tenant } from "../models/tenant.model";
 import { GetUserTenantsUseCase } from "../useCases/tenant/getUserTenants.useCase";
 import { NotFoundError } from "../errors/notFound.error";
 import DatabasePermissionRepository from "../repositories/databasePermission.repository";
@@ -19,7 +19,7 @@ export class TenantController {
       //O Service será criado com base no tipo de banco de dados e o model usado
       const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<Tenant> = new BaseController(tenantService, "Tenant");
+      const baseController: BaseController<ITenant, Tenant> = new BaseController(tenantService, "Tenant");
 
       baseController.create(req, res, next);
     } catch (error) {
@@ -38,7 +38,7 @@ export class TenantController {
       //O Service será criado com base no tipo de banco de dados e o model usado
       const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<Tenant> = new BaseController(tenantService, "Tenant");
+      const baseController: BaseController<ITenant, Tenant> = new BaseController(tenantService, "Tenant");
 
       baseController.findAll(req, res, next);
     } catch (error) {
@@ -57,7 +57,7 @@ export class TenantController {
       //O Service será criado com base no tipo de banco de dados e o model usado
       const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<Tenant> = new BaseController(tenantService, "Tenant");
+      const baseController: BaseController<ITenant, Tenant> = new BaseController(tenantService, "Tenant");
 
       baseController.findById(req, res, next);
     } catch (error) {
@@ -76,7 +76,7 @@ export class TenantController {
       //O Service será criado com base no tipo de banco de dados e o model usado
       const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<Tenant> = new BaseController(tenantService, "Tenant");
+      const baseController: BaseController<ITenant, Tenant> = new BaseController(tenantService, "Tenant");
 
       baseController.getCount(req, res, next);
     } catch (error) {
@@ -95,7 +95,7 @@ export class TenantController {
       //O Service será criado com base no tipo de banco de dados e o model usado
       const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<Tenant> = new BaseController(tenantService, "Tenant");
+      const baseController: BaseController<ITenant, Tenant> = new BaseController(tenantService, "Tenant");
 
       baseController.update(req, res, next);
     } catch (error) {
@@ -114,7 +114,7 @@ export class TenantController {
       //O Service será criado com base no tipo de banco de dados e o model usado
       const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<Tenant> = new BaseController(tenantService, "Tenant");
+      const baseController: BaseController<ITenant, Tenant> = new BaseController(tenantService, "Tenant");
 
       baseController.delete(req, res, next);
     } catch (error) {
@@ -133,7 +133,7 @@ export class TenantController {
       //O Service será criado com base no tipo de banco de dados e o model usado
       const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<Tenant> = new BaseController(tenantService, "Tenant");
+      const baseController: BaseController<ITenant, Tenant> = new BaseController(tenantService, "Tenant");
 
       baseController.deleteAll(req, res, next);
     } catch (error) {

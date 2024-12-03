@@ -2,32 +2,32 @@ import { IDatabaseAdapter } from "../adapters/IDatabase.adapter";
 import { FilterValue } from "../utils/mongoose/customQuery.util";
 import { IBaseRepository } from "./ibase.repository";
 
-export default abstract class BaseRepository<T> implements IBaseRepository<T>{
-  public adapter: IDatabaseAdapter<T>;
+export default abstract class BaseRepository<TInterface, TClass> implements IBaseRepository<TInterface, TClass>{
+  public adapter: IDatabaseAdapter<TInterface, TClass>;
   public databaseConnection: any;
 
-  constructor(adapter: IDatabaseAdapter<T>, databaseConnection: any){
+  constructor(adapter: IDatabaseAdapter<TInterface, TClass>, databaseConnection: any){
     this.adapter = adapter;
     this.databaseConnection = databaseConnection;
   }
 
-  create(data: T): Promise<T> {
+  create(data: TClass): Promise<TClass> {
     return this.adapter.create(data);
   }
 
-  findAll(limitPerPage: number, offset: number): Promise<T[]> {
+  findAll(limitPerPage: number, offset: number): Promise<TClass[]> {
     return this.adapter.findAll(limitPerPage, offset);
   }
 
-  findOne(query: T): Promise<T> {
+  findOne(query: TInterface): Promise<TClass> {
     return this.adapter.findOne(query);
   }
 
-  findMany(query: T): Promise<T[]> {
+  findMany(query: TInterface): Promise<TClass[]> {
     return this.adapter.findMany(query);
   }
 
-  findById(id: string): Promise<T> {
+  findById(id: number): Promise<TClass> {
     return this.adapter.findById(id);
   }
 
@@ -35,11 +35,11 @@ export default abstract class BaseRepository<T> implements IBaseRepository<T>{
     return this.adapter.getCount();
   }
 
-  update(id: string, data: Object): Promise<T> {
+  update(id: number, data: Object): Promise<TClass> {
     return this.adapter.update(id, data);
   }
 
-  delete(id: string): Promise<T> {
+  delete(id: number): Promise<TClass> {
     return this.adapter.delete(id);
   }
 
@@ -47,11 +47,11 @@ export default abstract class BaseRepository<T> implements IBaseRepository<T>{
     return this.adapter.deleteAll();
   }
 
-  findCustom(filterValues: FilterValue[], filterConditions: string[], model: any): Promise<T[] | null>{
+  findCustom(filterValues: FilterValue[], filterConditions: string[], model: any): Promise<TClass[] | null>{
     return this.adapter.findCustom(filterValues, filterConditions, model);
   }
 
-  findUsingCustomQuery(query: any): Promise<T[]>{
+  findUsingCustomQuery(query: any): Promise<TClass[]>{
     return this.adapter.findUsingCustomQuery(query);
   }
 

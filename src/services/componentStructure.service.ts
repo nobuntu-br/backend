@@ -1,9 +1,9 @@
 import { DatabaseType } from "../adapters/createDb.adapter";
-import { ComponentStructure } from "../models/componentStructure.model";
-import ComponentStructureRepository from "../repositories/componentStructureRole.repository";
+import { ComponentStructure, IComponentStructure } from "../models/componentStructure.model";
+import ComponentStructureRepository from "../repositories/componentStructure.repository";
 import BaseService from "./base.service";
 
-export class ComponentStructureService extends BaseService<ComponentStructure> {
+export class ComponentStructureService extends BaseService<IComponentStructure, ComponentStructure> {
   private componentStructureRepository: ComponentStructureRepository;
 
   constructor(databaseType: DatabaseType, databaseConnection: any) {

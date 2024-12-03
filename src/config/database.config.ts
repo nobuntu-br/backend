@@ -42,7 +42,7 @@ export async function getTenantConnection(tenantId: string, userUID: string): Pr
     }
 
     //Obtem a instância de conxão com o banco de dados
-    const tenantConnection: TenantConnection = tenantConnectionService.findOneConnection(tenantId);
+    const tenantConnection: TenantConnection | null = tenantConnectionService.findOneConnection(tenantId);
 
     if (tenantConnection == null) {
 
@@ -106,6 +106,7 @@ export async function connectTenant(tenantId: string, databaseCredential: IDatab
   }
 }
 
+/*
 export async function connectSecurityTenant(tenantId: string): Promise<TenantConnection> {
 
   try {
@@ -146,6 +147,11 @@ export async function connectSecurityTenant(tenantId: string): Promise<TenantCon
       throw new Error("SECURITY_TENANT_DATABASE_TIMEOUT invalid.");
     }
 
+    console.log(process.env.SECURITY_TENANT_DATABASE_SRV_ENABLED);
+
+    console.log(process.env.SECURITY_TENANT_DATABASE_SRV_ENABLED === "true");
+    console.log(srvEnabled);
+
     const databaseCredential: DatabaseCredential = new DatabaseCredential({
       type: process.env.SECURITY_TENANT_DATABASE_TYPE as "mongodb" | "postgres" | "mysql" | "sqlite" | "mariadb" | "mssql" | "db2" | "snowflake" | "oracle" | "firebird",
       name: process.env.SECURITY_TENANT_DATABASE_NAME,
@@ -164,6 +170,8 @@ export async function connectSecurityTenant(tenantId: string): Promise<TenantCon
       sslPrivateKey: process.env.SECURITY_TENANT_DATABASE_SSL_PRIVATE_KEY,
       sslCertificate: process.env.SECURITY_TENANT_DATABASE_SSL_CERTIFICATE
     });
+
+    console.log(databaseCredential);
 
     if (databaseCredential.checkDatabaseCredential(databaseCredential) == false || tenantId == undefined) {
       throw new Error("Missing data on environment variables to connect Security Tenant.");
@@ -189,7 +197,7 @@ export async function connectSecurityTenant(tenantId: string): Promise<TenantCon
   }
 
 }
-
+*/
 /**
  * Define os models da banco de dados Security na conexão
  * @param databaseType Tipo de banco de dados

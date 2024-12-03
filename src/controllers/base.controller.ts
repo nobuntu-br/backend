@@ -3,12 +3,12 @@ import { NextFunction, Request, Response } from "express";
 import { IBaseService } from "../services/IBase.service";
 import { IBaseController } from "./IBase.controller";
 
-export class BaseController<T> implements IBaseController {
+export class BaseController<TInterface, TClass> implements IBaseController {
 
-  private service: IBaseService<T>;
+  private service: IBaseService<TInterface, TClass>;
   public entityName: string;
 
-  constructor(service: IBaseService<T>, entityName: string) {
+  constructor(service: IBaseService<TInterface, TClass>, entityName: string) {
     this.service = service;
     this.entityName = entityName;
   }
@@ -79,7 +79,8 @@ export class BaseController<T> implements IBaseController {
    */
   async findById(req: Request, res: Response, next: NextFunction): Promise<Object | null> {
     try {
-      const data = await this.service.findById(req.params.id);
+      const id : number = Number(req.params.id);
+      const data = await this.service.findById(id);
       if (!data){
         return res.status(404).send({ message: "A entidade com id " + req.params.id + " não foi encontrada!" });
       }
@@ -113,7 +114,7 @@ export class BaseController<T> implements IBaseController {
    */
   async update(req: Request, res: Response, next: NextFunction): Promise<Object | null> {
     try {
-      const id = req.params.id;
+      const id : number = Number(req.params.id);
       const newValues = req.body;
 
       const data = await this.service.update(id, newValues);
@@ -135,7 +136,7 @@ export class BaseController<T> implements IBaseController {
    */
   async delete(req: Request, res: Response, next: NextFunction): Promise<Object> {
     try {
-      const id = req.params.id;
+      const id : number = Number(req.params.id);
       const data = await this.service.delete(id);
 
       if (!data) {
