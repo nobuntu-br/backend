@@ -1,5 +1,17 @@
 import { BaseResourceModel } from "./baseResource.model";
 
+export interface IUserDatabaseModel extends BaseResourceModel{
+  UID?: string;
+  tenantUID?: string;
+  userName?: string;
+  firstName?: string;
+  lastName?: string;
+  isAdministrator?: boolean;
+  memberType?: string;
+  email?: string;
+  password?: string;
+}
+
 export interface IUser extends BaseResourceModel{
   UID?: string;
   tenantUID?: string;
@@ -10,7 +22,6 @@ export interface IUser extends BaseResourceModel{
   memberType?: string;
   email?: string;
   password?: string;
-
 }
 
 export class User extends BaseResourceModel implements IUser {

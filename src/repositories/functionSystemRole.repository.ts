@@ -1,15 +1,16 @@
 import createDbAdapter, { DatabaseType } from "../adapters/createDb.adapter";
 import { IDatabaseAdapter } from "../adapters/IDatabase.adapter";
-import { FunctionSystemRole, IFunctionSystemRole } from "../models/functionSystemRole.model";
+import { FunctionSystemRole, IFunctionSystemRoleDatabaseModel } from "../models/functionSystemRole.model";
+import TenantConnection from "../models/tenantConnection.model";
 import BaseRepository from "./base.repository";
 
-export default class FunctionSystemRoleRepository extends BaseRepository<IFunctionSystemRole ,FunctionSystemRole> {
+export default class FunctionSystemRoleRepository extends BaseRepository<IFunctionSystemRoleDatabaseModel ,FunctionSystemRole> {
   private databaseModels: any;
 
-  constructor(databaseType: DatabaseType, databaseConnection: any) {
-    const _adapter: IDatabaseAdapter<IFunctionSystemRole ,FunctionSystemRole> = createDbAdapter<IFunctionSystemRole ,FunctionSystemRole>(databaseType, databaseConnection.models["FunctionSystemRole"], FunctionSystemRole.fromJson);
-    super(_adapter, databaseConnection);
-    this.databaseModels = databaseConnection.models;
+  constructor(databaseType: DatabaseType, tenantConnection: TenantConnection) {
+    const _adapter: IDatabaseAdapter<IFunctionSystemRoleDatabaseModel ,FunctionSystemRole> = createDbAdapter<IFunctionSystemRoleDatabaseModel ,FunctionSystemRole>(tenantConnection.models!.get("FunctionSystemRole"), databaseType, tenantConnection.connection, FunctionSystemRole.fromJson);
+    super(_adapter, tenantConnection);
+    this.databaseModels = tenantConnection.models;
   }
 
   async isUserHaveAccessToRoute(userUID: string, method: string, route: string): Promise<boolean | null> {

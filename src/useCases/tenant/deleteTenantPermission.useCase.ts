@@ -1,15 +1,15 @@
-import UserTenantService from '../../services/databasePermission.service';
 import { DatabasePermission } from '../../models/databasePermission.model';
+import DatabasePermissionRepository from '../../repositories/databasePermission.repository';
 
 export class DeleteTenantPermissionUseCase {
-  constructor(private userTenantService: UserTenantService) { }
+  constructor(private databasePermissionRepository: DatabasePermissionRepository) { }
 
-  async execute(userTenantId: string): Promise<DatabasePermission | Error> {
+  async execute(databasePermissionId: number): Promise<DatabasePermission | Error> {
 
     try {
 
       //Verificar se a permissão existe
-      const userTenant = await this.userTenantService.findById(userTenantId);
+      const userTenant = await this.databasePermissionRepository.findById(databasePermissionId);
 
       if (userTenant == null) {
         //Se permissão não existe, dá erro
@@ -17,7 +17,7 @@ export class DeleteTenantPermissionUseCase {
       }
 
       //Remove a permissão
-      const removedUserTenant = await this.userTenantService.delete(userTenantId)!;
+      const removedUserTenant = await this.databasePermissionRepository.delete(databasePermissionId)!;
 
       if(removedUserTenant == null){
         return Error("Erro ao remover a permissão do tenant.");

@@ -1,14 +1,15 @@
-import mongoose, { Mongoose, Schema } from "mongoose";
+import mongoose, { Connection } from "mongoose";
 import { File } from "../file.model";
+import { updateCounter } from "./counter.model";
 
-export default function defineModel(mongooseConnection: Mongoose) {
+export default function defineModel(mongooseConnection: Connection) {
 
-  if (mongooseConnection.models.file) {
-    return mongooseConnection.models.file;
-  }
-
-  var schema = new mongoose.Schema<File>(
+  var schema = new mongoose.Schema(
     {
+      _id: {
+        type: Number,
+        required: false
+      },
       name: {
         type: String,
         required: true
@@ -29,13 +30,29 @@ export default function defineModel(mongooseConnection: Mongoose) {
     { timestamps: true }
   );
 
-  schema.set("toObject", {
+  schema.set('toJSON', {
     transform: (doc, ret, options) => {
       ret.id = ret._id;
       delete ret._id;
       delete ret.__v;
       return ret;
     }
+  });
+
+  schema.set('toObject', {
+    virtuals: true,
+    versionKey: false,
+    transform: (doc, ret) => {
+      ret.id = ret._id;
+      delete ret._id;
+    }
+  });
+
+  schema.pre('save', async function (next) {
+    if (!this.isNew) return next();
+  
+    this._id = await updateCounter(mongooseConnection, "File");
+    next();
   });
 
   return mongooseConnection.model<File>("File", schema);

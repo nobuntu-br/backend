@@ -1,4 +1,4 @@
-import { Model } from "mongoose";
+import { ClientSession, Connection, Model, Mongoose } from "mongoose";
 import { IDatabaseAdapter } from "./IDatabase.adapter";
 import findDataByCustomQuery from "../utils/mongoose/customQuery.util";
 import { NotFoundError } from "../errors/notFound.error";
@@ -11,10 +11,12 @@ export class MongooseAdapter<TInterface, TClass> implements IDatabaseAdapter<TIn
 
   private _model: Model<any>;
   private _databaseType: string;
+  private _databaseConnection: Connection;
 
-  constructor(model: Model<any>, databaseType: string, protected jsonDataToResourceFn: (jsonData: any) => TClass) {
+  constructor(model: Model<any>, databaseType: string, databaseConnection: Connection, protected jsonDataToResourceFn: (jsonData: any) => TClass) {
     this._model = model;
     this._databaseType = databaseType;
+    this._databaseConnection = databaseConnection;
   }
 
   get databaseType(){
@@ -23,6 +25,10 @@ export class MongooseAdapter<TInterface, TClass> implements IDatabaseAdapter<TIn
 
   get model(){
     return this._model;
+  }
+
+  get databaseConnection(): Connection {
+    return this._databaseConnection;
   }
 
   async create(data: TClass): Promise<TClass> {
@@ -50,8 +56,11 @@ export class MongooseAdapter<TInterface, TClass> implements IDatabaseAdapter<TIn
   async findOne(query: TInterface): Promise<TClass> {
 
     try {
-      const returnedValue = await this._model.findOne( query! );
+      const returnedValue = await this.model.findOne( query! );
 
+      
+
+      console.log("Returned value: ", returnedValue);
       if (returnedValue == null) {
         throw new NotFoundError("Not found document");
       }
@@ -71,7 +80,7 @@ export class MongooseAdapter<TInterface, TClass> implements IDatabaseAdapter<TIn
     throw new Error("Method not implemented");
   }
 
-  async findById(id: string): Promise<TClass> {
+  async findById(id: number): Promise<TClass> {
     try {
       const returnedValue = await this._model.findById(id).exec();
 
@@ -98,7 +107,7 @@ export class MongooseAdapter<TInterface, TClass> implements IDatabaseAdapter<TIn
     }
   }
 
-  async update(id: string, data: Object): Promise<TClass> {
+  async update(id: number, data: Object): Promise<TClass> {
     try {
       const returnedValue = await this._model.findByIdAndUpdate(id, data, { useFindAndModify: false, new: true });
 
@@ -117,7 +126,7 @@ export class MongooseAdapter<TInterface, TClass> implements IDatabaseAdapter<TIn
     }
   }
 
-  async delete(id: string): Promise<TClass> {
+  async delete(id: number): Promise<TClass> {
     
     try {
       const returnedValue = await this._model.findByIdAndDelete(id);
@@ -175,4 +184,100 @@ export class MongooseAdapter<TInterface, TClass> implements IDatabaseAdapter<TIn
     return this.jsonDataToResourceFn(jsonData.toObject());
   }
 
+  async startTransaction(): Promise<ClientSession>{
+    try {
+      let transaction = await this.databaseConnection.startSession();
+      transaction.startTransaction();
+      return transaction; 
+    } catch (error) {
+      throw new UnknownError("Error to start transaction using Mongoose. Detail: "+ error);
+    }
+  }
+
+  async commitTransaction(transaction: ClientSession): Promise<void>{
+    try {
+      await transaction.commitTransaction();
+      await transaction.endSession();
+    } catch (error) {
+      throw new UnknownError("Error to commit transaction using Mongoose. Detail: "+ error);
+    }
+  }
+
+  async rollbackTransaction(transaction: ClientSession): Promise<void>{
+    try {
+      await transaction.abortTransaction();
+      await transaction.endSession();
+    } catch (error) {
+      throw new UnknownError("Error to commit transaction using Mongoose. Detail: "+ error);
+    }
+  }
+
+  async createWithTransaction(data: TInterface, transaction: ClientSession): Promise<TClass>{
+    try {
+
+      console.log("dados para criar: ", data);
+      // const returnedValue = this.model.create(data, {session: transaction});
+      const returnedValue = await this.model.create([data], {session: transaction});
+      console.log(returnedValue);
+      return this.jsonDataToResource(returnedValue[0]);
+    } catch (error) {
+      this.rollbackTransaction(transaction);
+      throw new UnknownError("Error to save document with transaction using Mongoose. Detail: "+ error);
+    }
+  }
+
+  async updateWithTransaction(id: number, data: Object, transaction: ClientSession): Promise<TClass>{
+    try {
+      const returnedValue = await this._model.findByIdAndUpdate(id, data, { useFindAndModify: false, new: true, session: transaction });
+
+      if(returnedValue == null){
+        throw new NotFoundError("Not found document");
+      }
+
+      return this.jsonDataToResource(returnedValue);
+    } catch (error) {
+      this.rollbackTransaction(transaction);
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+
+      throw new UnknownError("Error to update document with transaction using Mongoose. Detail: "+ error);
+    }
+  }
+
+  async deleteWithTransaction(id: number, transaction: ClientSession): Promise<TClass>{
+    try {
+      const returnedValue = await this._model.findByIdAndDelete(id, {session: transaction});
+
+      if(returnedValue == null){
+        throw new NotFoundError("Not found document");
+      }
+
+      return this.jsonDataToResource(returnedValue);
+    } catch (error) {
+      this.rollbackTransaction(transaction);
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+      
+      throw new UnknownError("Error to delete document with transaction using Mongoose. Detail: "+ error);
+    }
+  }
+
+  //TODO procurar a função de varredura das classes que são relacionadas para preencher o populate
+  async findAllWithAagerLoading(limitPerPage: number, offset: number): Promise<TClass[]>{
+    throw new Error("Method not implemented");
+  }
+
+  async findOneWithEagerLoading(query: TInterface): Promise<TClass>{
+    throw new Error("Method not implemented");
+  }
+
+  findManyWithEagerLoading(query: TInterface): Promise<TClass[]>{
+    throw new Error("Method not implemented");
+  }
+
+  async findByIdWithEagerLoading(id: number): Promise<TClass>{
+    throw new Error("Method not implemented");
+  }
 }

@@ -6,19 +6,19 @@ import { DatabasePermissionDTO } from '../../models/DTO/databasePermission.DTO';
 export class RegisterTenantPermissionUseCase {
   constructor(private userTenantService: UserTenantService, private userService: UserService) { }
 
-  async execute(userTenantDTO: DatabasePermissionDTO): Promise<IDatabasePermission> {
+  async execute(input: DatabasePermissionDTO): Promise<IDatabasePermission> {
 
     try {
 
       //Verificar se a permissão existe
-      const userTenant = await this.userTenantService.findOne({ tenantId: userTenantDTO.tenantId, userUID: userTenantDTO.userUID, databaseCredentialId: userTenantDTO.databaseCredentialId });
+      const userTenant = await this.userTenantService.findOne({ tenant: input.tenant, userUID: input.userUID, databaseCredential: input.databaseCredential });
       //Se permissão nÃo existir, crie
       if (userTenant == null) {
         throw new Error("Erro ao registrar novo UserTenant. Registro já existente!");
       }
 
       //Obter o ID do usuário pelo UID pra registrar
-      const user = await this.userService.findOne({UID: userTenantDTO.userUID});
+      const user = await this.userService.findOne({UID: input.userUID});
 
       if(user == null){
         throw new Error("Erro ao registrar novo UserTenant. Usuário não existe!");
@@ -27,10 +27,10 @@ export class RegisterTenantPermissionUseCase {
       return await this.userTenantService.create(
         {
           isAdmin: false,
-          databaseCredentialId: userTenantDTO.databaseCredentialId,
-          tenantId: userTenantDTO.tenantId,
-          userId: user.UID,
-          userUID: userTenantDTO.userUID
+          databaseCredential: input.databaseCredential,
+          tenant: input.tenant,
+          user: user.id,
+          userUID: input.userUID
         }
       );
 

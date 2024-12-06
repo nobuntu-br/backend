@@ -83,7 +83,7 @@ export class InviteUserToApplicationUseCase {
     return { "message": "invited send to " + input.invitedUserEmail };
   }
 
-  private isValidTenantIds(invitedTenantIds: string[], tenants: ITenant[]): boolean {
+  private isValidTenantIds(invitedTenantIds: number[], tenants: ITenant[]): boolean {
     const _tenantsIds = tenants.map(tenant => tenant.id);
     return invitedTenantIds.every(value => _tenantsIds.includes(value));
   }

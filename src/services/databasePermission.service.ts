@@ -15,7 +15,7 @@ export default class DatabasePermissionService extends BaseService<IDatabasePerm
     this.databasePermissionRepository = repository;
   }
 
-  async userHasAccessToTenant(userUID: string, tenantId: string): Promise<boolean> {
+  async userHasAccessToTenant(userUID: string, tenantId: number): Promise<boolean> {
     try {
 
       if (this.getUserAcessToTenantOnCache(userUID, tenantId) != null) {
@@ -37,7 +37,7 @@ export default class DatabasePermissionService extends BaseService<IDatabasePerm
 
   }
 
-  saveUserAcessToTenantOnCache(userUID: string, tenantId: string, databasePermission: Object) {
+  saveUserAcessToTenantOnCache(userUID: string, tenantId: number, databasePermission: Object) {
     try {
       myCache.set(userUID + tenantId, databasePermission);
     } catch (error) {
@@ -46,9 +46,9 @@ export default class DatabasePermissionService extends BaseService<IDatabasePerm
     }
   }
 
-  getUserAcessToTenantOnCache(userUID: string, tenantId: string): string | null {
+  getUserAcessToTenantOnCache(userUID: string, tenantId: number): string | null {
     //TODO se não encontrar nada do cache, retornar null
-    return myCache.get(userUID + tenantId);
+    return myCache.get(userUID + String(tenantId));
   }
 
   //TODO  um usuário X que deve ser administrador do tenant pode alterar quais usuários tem permissão no tenant. Ao ter feito alguma alteração, tem que ser alterado no cache.

@@ -1,10 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import axios from "axios";
-import { FunctionSystemService } from "../services/functionSystem.service";
 import TenantConnection from "../models/tenantConnection.model";
 import { UserService } from "../services/user.service";
-import { FunctionSystemRoleService } from "../services/functionSystemRole.service";
 import { UnauthorizedError } from "../errors/unauthorized.error";
 import { GetSecurityTenantConnectionUseCase } from "../useCases/tenant/getSecurityTenantConnection.useCase";
 import FunctionSystemRoleRepository from "../repositories/functionSystemRole.repository";
@@ -141,7 +139,7 @@ async function isAuthorizedUrl(userUID: string, method: string, url: string, dat
 
 async function isUserHaveAccessToRoute(userUID: string, method: string, url: string, databaseConnection: TenantConnection): Promise<boolean | null>{
   //TODO se for pra fazer isso, tem que ser com cache
-  const functionSystemRoleRepository: FunctionSystemRoleRepository = new FunctionSystemRoleRepository(databaseConnection.databaseType, databaseConnection.connection);
+  const functionSystemRoleRepository: FunctionSystemRoleRepository = new FunctionSystemRoleRepository(databaseConnection.databaseType, databaseConnection);
   return await functionSystemRoleRepository.isUserHaveAccessToRoute(userUID, method, url);
 }
 
@@ -165,6 +163,6 @@ async function userIsAdmin(userUID: string, databaseConnection: TenantConnection
  */
 async function isPublicRoute(method: string, url: string, databaseConnection: TenantConnection): Promise<boolean | null> {
   //TODO se for pra fazer isso, tem que ser com cache
-  const functionSystemRoleRepository: FunctionSystemRoleRepository = new FunctionSystemRoleRepository(databaseConnection.databaseType, databaseConnection.connection);
+  const functionSystemRoleRepository: FunctionSystemRoleRepository = new FunctionSystemRoleRepository(databaseConnection.databaseType, databaseConnection);
   return await functionSystemRoleRepository.isPublicRoute(method, url);
 }

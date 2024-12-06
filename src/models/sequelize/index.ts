@@ -7,21 +7,27 @@ import functionSystemRoleModel from "./functionSystemRole.model";
 import componentStructureModel from "./componentStructure.model";
 import componentStructureRoleModel from "./componentStructureRole.model";
 import verificationEmailModel from "./verificationEmail.model";
+import TenantConnection from "../tenantConnection.model";
 /**
  * Define os modelos que serão usados pelos usuários da aplicação
- * @param sequelize Instância da conexão com o banco de dados usando a biblioteca sequelize
+ * @param tenantConnection Instância da conexão com o banco de dados usando a biblioteca sequelize
  * @returns retorna os modelos do banco de dados para ser usado suas operações
  */
-export default async function setModels(sequelize: Sequelize) {
+export default async function setModels(tenantConnection: TenantConnection) {
+  const sequelizeConnection = tenantConnection.connection;
 
-  const user = userModel(sequelize);
-  const role = roleModel(sequelize);
-  const userRole = userRoleModel(sequelize);
-  const functionSystem = functionSystemModel(sequelize);
-  const functionSystemRole = functionSystemRoleModel(sequelize);
-  const componentStructure = componentStructureModel(sequelize);
-  const componentStructureRole = componentStructureRoleModel(sequelize);
-  const verificationEmail = verificationEmailModel(sequelize);
+  if(sequelizeConnection instanceof Sequelize == false){
+    throw new Error("Instance of database connection is incompatible with setModels function on sequelize.");
+  }
+
+  const user = userModel(sequelizeConnection);
+  const role = roleModel(sequelizeConnection);
+  const userRole = userRoleModel(sequelizeConnection);
+  const functionSystem = functionSystemModel(sequelizeConnection);
+  const functionSystemRole = functionSystemRoleModel(sequelizeConnection);
+  const componentStructure = componentStructureModel(sequelizeConnection);
+  const componentStructureRole = componentStructureRoleModel(sequelizeConnection);
+  const verificationEmail = verificationEmailModel(sequelizeConnection);
 
   //Relação de muitos pra muitos de User para Role
   user.belongsToMany(role, {through: userRole, foreignKey: "userId", otherKey: "roleId"});
@@ -42,7 +48,7 @@ export default async function setModels(sequelize: Sequelize) {
   role.belongsToMany(componentStructure, {through: componentStructureRole, foreignKey: "roleId", otherKey: "componentStructureId"});
 
   //TODO precisará ser gerado várias linhas como essa abaixo, com o model diferente
-  await sequelize.sync();
+  await sequelizeConnection.sync();
   
   const models = new Map<string, any>();
   
@@ -56,17 +62,5 @@ export default async function setModels(sequelize: Sequelize) {
   models.set('VerificationEmail', verificationEmail);
 
   //Precisará ser gerado aqui os nomes das variáveis de cada model
-
-  // const models = {
-  //   user,
-  //   role,
-  //   userRole,
-  //   functionSystem,
-  //   functionSystemRole,
-  //   componentStructure,
-  //   componentStructureRole,
-  //   verificationEmail
-  //   //Precisará ser gerado aqui os nomes das variáveis de cada model
-  // }
   return models;
 }

@@ -1,14 +1,15 @@
 import createDbAdapter, { DatabaseType } from "../adapters/createDb.adapter";
 import { IDatabaseAdapter } from "../adapters/IDatabase.adapter";
-import { IRole, Role } from "../models/role.model";
+import { IRoleDataBaseModel, Role } from "../models/role.model";
+import TenantConnection from "../models/tenantConnection.model";
 import BaseRepository from "./base.repository";
 
 
-export default class RoleRepository extends BaseRepository<IRole, Role>{
+export default class RoleRepository extends BaseRepository<IRoleDataBaseModel, Role>{
 
-  constructor(databaseType: DatabaseType, databaseConnection: any){
-    const _adapter : IDatabaseAdapter<IRole, Role> = createDbAdapter<IRole, Role>(databaseType, databaseConnection.models["Role"], Role.fromJson);
-    super(_adapter, databaseConnection);
+  constructor(databaseType: DatabaseType, tenantConnection: TenantConnection){
+    const _adapter : IDatabaseAdapter<IRoleDataBaseModel, Role> = createDbAdapter<IRoleDataBaseModel, Role>(tenantConnection.models!.get("Role"), databaseType, tenantConnection.connection, Role.fromJson);
+    super(_adapter, tenantConnection);
   }
 
 }

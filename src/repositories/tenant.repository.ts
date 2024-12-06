@@ -1,13 +1,14 @@
 import createDbAdapter, { DatabaseType } from "../adapters/createDb.adapter";
 import { IDatabaseAdapter } from "../adapters/IDatabase.adapter";
-import { ITenant, Tenant } from "../models/tenant.model";
+import { ITenantDatabaseModel, Tenant } from "../models/tenant.model";
+import TenantConnection from "../models/tenantConnection.model";
 import BaseRepository from "./base.repository";
 
-export default class TenantRepository extends BaseRepository<ITenant, Tenant>{
+export default class TenantRepository extends BaseRepository<ITenantDatabaseModel, Tenant>{
 
-  constructor(dbType: DatabaseType, databaseConnection: any){
-    const _adapter : IDatabaseAdapter<ITenant, Tenant> = createDbAdapter<ITenant, Tenant>(dbType, databaseConnection.models["Tenant"], Tenant.fromJson);
-    super(_adapter, databaseConnection);
+  constructor(databaseType: DatabaseType, tenantConnection: TenantConnection){
+    const _adapter : IDatabaseAdapter<ITenantDatabaseModel, Tenant> = createDbAdapter<ITenantDatabaseModel, Tenant>(tenantConnection.models!.get("Tenant"), databaseType, tenantConnection.connection, Tenant.fromJson);
+    super(_adapter, tenantConnection);
   }
 
 }

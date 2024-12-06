@@ -1,3 +1,5 @@
+import { ClientSession } from "mongoose";
+import { Transaction } from "sequelize";
 import { IDatabaseAdapter } from "../adapters/IDatabase.adapter";
 import { FilterValue } from "../utils/mongoose/customQuery.util";
 import { IBaseRepository } from "./ibase.repository";
@@ -10,7 +12,7 @@ export default abstract class BaseRepository<TInterface, TClass> implements IBas
     this.adapter = adapter;
     this.databaseConnection = databaseConnection;
   }
-
+  
   create(data: TClass): Promise<TClass> {
     return this.adapter.create(data);
   }
@@ -53,6 +55,46 @@ export default abstract class BaseRepository<TInterface, TClass> implements IBas
 
   findUsingCustomQuery(query: any): Promise<TClass[]>{
     return this.adapter.findUsingCustomQuery(query);
+  }
+  
+  startTransaction(): Promise<any> {
+    return this.adapter.startTransaction();
+  }
+
+  commitTransaction(transaction: ClientSession | Transaction): Promise<void> {
+    return this.adapter.commitTransaction(transaction);
+  }
+
+  rollbackTransaction(transaction: ClientSession | Transaction): Promise<void> {
+    return this.adapter.commitTransaction(transaction);
+  }
+
+  createWithTransaction(data: TInterface, transaction: ClientSession | Transaction): Promise<TClass> {
+    return this.adapter.createWithTransaction(data, transaction);
+  }
+
+  updateWithTransaction(id: number, data: Object, transaction: ClientSession | Transaction): Promise<TClass> {
+    return this.adapter.updateWithTransaction(id, data, transaction);
+  }
+
+  deleteWithTransaction(id: number, transaction: ClientSession | Transaction): Promise<TClass> {
+    return this.adapter.deleteWithTransaction(id, transaction);
+  }
+
+  findAllWithAagerLoading(limitPerPage: number, offset: number): Promise<TClass[]> {
+    return this.adapter.findAllWithAagerLoading(limitPerPage, offset);
+  }
+
+  findOneWithEagerLoading(query: TInterface): Promise<TClass> {
+    return this.adapter.findOneWithEagerLoading(query);
+  }
+
+  findManyWithEagerLoading(query: TInterface): Promise<TClass[]> {
+    return this.adapter.findManyWithEagerLoading(query);
+  }
+
+  findByIdWithEagerLoading(id: number): Promise<TClass> {
+    return this.adapter.findByIdWithEagerLoading(id);
   }
 
 }

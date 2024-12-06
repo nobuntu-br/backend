@@ -26,17 +26,17 @@ export class TenantConnectionService {
     return TenantConnectionService._instance;
   }
 
-  setOnTenantConnectionPool(tenantId: string, tenantConnection: TenantConnection): TenantConnection {
+  setOnTenantConnectionPool(tenantId: number, tenantConnection: TenantConnection): TenantConnection {
     try {
       if (this.hasReachedMaxConnections()) {
         this.removeOldestConnection();
       }
 
-      if (this.tenantConnections.get(tenantId) != undefined) {
-        return this.tenantConnections.get(tenantId)!;
+      if (this.tenantConnections.get(String(tenantId)) != undefined) {
+        return this.tenantConnections.get(String(tenantId))!;
       }
 
-      this.tenantConnections.set(tenantId, tenantConnection);
+      this.tenantConnections.set(String(tenantId), tenantConnection);
 
       return tenantConnection;
     } catch (error) {
@@ -49,10 +49,10 @@ export class TenantConnectionService {
     return this.tenantConnections;
   }
 
-  findOneConnection(tenantCredentialId: string): TenantConnection | null {
-    const tenantConnection: TenantConnection | undefined = this.tenantConnections.get(tenantCredentialId);
+  findOneConnection(tenantCredentialId: number): TenantConnection | null {
+    const tenantConnection: TenantConnection | undefined = this.tenantConnections.get(tenantCredentialId.toString());
     if(tenantConnection != undefined){
-      return this.tenantConnections.get(tenantCredentialId)!; 
+      return this.tenantConnections.get(tenantCredentialId.toString())!; 
     }
     return null;
   }

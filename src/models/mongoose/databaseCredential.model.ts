@@ -1,9 +1,14 @@
-import mongoose, { Mongoose, Schema } from "mongoose";
+import mongoose, { Connection } from "mongoose";
+import { updateCounter } from "./counter.model";
 
-export default function defineModel(mongooseConnection: Mongoose) {
+export default function defineModel(mongooseConnection: Connection) {
 
   const schema = new mongoose.Schema(
     {
+      _id: {
+        type: Number,
+        required: false
+      },
       name: {
         type: String,
         required: true
@@ -14,11 +19,11 @@ export default function defineModel(mongooseConnection: Mongoose) {
       },
       username: {
         type: String,
-        required: true
+        required: false
       },
       password: {
         type: String,
-        required: true
+        required: false
       },
       host: {
         type: String,
@@ -89,9 +94,15 @@ export default function defineModel(mongooseConnection: Mongoose) {
     virtuals: true,
     versionKey: false,
     transform: (doc, ret) => {
-      ret.id = ret._id.toHexString();
+      ret.id = ret._id;
       delete ret._id;
     }
+  });
+
+  schema.pre('save', async function (next) {
+    if (!this.isNew) return next();
+    this._id = await updateCounter(mongooseConnection, "DatabaseCredential");
+    next();
   });
 
   return mongooseConnection.model('DatabaseCredential', schema);

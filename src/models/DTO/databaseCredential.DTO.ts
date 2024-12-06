@@ -19,6 +19,6 @@ export interface DatabaseCredentialInputDTO {
   sslPrivateKey?: string; //Usada para descriptografar mensagens recebidas e assinar mensagens enviadas. Deve ser mantido em segredo.
   sslCertificate?: string; //Informações públicas, como o domínio, entidade responsável e a CertificateAuthority que o emitiu.
 
-  tenantId?: string;
+  tenant?: number;
   userUID?: string;
 }

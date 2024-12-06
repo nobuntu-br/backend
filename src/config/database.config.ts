@@ -1,5 +1,3 @@
-import getMongooseSecurityModels from "../models/mongoose/indexSecurity";
-import getSequelizeSecurityModels from "../models/sequelize/indexSecurity.model";
 import getMongooseModels from "../models/mongoose";
 import getSequelizeModels from "../models/sequelize";
 import TenantConnection from '../models/tenantConnection.model';
@@ -26,7 +24,7 @@ export const myCache = new NodeCache({ stdTTL: 100, checkperiod: 120 });
  * @param {*} userUID UID do usuário que está fazendo uso do tenant 
  * @returns Retorna a instância da conexão com o tenant caso encontrado e o usuário tiver permissão, caso não, será retornado null
  */
-export async function getTenantConnection(tenantId: string, userUID: string): Promise<TenantConnection | null> {
+export async function getTenantConnection(tenantId: number, userUID: string): Promise<TenantConnection | null> {
   try {
     const tenantConnectionService: TenantConnectionService = TenantConnectionService.instance;
 
@@ -70,7 +68,7 @@ export async function getTenantConnection(tenantId: string, userUID: string): Pr
  * @param databaseCredential Dados de credenciais para realizar a conexão do banco de dados
  * @returns
  */
-export async function connectTenant(tenantId: string, databaseCredential: IDatabaseCredential): Promise<TenantConnection> {
+export async function connectTenant(tenantId: number, databaseCredential: IDatabaseCredential): Promise<TenantConnection> {
 
   //TODO verificar se o tenant já não tem conexão realizada
 
@@ -92,7 +90,8 @@ export async function connectTenant(tenantId: string, databaseCredential: IDatab
     const databaseType: string = databaseCredential.type;
 
     tenantConnection = await connectToDatabase(databaseCredential, false);
-    tenantConnection.models = await getModels(databaseType, tenantConnection.connection);
+    console.log("tenantConnection: ", tenantConnection);
+    tenantConnection.models = await getModels(databaseType, tenantConnection);
 
     await saveRoutes(tenantConnection);
 
@@ -106,123 +105,18 @@ export async function connectTenant(tenantId: string, databaseCredential: IDatab
   }
 }
 
-/*
-export async function connectSecurityTenant(tenantId: string): Promise<TenantConnection> {
-
-  try {
-    const srvEnabledFromEnvironmentVariables: string | undefined = process.env.SECURITY_TENANT_DATABASE_SRV_ENABLED;
-    let srvEnabled: boolean = false;
-
-    if (srvEnabledFromEnvironmentVariables == undefined) {
-      throw new Error("SECURITY_TENANT_DATABASE_SRV_ENABLED is not populated.");
-    }
-
-    if (srvEnabledFromEnvironmentVariables === "true") {
-      srvEnabled = true;
-    } else if (srvEnabledFromEnvironmentVariables === "false") {
-      srvEnabled = false;
-    }
-
-    const sslEnabledEnvironmentVariables: string | undefined = process.env.SECURITY_TENANT_DATABASE_SSL_ENABLED;
-    let sslEnabled: boolean = false;
-
-    if (sslEnabledEnvironmentVariables == undefined) {
-      throw new Error("SECURITY_TENANT_DATABASE_SSL_ENABLED is not populated.");
-    }
-
-    if (sslEnabledEnvironmentVariables === "true") {
-      srvEnabled = true;
-    } else if (sslEnabledEnvironmentVariables === "false") {
-      srvEnabled = false;
-    }
-
-    const poolSize: number = parseInt(process.env.SECURITY_TENANT_DATABASE_POOLSIZE || '1', 10);
-    const timeout: number = parseFloat(process.env.SECURITY_TENANT_DATABASE_TIMEOUT || '3000');
-
-    if (isNaN(poolSize)) {
-      throw new Error("SECURITY_TENANT_DATABASE_POOLSIZE invalid.");
-    }
-
-    if (isNaN(timeout)) {
-      throw new Error("SECURITY_TENANT_DATABASE_TIMEOUT invalid.");
-    }
-
-    console.log(process.env.SECURITY_TENANT_DATABASE_SRV_ENABLED);
-
-    console.log(process.env.SECURITY_TENANT_DATABASE_SRV_ENABLED === "true");
-    console.log(srvEnabled);
-
-    const databaseCredential: DatabaseCredential = new DatabaseCredential({
-      type: process.env.SECURITY_TENANT_DATABASE_TYPE as "mongodb" | "postgres" | "mysql" | "sqlite" | "mariadb" | "mssql" | "db2" | "snowflake" | "oracle" | "firebird",
-      name: process.env.SECURITY_TENANT_DATABASE_NAME,
-      username: process.env.SECURITY_TENANT_DATABASE_USERNAME,
-      password: process.env.SECURITY_TENANT_DATABASE_PASSWORD,
-      host: process.env.SECURITY_TENANT_DATABASE_HOST,
-      port: process.env.SECURITY_TENANT_DATABASE_PORT,
-      srvEnabled: srvEnabled,
-      options: process.env.SECURITY_TENANT_DATABASE_OPTIONS,
-      storagePath: process.env.SECURITY_TENANT_DATABASE_STORAGE_PATH,
-      sslEnabled: sslEnabled,
-      poolSize: poolSize,
-      timeOutTime: timeout,
-      //SSL data
-      sslCertificateAuthority: process.env.SECURITY_TENANT_DATABASE_SSL_CERTIFICATE_AUTHORITY,
-      sslPrivateKey: process.env.SECURITY_TENANT_DATABASE_SSL_PRIVATE_KEY,
-      sslCertificate: process.env.SECURITY_TENANT_DATABASE_SSL_CERTIFICATE
-    });
-
-    console.log(databaseCredential);
-
-    if (databaseCredential.checkDatabaseCredential(databaseCredential) == false || tenantId == undefined) {
-      throw new Error("Missing data on environment variables to connect Security Tenant.");
-    }
-
-    let tenantConnection: TenantConnection;
-
-    try {
-      tenantConnection = await connectToDatabase(databaseCredential, true);
-    } catch (error) {
-      throw new Error("Erro ao realizar a conexão com o banco de dados Security! Verifique se o banco de dados foi criado. Detail: " + error);
-    }
-
-    tenantConnection.models = await getModelsSecurity(databaseCredential.type!, tenantConnection.connection);
-
-    const tenantConnectionService: TenantConnectionService = TenantConnectionService.instance;
-    tenantConnectionService.setOnTenantConnectionPool(tenantId, tenantConnection);
-
-    console.log("Connection established with the Security database. Responsible for managing Tenants.");
-    return tenantConnection;
-  } catch (error) {
-    throw new Error("Error to connect Security Tenant. Detail: " + error);
-  }
-
-}
-*/
-/**
- * Define os models da banco de dados Security na conexão
- * @param databaseType Tipo de banco de dados
- * @param connection Instância da conexão com o banco de dados
- * @returns
- */
-function getModelsSecurity(databaseType: string, connection: any): any {
-  if (databaseType === "mongodb") {
-    return getMongooseSecurityModels(connection);
-  } else {
-    return getSequelizeSecurityModels(connection);
-  }
-}
 
 /**
  * Define os models da banco de dados na conexão
  * @param databaseType Tipo de banco de dados
- * @param connection Instância da conexão com o banco de dados
+ * @param tenantConnection Instância da conexão com o banco de dados
  * @returns
  */
-function getModels(databaseType: string, connection: any): any {
+function getModels(databaseType: string, tenantConnection: TenantConnection): any {
   if (databaseType === "mongodb") {
-    return getMongooseModels(connection);
+    return getMongooseModels(tenantConnection);
   } else {
-    return getSequelizeModels(connection);
+    return getSequelizeModels(tenantConnection);
   }
 }
 

@@ -1,5 +1,14 @@
 import { BaseResourceModel } from "./baseResource.model";
 
+export interface IVerificationEmailDatabaseModel extends BaseResourceModel{
+  email?: string;
+  verificationCode?: string;
+  isVerified?: boolean;
+  verifiedDate?: Date;
+  expirationDate?: Date;
+  createdAt?: Date;
+}
+
 export interface IVerificationEmail extends BaseResourceModel{
   email?: string;
   verificationCode?: string;

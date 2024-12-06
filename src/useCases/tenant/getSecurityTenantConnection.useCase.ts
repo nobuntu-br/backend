@@ -15,9 +15,9 @@ export class GetSecurityTenantConnectionUseCase {
   * @returns retornar uma instância de conexão com o banco de dados
   */
   async execute(): Promise<TenantConnection> {
-    const tenantId = process.env.SECURITY_TENANT_DATABASE_ID;
+    const tenantId : number = Number(process.env.SECURITY_TENANT_DATABASE_ID);
 
-    if (tenantId == undefined) {
+    if (isNaN(tenantId)) {
       throw new Error(`Dados ausentes ao realizar a conexão com o banco security`);
     }
 
@@ -61,7 +61,7 @@ export class GetSecurityTenantConnectionUseCase {
         throw new Error("Erro ao realizar a conexão com o banco de dados Security! Verifique se o banco de dados foi criado. Detail: " + error);
       }
 
-      tenantConnection.models = await this.getModelsSecurity(databaseCredential.type!, tenantConnection.connection);
+      tenantConnection.models = await this.getModelsSecurity(databaseCredential.type!, tenantConnection);
 
       tenantConnectionService.setOnTenantConnectionPool(tenantId, tenantConnection);
 
@@ -80,11 +80,11 @@ export class GetSecurityTenantConnectionUseCase {
    * @param connection Instância da conexão com o banco de dados
    * @returns
    */
-  getModelsSecurity(databaseType: string, connection: any): any {
+  getModelsSecurity(databaseType: string, tenantConnection: TenantConnection): any {
     if (databaseType === "mongodb") {
-      return getMongooseSecurityModels(connection);
+      return getMongooseSecurityModels(tenantConnection);
     } else {
-      return getSequelizeSecurityModels(connection);
+      return getSequelizeSecurityModels(tenantConnection);
     }
   }
 

@@ -1,17 +1,18 @@
 import { Op } from "sequelize";
 import createDbAdapter, { DatabaseType } from "../adapters/createDb.adapter";
 import { IDatabaseAdapter } from "../adapters/IDatabase.adapter";
-import { DatabasePermission, IDatabasePermission } from "../models/databasePermission.model";
+import { DatabasePermission, IDatabasePermissionDatabaseModel } from "../models/databasePermission.model";
 import BaseRepository from "./base.repository";
 import { DatabasePermissionDetailOutputDTO } from "../models/DTO/databasePermission.DTO";
+import TenantConnection from "../models/tenantConnection.model";
 
-export default class DatabasePermissionRepository extends BaseRepository<IDatabasePermission, DatabasePermission> {
+export default class DatabasePermissionRepository extends BaseRepository<IDatabasePermissionDatabaseModel, DatabasePermission> {
   private databaseModels: any;
 
-  constructor(databaseType: DatabaseType, databaseConnection: any) {
-    const _adapter: IDatabaseAdapter<IDatabasePermission, DatabasePermission> = createDbAdapter<IDatabasePermission, DatabasePermission>(databaseType, databaseConnection.models["DatabasePermission"], DatabasePermission.fromJson);
-    super(_adapter, databaseConnection);
-    this.databaseModels = databaseConnection.models;
+  constructor(databaseType: DatabaseType, tenantConnection: TenantConnection) {
+    const _adapter: IDatabaseAdapter<IDatabasePermissionDatabaseModel, DatabasePermission> = createDbAdapter<IDatabasePermissionDatabaseModel, DatabasePermission>(tenantConnection.models!.get("DatabasePermission"), databaseType, tenantConnection.connection, DatabasePermission.fromJson);
+    super(_adapter, tenantConnection);
+    this.databaseModels = tenantConnection.models;
   }
 
   async getTenantsWithDefaultTenantByUserUID(UserUID: string): Promise<DatabasePermissionDetailOutputDTO[]> {

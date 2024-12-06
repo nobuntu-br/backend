@@ -12,11 +12,11 @@ export default function defineModel(sequelize: Sequelize) {
     },
     username: {
       type: DataTypes.STRING(100),
-      allowNull: false,
+      allowNull: true,
     },
     password: {
       type: DataTypes.STRING(100),
-      allowNull: false,
+      allowNull: true,
     },
     host: {
       type: DataTypes.STRING(100),

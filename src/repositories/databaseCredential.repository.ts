@@ -1,13 +1,14 @@
 import createDbAdapter, { DatabaseType } from "../adapters/createDb.adapter";
 import { IDatabaseAdapter } from "../adapters/IDatabase.adapter";
-import { DatabaseCredential, IDatabaseCredential } from "../models/databaseCredential.model";
+import { DatabaseCredential, IDatabaseCredentialDatabaseModel } from "../models/databaseCredential.model";
+import TenantConnection from "../models/tenantConnection.model";
 import BaseRepository from "./base.repository";
 
-export default class DatabaseCredentialRepository extends BaseRepository<IDatabaseCredential, DatabaseCredential>{
+export default class DatabaseCredentialRepository extends BaseRepository<IDatabaseCredentialDatabaseModel, DatabaseCredential>{
 
-  constructor(databaseType: DatabaseType, databaseConnection: any){
-    const _adapter : IDatabaseAdapter<IDatabaseCredential, DatabaseCredential> = createDbAdapter<IDatabaseCredential, DatabaseCredential>(databaseType, databaseConnection.models["DatabaseCredential"], DatabaseCredential.fromJson);
-    super(_adapter, databaseConnection);
+  constructor(databaseType: DatabaseType, tenantConnection: TenantConnection){
+    const _adapter : IDatabaseAdapter<IDatabaseCredentialDatabaseModel, DatabaseCredential> = createDbAdapter<IDatabaseCredentialDatabaseModel, DatabaseCredential>(tenantConnection.models!.get("DatabaseCredential"), databaseType, tenantConnection.connection, DatabaseCredential.fromJson);
+    super(_adapter, tenantConnection);
   }
 
 }

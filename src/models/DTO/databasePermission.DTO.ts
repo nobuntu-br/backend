@@ -1,18 +1,18 @@
 export interface DatabasePermissionDTO {
-  userId?: string;
-  tenantId: string;
-  databaseCredentialId: string;
+  user?: number;
+  tenant: number;
+  databaseCredential: number;
   userUID: string;
   isAdmin?: boolean;
 }
  
 export interface DatabasePermissionDetailOutputDTO {
   tenant: {
-    id: string,
+    id: number,
     name: string
   };
   databaseCredential: {
-    id: string,
+    id: number,
 
   };
   userUID: string;

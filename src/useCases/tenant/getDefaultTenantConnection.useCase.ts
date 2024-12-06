@@ -36,7 +36,7 @@ export class GetDefaultTenantConnectionUseCase {
       sslEnabled: process.env.DEFAULT_TENANT_DATABASE_SSL_ENABLED === "true" ? true : false,
       poolSize: getEnvironmentNumber("DEFAULT_TENANT_DATABASE_POOLSIZE", 1),
       timeOutTime: getEnvironmentNumber("DEFAULT_TENANT_DATABASE_TIMEOUT", 3000),
-      
+
       //SSL data
       sslCertificateAuthority: process.env.SECURITY_TENANT_DATABASE_SSL_CERTIFICATE_AUTHORITY,
       sslPrivateKey: process.env.SECURITY_TENANT_DATABASE_SSL_PRIVATE_KEY,
@@ -51,7 +51,7 @@ export class GetDefaultTenantConnectionUseCase {
 
       const tenantConnectionService: TenantConnectionService = TenantConnectionService.instance;
 
-      var tenantConnection: TenantConnection | null = tenantConnectionService.findOneConnection(process.env.DEFAULT_TENANT_DATABASE_ID!);
+      var tenantConnection: TenantConnection | null = tenantConnectionService.findOneConnection(Number(process.env.DEFAULT_TENANT_DATABASE_ID!));
 
       //Se iniciou o servidor pela primeira vez, tem que registrar ele e conectar
 
@@ -83,6 +83,7 @@ export class GetDefaultTenantConnectionUseCase {
    * @param databaseCredential Dados das credenciais de acesso ao banco de dados do Tenant Padrão do projeto
    */
   async saveDefaultTenantOnSecurityTenant(databaseCredential: DatabaseCredential): Promise<DatabaseCredential> {
+
     const defaultTenantName: string | undefined = process.env.DEFAULT_TENANT_DATABASE_ID;
 
     if (defaultTenantName == undefined || defaultTenantName == null) {
@@ -92,52 +93,57 @@ export class GetDefaultTenantConnectionUseCase {
     const getSecurityTenantConnectionUseCase: GetSecurityTenantConnectionUseCase = new GetSecurityTenantConnectionUseCase();
     const securityTenantConnection: TenantConnection = await getSecurityTenantConnectionUseCase.execute();
 
-    const tenantRepository: TenantRepository = new TenantRepository(securityTenantConnection.databaseType, securityTenantConnection.connection);
+    const tenantRepository: TenantRepository = new TenantRepository(securityTenantConnection.databaseType, securityTenantConnection);
 
+    const transaction = await tenantRepository.startTransaction();
+
+    //Cria o tenant
     let tenant: Tenant;
     try {
       tenant = await tenantRepository.findOne({ name: defaultTenantName });
     } catch (error) {
       if (error instanceof NotFoundError) {
-        tenant = await tenantRepository.create({ name: defaultTenantName });
+        tenant = await tenantRepository.createWithTransaction({ name: defaultTenantName }, transaction);
       } else {
         throw new UnknownError("Unknown error on Save Default Tenant on Security Tenant function. Unknown error on create Tenant. Detail: " + error);
       }
     }
 
-    const databaseCredentialRepository: DatabaseCredentialRepository = new DatabaseCredentialRepository(securityTenantConnection.databaseType, securityTenantConnection.connection);
-    
-    //Verificar se as credenciais do tenant padrão foram criadas, se não, criar
+    //Cria o databaseCredential
+    const databaseCredentialRepository: DatabaseCredentialRepository = new DatabaseCredentialRepository(securityTenantConnection.databaseType, securityTenantConnection);
+
+    console.log(databaseCredential);
     let _databaseCredential: DatabaseCredential;
     try {
       _databaseCredential = await databaseCredentialRepository.findOne({ name: databaseCredential.name });
-      console.log("databaseCredential obtido: ", _databaseCredential);
     } catch (error) {
       if (error instanceof NotFoundError) {
-        _databaseCredential = new DatabaseCredential(await databaseCredentialRepository.create(databaseCredential));
-        console.log("databaseCredential criado: ", _databaseCredential);
+        console.log("errrroooo");
+        _databaseCredential = new DatabaseCredential(await databaseCredentialRepository.createWithTransaction(databaseCredential, transaction));
       } else {
         throw new UnknownError("Unknown error on Save Default Tenant on Security Tenant function. Unknown error on create Database Credential. Detail: " + error);
       }
     }
 
-    const databasePermissionRepository: DatabasePermissionRepository = new DatabasePermissionRepository(securityTenantConnection.databaseType, securityTenantConnection.connection);
-
-    console.log(_databaseCredential);
+    //Cria o databasePermission
+    const databasePermissionRepository: DatabasePermissionRepository = new DatabasePermissionRepository(securityTenantConnection.databaseType, securityTenantConnection);
 
     try {
       let databasePermission = await databasePermissionRepository.findOne({ tenantId: tenant.id, databaseCredentialId: _databaseCredential.id });
     } catch (error) {
       if (error instanceof NotFoundError) {
-        await databasePermissionRepository.create({
+        await databasePermissionRepository.createWithTransaction({
           tenantId: tenant.id,
-          databaseCredentialId: databaseCredential.id,
-        });
+          databaseCredentialId: _databaseCredential.id,
+        }, transaction);
       } else {
         throw new UnknownError("Unknown error on Save Default Tenant on Security Tenant function. Detail: " + error);
       }
     }
 
+    await tenantRepository.commitTransaction(transaction);
+
     return databaseCredential;
+
   }
 }

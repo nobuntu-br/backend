@@ -104,6 +104,11 @@ export function buildMongoDBURI(databaseCredential: IDatabaseCredential): string
     protocol = "mongodb";
   }
 
+  //se não tiver user e senha tir
+  if(databaseCredential.username == "" && databaseCredential.password == ""){
+    return protocol+"://"+ databaseCredential.host + "/" + databaseCredential.name + "?" + databaseCredential.options;
+  }
+
   return protocol+"://" + databaseCredential.username + ":" + databaseCredential.password + "@" + databaseCredential.host + "/" + databaseCredential.name + "?" + databaseCredential.options
 }
 

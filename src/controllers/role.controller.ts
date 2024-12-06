@@ -14,7 +14,7 @@ export class RoleController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const roleService: RoleService = new RoleService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
+      const roleService: RoleService = new RoleService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<IRole, Role> = new BaseController(roleService, "Role");
 
@@ -31,7 +31,7 @@ export class RoleController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const roleService: RoleService = new RoleService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
+      const roleService: RoleService = new RoleService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<IRole, Role> = new BaseController(roleService, "Role");
 
@@ -48,7 +48,7 @@ export class RoleController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const roleService: RoleService = new RoleService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
+      const roleService: RoleService = new RoleService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<IRole, Role> = new BaseController(roleService, "Role");
 
@@ -65,7 +65,7 @@ export class RoleController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const roleService: RoleService = new RoleService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
+      const roleService: RoleService = new RoleService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<IRole, Role> = new BaseController(roleService, "Role");
 
@@ -82,7 +82,7 @@ export class RoleController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const roleService: RoleService = new RoleService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
+      const roleService: RoleService = new RoleService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<IRole, Role> = new BaseController(roleService, "Role");
 
@@ -99,7 +99,7 @@ export class RoleController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const roleService: RoleService = new RoleService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
+      const roleService: RoleService = new RoleService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<IRole, Role> = new BaseController(roleService, "Role");
 
@@ -116,7 +116,7 @@ export class RoleController {
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const roleService: RoleService = new RoleService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
+      const roleService: RoleService = new RoleService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<IRole, Role> = new BaseController(roleService, "Role");
 

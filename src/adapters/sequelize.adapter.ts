@@ -1,4 +1,4 @@
-import { ModelStatic } from "sequelize";
+import { ModelStatic, Sequelize, Transaction } from "sequelize";
 import { IDatabaseAdapter } from "./IDatabase.adapter";
 import findDataByCustomQuery from "../utils/sequelize/customQuery.util";
 import { FilterValue } from "../utils/mongoose/customQuery.util";
@@ -12,10 +12,12 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
 
   private _model: ModelStatic<any>;
   private _databaseType: string;
+  private _databaseConnection: Sequelize;
 
-  constructor(model: any, databaseType: string, protected jsonDataToResourceFn: (jsonData: any) => TClass) {
+  constructor(model: any, databaseType: string, databaseConnection: Sequelize, protected jsonDataToResourceFn: (jsonData: any) => TClass) {
     this._model = model;
     this._databaseType = databaseType;
+    this._databaseConnection = databaseConnection;
   }
 
   get databaseType() {
@@ -24,6 +26,10 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
 
   get model() {
     return this._model;
+  }
+
+  get databaseConnection(): Sequelize {
+    return this._databaseConnection;
   }
 
   async create(data: TClass): Promise<TClass> {
@@ -55,10 +61,7 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
         limit: limitPerPage,
         offset: offset,
         order: [['createdAt', 'DESC']], // Ordenar por data de criação, por exemplo
-        include: [{ all: true }]
       });
-
-      this.replaceForeignKeysFieldWithData(items);
 
       return this.jsonDataToResources(items);
 
@@ -69,9 +72,8 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
 
   async findOne(query: TInterface): Promise<TClass> {
     try {
-      console.log(query);
 
-      const item = await this._model.findOne({ where: query as any, include: [{ all: true }] });
+      const item = await this._model.findOne({ where: query as any });
 
       if (item == null) {
         throw new NotFoundError("Not found document");
@@ -79,7 +81,7 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
 
       return this.jsonDataToResource(item);
     } catch (error) {
-      
+
       if (error instanceof NotFoundError) {
         throw error;
       }
@@ -103,6 +105,7 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
 
   }
 
+  //TODO Tornar lazy loading
   async findById(id: number): Promise<TClass> {
     try {
       const returnedValue = await this._model.findOne({ where: { id: id }, include: [{ all: true }] });
@@ -185,7 +188,7 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
       if (error instanceof NotFoundError) {
         throw error;
       }
-      
+
       throw new UnknownError("Error delete data using Sequelize. Detail: " + error);
     }
 
@@ -303,6 +306,174 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
       return match[1];
     } else {
       return null;
+    }
+  }
+
+  async startTransaction(): Promise<any> {
+    try {
+      return await this.databaseConnection.transaction();
+    } catch (error) {
+      throw new UnknownError("Error to start transaction using Sequelize. Detail: " + error);
+    }
+  }
+
+  async commitTransaction(transaction: Transaction): Promise<any> {
+    try {
+      return await transaction.commit();
+    } catch (error) {
+      throw new UnknownError("Error to commit transaction using Sequelize. Detail: " + error);
+    }
+  }
+
+  async rollbackTransaction(transaction: Transaction): Promise<void> {
+    try {
+      await transaction.rollback();
+    } catch (error) {
+      throw new UnknownError("Error to commit transaction using Sequelize. Detail: " + error);
+    }
+  }
+
+  async createWithTransaction(data: TInterface, transaction: Transaction): Promise<TClass> {
+    try {
+
+      const newItem = await this._model.create(data!, { transaction: transaction });
+      return this.jsonDataToResource(newItem);
+
+    } catch (error: any) {
+      await this.rollbackTransaction(transaction);
+      // Manipula erros específicos
+      if (error.name === 'SequelizeUniqueConstraintError') {
+        throw new Error("Error to save data usign sequelize. One data is unique. Detail: " + error);
+      }
+
+      if (error.name === 'SequelizeValidationError') {
+        // Para erros de validação, você pode retornar detalhes específicos
+        throw new Error("Validation Error on save data using Sequelize. Detail: " + error);
+      }
+
+      throw new UnknownError("Error to save data with transaction using Sequelize. Detail: " + error);
+    }
+  }
+
+  async updateWithTransaction(id: number, data: Object, transaction: Transaction): Promise<TClass> {
+    try {
+
+      //Irá obter a quantidade de linhas alteradas
+      var [affectedCount] = await this._model.update(data, {
+        where: {
+          id: this.databaseType == "mongodb" ? id : Number(id),
+        },
+        transaction: transaction
+      });
+
+      //Se nenhum registro foi atualizado
+      if (affectedCount == 0) {
+        throw new NotFoundError("Not found data");
+      }
+
+      //A opção de retornar o registro editado da função update só funciona pra msql e postgres, então na dúvida eu prefiro pesquisar novamente o registro pra não dar problemas (sei que duas buscas não é o ideial mas, o ambiente é complexo).
+      const returnedValue = await this._model.findOne({ where: { id: id } });
+
+      return this.jsonDataToResource(returnedValue);
+    } catch (error) {
+
+      await this.rollbackTransaction(transaction);
+
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+
+      throw new UnknownError(
+        "Error to update entities to database with transaction using Sequelize. Details: " +
+        error
+      );
+    }
+  }
+
+  async deleteWithTransaction(id: number, transaction: Transaction): Promise<TClass> {
+    try {
+      //Essa busca é feita para retornar o objeto que será removido
+      const removedValue = await this._model.findOne({ where: { id: id }, transaction: transaction });
+
+      await this._model.destroy({
+        where: {
+          id: id,
+        },
+        transaction: transaction
+      });
+
+      return this.jsonDataToResource(removedValue);
+    } catch (error) {
+      await this.rollbackTransaction(transaction);
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+
+      throw new UnknownError("Error delete data using Sequelize. Detail: " + error);
+    }
+
+  }
+
+  async findAllWithAagerLoading(limitPerPage: number, offset: number): Promise<TClass[]> {
+    try {
+
+      const items = await this._model.findAll({
+        limit: limitPerPage,
+        offset: offset,
+        order: [['createdAt', 'DESC']], // Ordenar por data de criação, por exemplo
+        include: [{ all: true }]
+      });
+
+      this.replaceForeignKeysFieldWithData(items);
+
+      return this.jsonDataToResources(items);
+
+    } catch (error) {
+      throw new UnknownError("Error to find all data using sequelize. Detail: " + error);
+    }
+  }
+
+  async findOneWithEagerLoading(query: TInterface): Promise<TClass> {
+    try {
+      const item = await this._model.findOne({ where: query as any, include: [{ all: true }] });
+
+      if (item == null) {
+        throw new NotFoundError("Not found document");
+      }
+
+      return this.jsonDataToResource(item);
+    } catch (error) {
+
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+
+      throw new UnknownError("Error to find one data using sequelize. Detail: " + error);
+    }
+  }
+
+  findManyWithEagerLoading(query: TInterface): Promise<TClass[]> {
+    throw new Error("Method not implemented");
+  }
+
+  async findByIdWithEagerLoading(id: number): Promise<TClass> {
+    try {
+      const returnedValue = await this._model.findOne({ where: { id: id }, include: [{ all: true }] });
+
+      if (returnedValue == null) {
+        throw new NotFoundError("Not found data");
+      }
+
+      this.replaceForeignKeyFieldWithData(returnedValue);
+
+      return this.jsonDataToResource(returnedValue);
+    } catch (error) {
+
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+
+      throw new UnknownError("Error to find data by id using Sequelize. Detail: " + error);
     }
   }
 

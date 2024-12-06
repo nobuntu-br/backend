@@ -3,8 +3,8 @@ import { Sequelize } from "sequelize";
 import { DatabaseType } from "../adapters/createDb.adapter";
 
 export default class TenantConnection {
-  _models: Map<string, any> | null;
-  _connection: Connection | Sequelize;
+  private _models: Map<string, any> | null;
+  private _connection: Connection | Sequelize;
   databaseType: DatabaseType;
   expireAt: Date;
   isDefaultConnection: boolean;

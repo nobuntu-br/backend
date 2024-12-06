@@ -18,13 +18,13 @@ export class DatabasePermissionController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
-      const userTenantService: DatabasePermissionService = new DatabasePermissionService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
-      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
+      const userTenantService: DatabasePermissionService = new DatabasePermissionService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
+      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
       const registerTenantPermissionUseCase : RegisterTenantPermissionUseCase = new RegisterTenantPermissionUseCase(userTenantService, userService);
 
       const userTenant: DatabasePermissionDTO = {
-        tenantId: req.body.tenantId,
-        databaseCredentialId: req.body.databaseCredentialId,
+        tenant: req.body.tenant,
+        databaseCredential: req.body.databaseCredential,
         userUID: req.body.UID
       }
 
@@ -43,7 +43,7 @@ export class DatabasePermissionController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
+      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
       const baseController: BaseController<IUser, User>  = new BaseController(userService, "User");
 
       baseController.findAll(req, res, next);
@@ -59,7 +59,7 @@ export class DatabasePermissionController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
+      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
       const baseController: BaseController<IUser, User>  = new BaseController(userService, "User");
 
       baseController.findById(req, res, next);
@@ -75,7 +75,7 @@ export class DatabasePermissionController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
+      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
       const baseController: BaseController<IUser, User>  = new BaseController(userService, "User");
 
       baseController.getCount(req, res, next);
@@ -90,7 +90,7 @@ export class DatabasePermissionController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
+      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
       const baseController: BaseController<IUser, User>  = new BaseController(userService, "User");
 
       baseController.update(req, res, next);
@@ -106,7 +106,7 @@ export class DatabasePermissionController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
+      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
       const baseController: BaseController<IUser, User>  = new BaseController(userService, "User");
 
       baseController.delete(req, res, next);
@@ -122,7 +122,7 @@ export class DatabasePermissionController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
+      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
       const baseController: BaseController<IUser, User>  = new BaseController(userService, "User");
 
       baseController.deleteAll(req, res, next);
@@ -138,7 +138,7 @@ export class DatabasePermissionController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection);
+      const userService: UserService = new UserService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
 
       const user = await userService.findOne({ UID: req.params.UID });
       if (!user) {

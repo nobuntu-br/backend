@@ -1,10 +1,10 @@
 import { Sequelize, DataTypes } from "sequelize";
 
 export default function defineModel(sequelize: Sequelize) {
-  const schema = sequelize.define('field_file', {
+  const schema = sequelize.define('FieldFile', {
     fieldType: {
       type: DataTypes.STRING,
-      field: 'field_type'
+      field: 'fieldType'
     }
   });
   schema.prototype.toJSON = function () {

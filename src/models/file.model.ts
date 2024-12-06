@@ -1,6 +1,14 @@
 import { BaseResourceModel } from "./baseResource.model"
 
-export interface IFile {
+export interface IFileDatabaseModel extends BaseResourceModel {
+  name?: string,
+  size?: number,
+  extension?: string,
+  dataBlob?: Blob,
+  fieldFile?: number
+}
+
+export interface IFile extends BaseResourceModel {
   name?: string,
   size?: number,
   extension?: string,

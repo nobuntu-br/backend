@@ -1,9 +1,14 @@
-import mongoose, { Mongoose, Schema } from "mongoose";
+import mongoose, { Connection, Schema } from "mongoose";
+import { updateCounter } from "./counter.model";
 
-export default function defineModel(mongooseConnection: Mongoose) {
+export default function defineModel(mongooseConnection: Connection) {
 
   const schema = new mongoose.Schema(
     {
+      _id: {
+        type: Number,
+        required: false
+      },
       userUID: {
         type: Schema.Types.ObjectId, ref: 'user',
         required: false,
@@ -43,9 +48,15 @@ export default function defineModel(mongooseConnection: Mongoose) {
     virtuals: true,
     versionKey: false,
     transform: (doc, ret) => {
-      ret.id = ret._id.toHexString();
+      ret.id = ret._id;
       delete ret._id;
     }
+  });
+
+  schema.pre('save', async function (next) {
+    if (!this.isNew) return next();
+    this._id = await updateCounter(mongooseConnection, "DatabasePermission");
+    next();
   });
 
   return mongooseConnection.model("DatabasePermission", schema);

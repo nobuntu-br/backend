@@ -12,7 +12,7 @@ export class FileController {
         throw new NotFoundError("Não foi definido tenant para uso.");
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
-    const  fileService : FileService = new FileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
+    const  fileService : FileService = new FileService(req.body.databaseConnection.databaseType, req.body.databaseConnection); 
     const baseController : BaseController<IFile, File> = new BaseController(fileService,  "file"); 
 
     baseController.create(req, res, next); 
@@ -27,7 +27,7 @@ export class FileController {
         throw new NotFoundError("Não foi definido tenant para uso.");
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
-    const  fileService : FileService = new FileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
+    const  fileService : FileService = new FileService(req.body.databaseConnection.databaseType, req.body.databaseConnection); 
     const baseController : BaseController<IFile, File> = new BaseController(fileService,  "file"); 
 
     baseController.findAll(req, res, next); 
@@ -42,7 +42,7 @@ export class FileController {
         throw new NotFoundError("Não foi definido tenant para uso.");
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
-    const  fileService : FileService = new FileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
+    const  fileService : FileService = new FileService(req.body.databaseConnection.databaseType, req.body.databaseConnection); 
     const baseController : BaseController<IFile, File> = new BaseController(fileService,  "file"); 
 
     baseController.findById(req, res, next); 
@@ -57,7 +57,7 @@ export class FileController {
         throw new NotFoundError("Não foi definido tenant para uso.");
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
-    const  fileService : FileService = new FileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
+    const  fileService : FileService = new FileService(req.body.databaseConnection.databaseType, req.body.databaseConnection); 
     const baseController : BaseController<IFile, File> = new BaseController(fileService,  "file"); 
 
     baseController.update(req, res, next); 
@@ -72,7 +72,7 @@ export class FileController {
         throw new NotFoundError("Não foi definido tenant para uso.");
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
-    const  fileService : FileService = new FileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
+    const  fileService : FileService = new FileService(req.body.databaseConnection.databaseType, req.body.databaseConnection); 
     const baseController : BaseController<IFile, File> = new BaseController(fileService,  "file"); 
 
     baseController.getCount(req, res, next); 
@@ -87,7 +87,7 @@ export class FileController {
         throw new NotFoundError("Não foi definido tenant para uso.");
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
-    const  fileService : FileService = new FileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
+    const  fileService : FileService = new FileService(req.body.databaseConnection.databaseType, req.body.databaseConnection); 
     const baseController : BaseController<IFile, File> = new BaseController(fileService,  "file"); 
 
     baseController.delete(req, res, next); 
@@ -102,7 +102,7 @@ export class FileController {
         throw new NotFoundError("Não foi definido tenant para uso.");
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
-    const  fileService : FileService = new FileService(req.body.databaseConnection.databaseType, req.body.databaseConnection.connection); 
+    const  fileService : FileService = new FileService(req.body.databaseConnection.databaseType, req.body.databaseConnection); 
     const baseController : BaseController<IFile, File> = new BaseController(fileService,  "file"); 
 
       baseController.findCustom(req, res, next); 

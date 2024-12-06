@@ -18,9 +18,9 @@ declare global {
  */
 export default async function changeTenant(req: Request, res: Response, next: NextFunction) {
 
-  const tenantId = req.header('X-Tenant-ID');
+  const tenantId : number = Number(req.header('X-Tenant-ID'));
 
-  if (tenantId == undefined) {
+  if (isNaN(tenantId)) {
     return res.status(401).send({ message: "Token do tenant não fornecido ou inválido" });
   }
 

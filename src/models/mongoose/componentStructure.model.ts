@@ -1,13 +1,13 @@
-import mongoose, { Mongoose } from "mongoose";
+import mongoose, { Connection } from "mongoose";
+import { updateCounter } from "./counter.model";
 
-export default function defineModel(mongooseConnection: Mongoose) {
-
-  // Verifica se o modelo já foi criado para a conexão específica (Toda vez que é feito a conexão nova ao banco de dados, é preciso setar os models, porém só pode fazer isso uma vez por conexão, se fizer mais de uma vez dá erro. Por isso é verificado se dentro dos models da conexão existe o model)
-  if (mongooseConnection.models.componentStructure) {
-    return mongooseConnection.models.componentStructure;
-  }
+export default function defineModel(mongooseConnection: Connection) {
 
   var schema = new mongoose.Schema({
+    _id: {
+      type: Number,
+      required: false
+    },
     structure: {
       type: String,
       required: false
@@ -27,6 +27,21 @@ export default function defineModel(mongooseConnection: Mongoose) {
       delete ret.__v;
       return ret;
     }
+  });
+
+  schema.set('toObject', {
+    virtuals: true,
+    versionKey: false,
+    transform: (doc, ret) => {
+      ret.id = ret._id;
+      delete ret._id;
+    }
+  });
+
+  schema.pre('save', async function (next) {
+    if (!this.isNew) return next();
+    this._id = await updateCounter(mongooseConnection, "ComponentStructure");
+    next();
   });
 
   return mongooseConnection.model('ComponentStructure', schema);

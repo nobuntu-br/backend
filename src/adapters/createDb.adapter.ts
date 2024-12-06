@@ -1,6 +1,8 @@
+import { Connection } from "mongoose";
 import { IDatabaseAdapter } from "./IDatabase.adapter";
 import { MongooseAdapter } from "./mongoose.adapter";
 import { SequelizeAdapter } from "./sequelize.adapter";
+import { Sequelize } from "sequelize";
 
 export type DatabaseType = "mongodb" | "postgres" | "mysql" | "sqlite" | "mariadb" | "mssql" | "db2" | "snowflake" | "oracle" | "firebird";
 
@@ -11,14 +13,15 @@ export type DatabaseType = "mongodb" | "postgres" | "mysql" | "sqlite" | "mariad
  * @param jsonDataToResourceFn Função para criar uma classe com base no JSON retornado das funções
  * @returns 
  */
-function createDbAdapter<TInterface, TClass>(databaseType: DatabaseType, model: any, jsonDataToResourceFn: (jsonData: any) => TClass): IDatabaseAdapter<TInterface, TClass> {
-  switch (databaseType) {
-    case "mongodb":
-      return new MongooseAdapter<TInterface, TClass>(model, databaseType, jsonDataToResourceFn);
-    case "firebird":
-      throw new Error("Method not implemented");
-    default:
-      return new SequelizeAdapter<TInterface, TClass>(model, databaseType, jsonDataToResourceFn);
+function createDbAdapter<TInterface, TClass>(model: any, databaseType: DatabaseType, databaseConnection: Connection | Sequelize, jsonDataToResourceFn: (jsonData: any) => TClass): IDatabaseAdapter<TInterface, TClass> {
+  if (databaseType === "mongodb" && databaseConnection instanceof Connection) {
+    return new MongooseAdapter<TInterface, TClass>(model, databaseType, databaseConnection, jsonDataToResourceFn);
+  } else if (databaseType === "firebird") {
+    throw new Error("Method not implemented");
+  } else if (databaseConnection instanceof Sequelize) {
+    return new SequelizeAdapter<TInterface, TClass>(model, databaseType, databaseConnection, jsonDataToResourceFn);
+  } else {
+    throw new Error("Error do create Database Adapter. Detail: Conditions not satisfied");
   }
 }
 

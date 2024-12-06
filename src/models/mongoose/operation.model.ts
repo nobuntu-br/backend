@@ -1,13 +1,14 @@
-import mongoose, { Mongoose, Schema } from "mongoose";
+import mongoose, { Connection, Schema } from "mongoose";
+import { updateCounter } from "./counter.model";
 
-export default function defineModel(mongooseConnection: Mongoose) {
-
-  if (mongooseConnection.models.operation) {
-    return mongooseConnection.models.operation;
-  }
+export default function defineModel(mongooseConnection: Connection) {
 
   var schema = new mongoose.Schema(
     {
+      _id: {
+        type: Number,
+        required: false
+      },
       user: {
         type: Schema.Types.ObjectId, ref: 'User',
         required: true,
@@ -45,9 +46,16 @@ export default function defineModel(mongooseConnection: Mongoose) {
     virtuals: true,
     versionKey: false,
     transform: (doc, ret) => {
-      ret.id = ret._id.toHexString();
+      ret.id = ret._id;
       delete ret._id;
     }
+  });
+
+  schema.pre('save', async function (next) {
+    if (!this.isNew) return next();
+  
+    this._id = await updateCounter(mongooseConnection.models.counter, "Operation");
+    next();
   });
 
   return mongooseConnection.model("Operation", schema);

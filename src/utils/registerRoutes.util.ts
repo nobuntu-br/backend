@@ -11,7 +11,7 @@ const path = require('path');
 export async function saveRoutes(databaseConnection: TenantConnection) {
 
   var routesData = readRoutes();
-  const functionSystemRepository: FunctionSystemRepository = new FunctionSystemRepository(databaseConnection.databaseType, databaseConnection.connection);
+  const functionSystemRepository: FunctionSystemRepository = new FunctionSystemRepository(databaseConnection.databaseType, databaseConnection);
 
   for (let routeIndex = 0; routeIndex < routesData.length; routeIndex++) {
     const _description = getDescription(routesData[routeIndex].fileName, routesData[routeIndex].method, routesData[routeIndex].path);

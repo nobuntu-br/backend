@@ -1,5 +1,12 @@
 import { BaseResourceModel } from "./baseResource.model";
 
+export interface IFunctionSystemDatabaseModel extends BaseResourceModel {
+  description?: string;
+  route?: string;
+  method?: string;
+  className?: string;
+}
+
 export interface IFunctionSystem extends BaseResourceModel {
   description?: string;
   route?: string;

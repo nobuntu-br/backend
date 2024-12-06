@@ -1,6 +1,6 @@
 import { encryptDatabasePassword } from '../../utils/crypto.util';
 import { DatabaseCredentialInputDTO } from '../../models/DTO/databaseCredential.DTO';
-import UserTenantRepository from '../../repositories/databasePermission.repository';
+import DatabasePermissionRepository from '../../repositories/databasePermission.repository';
 import DatabaseCredentialRepository from '../../repositories/databaseCredential.repository';
 import UserRepository from '../../repositories/user.repository';
 import { DatabaseCredential } from '../../models/databaseCredential.model';
@@ -8,7 +8,7 @@ import { DatabaseCredential } from '../../models/databaseCredential.model';
 export class RegisterTenantCredentialUseCase {
   constructor(
     private databaseCredentialRepository: DatabaseCredentialRepository,
-    private userTenantRepository: UserTenantRepository,
+    private databasePermissionRepository: DatabasePermissionRepository,
     private userRepository: UserRepository
   ) { }
 
@@ -43,11 +43,11 @@ export class RegisterTenantCredentialUseCase {
       // await this.tenantCredentialService.create(input);
 
       //Registra o User Tenant
-      await this.userTenantRepository.create({
-        databaseCredentialId: newTenantCredential.id,
-        tenantId: input.tenantId,
+      await this.databasePermissionRepository.create({
+        databaseCredential: newTenantCredential.id,
+        tenant: input.tenant,
         isAdmin: true,
-        userId: user!.id,
+        user: user!.id,
         userUID: input.userUID,
       });
 
