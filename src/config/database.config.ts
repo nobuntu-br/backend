@@ -90,7 +90,6 @@ export async function connectTenant(tenantId: number, databaseCredential: IDatab
     const databaseType: string = databaseCredential.type;
 
     tenantConnection = await connectToDatabase(databaseCredential, false);
-    console.log("tenantConnection: ", tenantConnection);
     tenantConnection.models = await getModels(databaseType, tenantConnection);
 
     await saveRoutes(tenantConnection);

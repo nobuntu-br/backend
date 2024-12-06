@@ -58,9 +58,6 @@ export class MongooseAdapter<TInterface, TClass> implements IDatabaseAdapter<TIn
     try {
       const returnedValue = await this.model.findOne( query! );
 
-      
-
-      console.log("Returned value: ", returnedValue);
       if (returnedValue == null) {
         throw new NotFoundError("Not found document");
       }
@@ -214,11 +211,7 @@ export class MongooseAdapter<TInterface, TClass> implements IDatabaseAdapter<TIn
 
   async createWithTransaction(data: TInterface, transaction: ClientSession): Promise<TClass>{
     try {
-
-      console.log("dados para criar: ", data);
-      // const returnedValue = this.model.create(data, {session: transaction});
       const returnedValue = await this.model.create([data], {session: transaction});
-      console.log(returnedValue);
       return this.jsonDataToResource(returnedValue[0]);
     } catch (error) {
       this.rollbackTransaction(transaction);

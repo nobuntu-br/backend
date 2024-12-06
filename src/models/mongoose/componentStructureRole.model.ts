@@ -10,11 +10,11 @@ export default function defineModel(mongooseConnection: Connection) {
         required: false
       },
       componentStructureId: {
-        type: Schema.Types.ObjectId, ref: 'componentStructure',
+        type: Number, ref: 'componentStructure',
         required: true,
       },
       roleId: {
-        type: Schema.Types.ObjectId, ref: 'role',
+        type: Number, ref: 'role',
         required: true,
       },
 

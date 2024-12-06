@@ -19,7 +19,7 @@ export default function defineModel(mongooseConnection: Connection) {
         ref: "User"
       },
       files: [{
-        type: Schema.Types.ObjectId,
+        type: Number,
         ref: "File"
       }]
     },

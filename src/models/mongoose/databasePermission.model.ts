@@ -4,21 +4,25 @@ import { updateCounter } from "./counter.model";
 export default function defineModel(mongooseConnection: Connection) {
 
   const schema = new mongoose.Schema(
-    {
+    { 
       _id: {
         type: Number,
         required: false
       },
+      userId: {
+        type: Number, ref: 'user',
+        required: false
+      },
       userUID: {
-        type: Schema.Types.ObjectId, ref: 'user',
+        type: Number,
         required: false,
       },
       databaseCredentialId: {
-        type: Schema.Types.ObjectId, ref: 'databaseCredential',
+        type: Number, ref: 'databaseCredential',
         required: true,
       },
       tenantId: {
-        type: Schema.Types.ObjectId, ref: 'tenant',
+        type: Number, ref: 'tenant',
         required: true,
       },
       isAdmin: {

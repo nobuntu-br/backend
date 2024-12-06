@@ -8,11 +8,11 @@ export default function defineModel(mongooseConnection: Connection) {
       type: Number,
       required: false
     },
-    role: {
-      type: Schema.Types.ObjectId, ref: 'Roles'
+    roleId: {
+      type: Number, ref: 'Roles'
     },
-    functionSystem: {
-      type: Schema.Types.ObjectId, ref: 'FunctionSystem'
+    functionSystemId: {
+      type: Number, ref: 'FunctionSystem'
     },
     authorized: Boolean
   },

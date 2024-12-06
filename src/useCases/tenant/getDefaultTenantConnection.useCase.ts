@@ -101,9 +101,12 @@ export class GetDefaultTenantConnectionUseCase {
     let tenant: Tenant;
     try {
       tenant = await tenantRepository.findOne({ name: defaultTenantName });
+      console.log("Tenant retorno do tenant: ", tenant);
     } catch (error) {
+      console.log(error);
       if (error instanceof NotFoundError) {
         tenant = await tenantRepository.createWithTransaction({ name: defaultTenantName }, transaction);
+        console.log("Tenant criado: ", tenant);
       } else {
         throw new UnknownError("Unknown error on Save Default Tenant on Security Tenant function. Unknown error on create Tenant. Detail: " + error);
       }
@@ -112,13 +115,12 @@ export class GetDefaultTenantConnectionUseCase {
     //Cria o databaseCredential
     const databaseCredentialRepository: DatabaseCredentialRepository = new DatabaseCredentialRepository(securityTenantConnection.databaseType, securityTenantConnection);
 
-    console.log(databaseCredential);
     let _databaseCredential: DatabaseCredential;
     try {
       _databaseCredential = await databaseCredentialRepository.findOne({ name: databaseCredential.name });
     } catch (error) {
       if (error instanceof NotFoundError) {
-        console.log("errrroooo");
+        console.log("Database Credential não encontrado!");
         _databaseCredential = new DatabaseCredential(await databaseCredentialRepository.createWithTransaction(databaseCredential, transaction));
       } else {
         throw new UnknownError("Unknown error on Save Default Tenant on Security Tenant function. Unknown error on create Database Credential. Detail: " + error);
@@ -134,7 +136,8 @@ export class GetDefaultTenantConnectionUseCase {
       if (error instanceof NotFoundError) {
         await databasePermissionRepository.createWithTransaction({
           tenantId: tenant.id,
-          databaseCredentialId: _databaseCredential.id,
+          // databaseCredentialId: _databaseCredential.id,
+          
         }, transaction);
       } else {
         throw new UnknownError("Unknown error on Save Default Tenant on Security Tenant function. Detail: " + error);

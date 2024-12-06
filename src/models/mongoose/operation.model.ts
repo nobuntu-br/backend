@@ -9,16 +9,16 @@ export default function defineModel(mongooseConnection: Connection) {
         type: Number,
         required: false
       },
-      user: {
-        type: Schema.Types.ObjectId, ref: 'User',
+      userId: {
+        type: Number, ref: 'User',
         required: true,
       },
       operationType: {
         type: String,
         required: true,
       },
-      tenant: {
-        type: Schema.Types.ObjectId, ref: 'Tenant',
+      tenantId: {
+        type: Number, ref: 'Tenant',
         required: true,
       },
       ipAddress: {
@@ -54,7 +54,7 @@ export default function defineModel(mongooseConnection: Connection) {
   schema.pre('save', async function (next) {
     if (!this.isNew) return next();
   
-    this._id = await updateCounter(mongooseConnection.models.counter, "Operation");
+    this._id = await updateCounter(mongooseConnection, "Operation");
     next();
   });
 

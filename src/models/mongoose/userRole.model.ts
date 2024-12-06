@@ -9,12 +9,12 @@ export default function defineModel(mongooseConnection: Connection) {
         type: Number,
         required: false
       },
-      UserId: {
-        type: Schema.Types.ObjectId, ref: 'User',
+      userId: {
+        type: Number, ref: 'User',
         required: true,
       },
-      RoleId: {
-        type: Schema.Types.ObjectId, ref: 'Role',
+      roleId: {
+        type: Number, ref: 'Role',
         required: true,
       },
       dbConfig: Object,

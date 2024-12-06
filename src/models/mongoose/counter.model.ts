@@ -17,12 +17,6 @@ export default function defineModel(mongooseConnection: Connection) {
     { timestamps: true }
   );
 
-  schema.index(
-    //Limita para não ter um mesmo registro
-    { documentName: 1, sequence: 1},
-    { unique: true }
-  );
-
   schema.set('toJSON', {
     transform: (doc, ret, options) => {
       ret.id = ret._id;
@@ -53,5 +47,6 @@ export async function updateCounter(mongooseConnection: Connection, documentName
     { $inc: { sequence: 1 } }, // Incrementar a sequência
     { new: true, upsert: true } // Criar o contador se não existir
   );
+
   return counter.sequence; // Definir o ID incremental
-} 
+}
