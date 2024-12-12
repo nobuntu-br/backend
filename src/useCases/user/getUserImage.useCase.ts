@@ -8,7 +8,6 @@ export class GetUserImageUseCase {
   ) {}
 
   async execute(input: GetUserImageInputDTO): Promise<GetUserImageOutputDTO> {
-    console.log(input);
     return await this.identityService.getUserImage(input.userID);
   }
 

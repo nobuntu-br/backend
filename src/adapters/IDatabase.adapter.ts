@@ -12,9 +12,9 @@ export interface IDatabaseAdapter<TInterface, TClass> {
   //Lazy loading
   create(data: TClass): Promise<TClass>;
   findAll(limitPerPage: number, offset: number): Promise<TClass[]>;
-  findOne(query: TInterface): Promise<TClass>;
+  findOne(query: TInterface): Promise<TClass | null>;
   findMany(query: TInterface): Promise<TClass[]>;
-  findById(id: number): Promise<TClass>;
+  findById(id: number): Promise<TClass | null>;
   getCount(): Promise<number>;
   update(id: number, data: Object): Promise<TClass>;
   delete(id: number): Promise<TClass>;
@@ -35,7 +35,7 @@ export interface IDatabaseAdapter<TInterface, TClass> {
   
   //Eager Loading (busca com dados das entidades relacionadas)
   findAllWithAagerLoading(limitPerPage: number, offset: number): Promise<TClass[]>;//funções que já buscam com tudo (sequelize é include, mongoose nem lembro)
-  findOneWithEagerLoading(query: TInterface): Promise<TClass>;
+  findOneWithEagerLoading(query: TInterface): Promise<TClass | null>;
   findManyWithEagerLoading(query: TInterface): Promise<TClass[]>;
-  findByIdWithEagerLoading(id: number): Promise<TClass>;
+  findByIdWithEagerLoading(id: number): Promise<TClass | null>;
 }

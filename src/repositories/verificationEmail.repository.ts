@@ -1,14 +1,43 @@
-import createDbAdapter, { DatabaseType } from "../adapters/createDb.adapter";
+import createDbAdapter from "../adapters/createDb.adapter";
 import { IDatabaseAdapter } from "../adapters/IDatabase.adapter";
 import TenantConnection from "../models/tenantConnection.model";
 import { IVerificationEmailDatabaseModel, VerificationEmail } from "../models/verificationEmail.model";
 import BaseRepository from "./base.repository";
 
-export default class VerificationEmailRepository extends BaseRepository<IVerificationEmailDatabaseModel, VerificationEmail>{
+export default class VerificationEmailRepository extends BaseRepository<IVerificationEmailDatabaseModel, VerificationEmail> {
 
-  constructor(databaseType: DatabaseType, tenantConnection: TenantConnection){
-    const _adapter : IDatabaseAdapter<IVerificationEmailDatabaseModel, VerificationEmail> = createDbAdapter<IVerificationEmailDatabaseModel, VerificationEmail>(tenantConnection.models!.get("VerificationEmail"), databaseType, tenantConnection.connection, VerificationEmail.fromJson);
+  constructor(tenantConnection: TenantConnection) {
+    const _adapter: IDatabaseAdapter<IVerificationEmailDatabaseModel, VerificationEmail> = createDbAdapter<IVerificationEmailDatabaseModel, VerificationEmail>(tenantConnection.models!.get("VerificationEmail"), tenantConnection.databaseType, tenantConnection.connection, VerificationEmail.fromJson);
     super(_adapter, tenantConnection);
+  }
+
+  async ifEmailWasValidated(email: string): Promise<boolean> {
+    try {
+      const validatedEmail: VerificationEmail | null = await this.adapter.findOne({ email: email });
+
+      if (validatedEmail != null && validatedEmail.isVerified == true) {
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async checkIfExpired(email: string): Promise<boolean> {
+    try {
+      const emailVerification: VerificationEmail | null = await this.adapter.findOne({ email: email });
+
+      if (emailVerification == null) {
+        throw new Error("Não existe código de verificação enviado para esse email");
+      }
+
+      return emailVerification.isEmailExpired();
+
+    } catch (error) {
+      throw new Error("Erro ao verificar se o código de verificação de email está valido");
+    }
   }
 
 }

@@ -1,26 +1,26 @@
-import { VerificationEmailService } from '../../services/verificationEmail.service';
 import { EmailService } from '../../services/email.service';
-import { IVerificationEmail } from '../../models/verificationEmail.model';
+import { IVerificationEmail, VerificationEmail } from '../../models/verificationEmail.model';
 import { SendVerificationCodeToEmailDTO } from '../../models/DTO/sendVerificationCodeToEmail.DTO';
 import { ConflictError } from '../../errors/confict.error';
 import { TooManyRequestsError } from '../../errors/tooManyRequests.error';
+import VerificationEmailRepository from '../../repositories/verificationEmail.repository';
 
 export class SendVerificationCodeToEmailUseCase {
   constructor(
-    private verificationEmailService: VerificationEmailService
+    private verificationEmailRepository: VerificationEmailRepository
   ) { }
 
   async execute(input: SendVerificationCodeToEmailDTO): Promise<boolean> {
 
     try {
 
-      const verificationEmail: IVerificationEmail | null = await this.verificationEmailService.findOne({
+      const verificationEmail: IVerificationEmail | null = await this.verificationEmailRepository.findOne({
         email: input.email
       });
 
       if (verificationEmail != null) {
-        if (await this.verificationEmailService.checkIfExpired(input.email, new Date()) == true) {
-          await this.verificationEmailService.delete(verificationEmail.id!);
+        if (await this.verificationEmailRepository.checkIfExpired(input.email) == true) {
+          await this.verificationEmailRepository.delete(verificationEmail.id!);
         } else {
 
           if(verificationEmail.isVerified == true){
@@ -45,12 +45,12 @@ export class SendVerificationCodeToEmailUseCase {
 
       const currentTime: Date = new Date();
 
-      await this.verificationEmailService.create({
+      await this.verificationEmailRepository.create(new VerificationEmail({
         verificationCode: verificationCode,
         email: input.email,
         isVerified: false,
         expirationDate: new Date(currentTime.getTime() + 10 * 60 * 1000)//Adiciona 10 minutos
-      });
+      }));
 
       return true;
 

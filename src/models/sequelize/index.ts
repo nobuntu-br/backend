@@ -33,13 +33,6 @@ export default async function setModels(tenantConnection: TenantConnection) {
   user.belongsToMany(role, {through: userRole, foreignKey: "userId", otherKey: "roleId"});
   role.belongsToMany(user, {through: userRole, foreignKey: "roleId", otherKey: "userId"});
 
-  //Relação para o controle de acesso as rotas
-  // role.hasOne(functionSystemRole, {foreignKey: "roleId"});
-  // functionSystemRole.belongsTo(role, {foreignKey: "roleId"});
-
-  // functionSystem.hasOne(functionSystemRole, {foreignKey: "functionSystemId"});
-  // functionSystemRole.belongsTo(functionSystem, {foreignKey: "functionSystemId"});
-
   role.belongsToMany(functionSystem, {through: functionSystemRole, foreignKey: "roleId", otherKey: "functionSystemId"});
   functionSystem.belongsToMany(role, {through: functionSystemRole, foreignKey: "functionSystemId", otherKey: "roleId"});
 
@@ -54,9 +47,11 @@ export default async function setModels(tenantConnection: TenantConnection) {
   
   models.set('User', user);
   models.set('Role', role);
+  //Models de controle de acesso as rotas
   models.set('UserRole', userRole);
   models.set('FunctionSystem', functionSystem);
   models.set('FunctionSystemRole', functionSystemRole);
+  //Models de controle de acesso a ambiente
   models.set('ComponentStructure', componentStructure);
   models.set('ComponentStructureRole', componentStructureRole);
   models.set('VerificationEmail', verificationEmail);

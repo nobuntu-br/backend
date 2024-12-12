@@ -1,18 +1,18 @@
 import { NotFoundError } from "../../errors/notFound.error";
 import { ValidateEmailVerificationCodeDTO } from "../../models/DTO/validateEmailVerificationCode.DTO";
 import { IVerificationEmail } from "../../models/verificationEmail.model";
-import { VerificationEmailService } from "../../services/verificationEmail.service";
+import VerificationEmailRepository from "../../repositories/verificationEmail.repository";
 
 export class ValidateEmailVerificationCodeUseCase {
   constructor(
-    private verificationEmailService: VerificationEmailService
+    private verificationEmailRepository: VerificationEmailRepository 
   ) {}
 
   async execute(input: ValidateEmailVerificationCodeDTO): Promise<boolean> {
 
     try {
       //Encontrar o código de email que foi enviado para o email do usuário
-      const verificationEmailCodeExists: IVerificationEmail | null = await this.verificationEmailService.findOne({
+      const verificationEmailCodeExists: IVerificationEmail | null = await this.verificationEmailRepository.findOne({
         verificationCode: input.verificationEmailCode,
       });
 
@@ -34,7 +34,7 @@ export class ValidateEmailVerificationCodeUseCase {
         return true;
       } else {
         verificationEmailCodeExists.isVerified = true;
-        await this.verificationEmailService.update(verificationEmailCodeExists.id, verificationEmailCodeExists);
+        await this.verificationEmailRepository.update(verificationEmailCodeExists.id, verificationEmailCodeExists);
       }
 
       return true;

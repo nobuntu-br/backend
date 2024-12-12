@@ -85,6 +85,7 @@ export class TenantConnectionService {
     }
   }
 
+  //TODO usar fila é mais prático, define o tamanho máximo dela
   private removeOldestConnection(): void {
     let oldestTenant: TenantConnection;
     let oldestTime: Date = new Date();

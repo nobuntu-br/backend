@@ -39,9 +39,9 @@ export class EmailService implements IEmailService{
 
     //Caso queira mudar o pacote que é usado para envio de emails, mudar a classe abaixo
     this.emailAdapter = new NodemailerAdapter({
-      emailServerHost: emailServerHost,
       emailServerPassword: emailServerPassword,
       emailServerUser: emailServerUser,
+      host: emailServerHost,
       port: port,
       user: emailUser
     });

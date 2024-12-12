@@ -35,13 +35,13 @@ export default async function changeTenant(req: Request, res: Response, next: Ne
 
   try {
     //Obtem a instância da conexão com banco de dados do usuário
-    const databaseConnection = await getTenantConnection(tenantId, decoded.sub);
+    const tenantConnection : TenantConnection | null = await getTenantConnection(tenantId, decoded.sub);
 
-    if (databaseConnection == null) {
+    if (tenantConnection == null) {
       return res.status(404).json({ message: 'Tenant não encontrado' });
     }
 
-    req.body.databaseConnection = databaseConnection;
+    req.body.tenantConnection = tenantConnection;
 
     next();
   } catch (error) {
@@ -56,7 +56,7 @@ export async function getSecurityTenant(req: Request, res: Response, next: NextF
 
     const getSecurityTenantConnectionUseCase: GetSecurityTenantConnectionUseCase = new GetSecurityTenantConnectionUseCase();
 
-    req.body.databaseConnection = await getSecurityTenantConnectionUseCase.execute();
+    req.body.tenantConnection = await getSecurityTenantConnectionUseCase.execute();
 
     next();
   } catch (error) {

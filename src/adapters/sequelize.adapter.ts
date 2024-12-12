@@ -70,13 +70,13 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
     }
   }
 
-  async findOne(query: TInterface): Promise<TClass> {
+  async findOne(query: TInterface): Promise<TClass | null> {
     try {
 
       const item = await this._model.findOne({ where: query as any });
 
       if (item == null) {
-        throw new NotFoundError("Not found document");
+        return null;
       }
 
       return this.jsonDataToResource(item);
@@ -106,12 +106,12 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
   }
 
   //TODO Tornar lazy loading
-  async findById(id: number): Promise<TClass> {
+  async findById(id: number): Promise<TClass | null> {
     try {
       const returnedValue = await this._model.findOne({ where: { id: id }, include: [{ all: true }] });
 
       if (returnedValue == null) {
-        throw new NotFoundError("Not found data");
+        return null;
       }
 
       this.replaceForeignKeyFieldWithData(returnedValue);
@@ -456,12 +456,12 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
     throw new Error("Method not implemented");
   }
 
-  async findByIdWithEagerLoading(id: number): Promise<TClass> {
+  async findByIdWithEagerLoading(id: number): Promise<TClass | null> {
     try {
       const returnedValue = await this._model.findOne({ where: { id: id }, include: [{ all: true }] });
 
       if (returnedValue == null) {
-        throw new NotFoundError("Not found data");
+        return null;
       }
 
       this.replaceForeignKeyFieldWithData(returnedValue);

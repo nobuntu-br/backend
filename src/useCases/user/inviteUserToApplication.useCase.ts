@@ -2,9 +2,9 @@ import { InsufficientPermissionError } from "../../errors/insufficientPermission
 import { NotFoundError } from "../../errors/notFound.error";
 import { InviteUserToApplicationDTO } from "../../models/DTO/inviteUserToApplication.DTO";
 import { ITenant } from "../../models/tenant.model";
+import DatabasePermissionRepository from "../../repositories/databasePermission.repository";
+import UserRepository from "../../repositories/user.repository";
 import { EmailService } from "../../services/email.service";
-import TenantService from "../../services/tenant.service";
-import { UserService } from "../../services/user.service";
 import { TokenGenerator } from "../../utils/tokenGenerator";
 
 export class InviteUserToApplicationUseCase {
@@ -14,9 +14,9 @@ export class InviteUserToApplicationUseCase {
 
   constructor(
     private emailService: EmailService,
-    private userService: UserService,
+    private userRepository: UserRepository,
     private tokenGenerator: TokenGenerator,
-    private tenantService: TenantService
+    private databasePermissionRepository: DatabasePermissionRepository
   ) {
 
     if (process.env.APPLICATION_NAME == undefined || process.env.APPLICATION_NAME == '' ||
@@ -34,7 +34,7 @@ export class InviteUserToApplicationUseCase {
 
   async execute(input: InviteUserToApplicationDTO): Promise<any> {
     //Verificar se o usuário atual tem permissão de administrador para convidar alguém
-    const invitingUser = await this.userService.findOne({ email: input.invitingUserEmail });
+    const invitingUser = await this.userRepository.findOne({ email: input.invitingUserEmail });
 
     console.log("dados recebidos do usuário:", input);
 
@@ -50,7 +50,7 @@ export class InviteUserToApplicationUseCase {
     //Verificar se todos os tenants que serão dado o acesso ao novo usuário existem mesmo;
     var tenants: ITenant[];
     try {
-      tenants = await this.tenantService.findTenantsUserIsAdmin(input.invitingUserUID);
+      tenants = await this.databasePermissionRepository.findTenantsUserIsAdmin(input.invitingUserUID);
     } catch (error) {
       throw new NotFoundError("Inviting UserUID is invalid");
     }

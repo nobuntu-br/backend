@@ -1,18 +1,19 @@
-import { DatabaseType } from "../adapters/createDb.adapter";
 import { myCache } from "../config/database.config";
 import { DatabasePermission, IDatabasePermission } from "../models/databasePermission.model";
+import TenantConnection from "../models/tenantConnection.model";
 import DatabasePermissionRepository from "../repositories/databasePermission.repository";
 import BaseService from "./base.service";
 
 export default class DatabasePermissionService extends BaseService<IDatabasePermission, DatabasePermission> {
   private databasePermissionRepository: DatabasePermissionRepository;
 
-  constructor(databaseType: DatabaseType, databaseConnection: any) {
+  constructor(tenantConnection: TenantConnection) {
     //Cria o repositório com dados para obter o banco de dados
-    var repository = new DatabasePermissionRepository(databaseType, databaseConnection);
-    super(repository, databaseType, databaseConnection);
+    let repository: DatabasePermissionRepository = new DatabasePermissionRepository(tenantConnection);
+    super(repository, tenantConnection);
 
     this.databasePermissionRepository = repository;
+
   }
 
   async userHasAccessToTenant(userUID: string, tenantId: number): Promise<boolean> {
@@ -55,9 +56,9 @@ export default class DatabasePermissionService extends BaseService<IDatabasePerm
   //TODO fazer a função que verifica se o usuário é admin do tenant para poder alterar a permissão dos outros ao tenant
   //TODO permitir o usuário passar o cargo de admin pra outra pessoa
 
-  async getTenantsWithDefaultTenantByUserUID(UserUID: string){
+  async getTenantsWithDefaultTenantByUserUID(UserUID: string) {
     try {
-      return this.databasePermissionRepository.getTenantsWithDefaultTenantByUserUID(UserUID);
+      return this.databasePermissionRepository.getTenantsUserHasAccess(UserUID);
     } catch (error) {
       throw new Error("Erro ao obter userTenants com o tenant padrão");
     }

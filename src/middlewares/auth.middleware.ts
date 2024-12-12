@@ -139,7 +139,7 @@ async function isAuthorizedUrl(userUID: string, method: string, url: string, dat
 
 async function isUserHaveAccessToRoute(userUID: string, method: string, url: string, databaseConnection: TenantConnection): Promise<boolean | null>{
   //TODO se for pra fazer isso, tem que ser com cache
-  const functionSystemRoleRepository: FunctionSystemRoleRepository = new FunctionSystemRoleRepository(databaseConnection.databaseType, databaseConnection);
+  const functionSystemRoleRepository: FunctionSystemRoleRepository = new FunctionSystemRoleRepository(databaseConnection);
   return await functionSystemRoleRepository.isUserHaveAccessToRoute(userUID, method, url);
 }
 
@@ -150,7 +150,7 @@ async function isUserHaveAccessToRoute(userUID: string, method: string, url: str
  * @returns Retorna se o usuário é administrador, sendo verdadeiro pra sim, falso pra não. Null caso der erros.
  */
 async function userIsAdmin(userUID: string, databaseConnection: TenantConnection): Promise<boolean | null> {
-  const userService: UserService = new UserService(databaseConnection.databaseType, databaseConnection.connection);
+  const userService: UserService = new UserService(databaseConnection);
   return await userService.isUserAdmin(userUID);
 }
 
@@ -163,6 +163,6 @@ async function userIsAdmin(userUID: string, databaseConnection: TenantConnection
  */
 async function isPublicRoute(method: string, url: string, databaseConnection: TenantConnection): Promise<boolean | null> {
   //TODO se for pra fazer isso, tem que ser com cache
-  const functionSystemRoleRepository: FunctionSystemRoleRepository = new FunctionSystemRoleRepository(databaseConnection.databaseType, databaseConnection);
+  const functionSystemRoleRepository: FunctionSystemRoleRepository = new FunctionSystemRoleRepository(databaseConnection);
   return await functionSystemRoleRepository.isPublicRoute(method, url);
 }

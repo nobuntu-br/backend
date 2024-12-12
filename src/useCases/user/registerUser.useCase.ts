@@ -1,15 +1,15 @@
 import { NotFoundError } from "../../errors/notFound.error";
 import { RegisterNewUserDTO } from "../../models/DTO/registerNewUser.DTO";
 import { IUser } from "../../models/user.model";
+import UserRepository from "../../repositories/user.repository";
 import { IidentityService } from "../../services/Iidentity.service";
-import { UserService } from "../../services/user.service";
 import { VerificationEmailService } from "../../services/verificationEmail.service";
 import { TokenGenerator } from "../../utils/tokenGenerator";
 
 export class RegisterUserUseCase {
 
   constructor(
-    private userService: UserService,
+    private userRepository: UserRepository,
     private verificationEmailService: VerificationEmailService,
     private identityService: IidentityService,
     private tokenGenerator: TokenGenerator
@@ -25,10 +25,8 @@ export class RegisterUserUseCase {
         console.log(data);
       }
 
-
-
       //Verifica se usuário já existe
-      const isUserExist = await this.userService.findOne({
+      const isUserExist = await this.userRepository.findOne({
         email: input.email,
       });
 
@@ -45,12 +43,12 @@ export class RegisterUserUseCase {
 
       var userWillBeAdministrator: boolean = false;
       //Verificar se é o primeiro usuário da aplicação, para assim definir ele como admin
-      if (await this.userService.IfApplicationHasRegisteredUsers() == false) {
+      if (await this.userRepository.IfApplicationHasRegisteredUsers() == false) {
         userWillBeAdministrator = true;
       }
 
       //Registra o usuário no banco de dados
-      const newUser: IUser = await this.userService.create({
+      const newUser: IUser = await this.userRepository.create({
         UID: user.UID,//UID do servidor de identidade
         userName: input.userName,
         firstName: input.firstName,

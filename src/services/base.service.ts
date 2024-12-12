@@ -1,19 +1,29 @@
 import { DatabaseType } from "../adapters/createDb.adapter";
+import { NotFoundError } from "../errors/notFound.error";
+import TenantConnection from "../models/tenantConnection.model";
 import { IBaseRepository } from "../repositories/ibase.repository";
 import { IBaseService } from "./IBase.service";
 
 export default class BaseService<TInterface, TClass> implements IBaseService<TInterface, TClass> {
-  databaseType: DatabaseType;
-  repository: IBaseRepository<TInterface, TClass>;
-  databaseConnection: any;
+  _databaseType: DatabaseType;
+  _repository: IBaseRepository<TInterface, TClass>;
+  tenantConnection: TenantConnection;
 
   /**
    * @param databaseConnection Instância da conexão com banco de dados 
    */
-  constructor(repository: IBaseRepository<TInterface, TClass>, databaseType: DatabaseType, databaseConnection: any) {
-    this.repository = repository;
-    this.databaseType = databaseType;
-    this.databaseConnection = databaseConnection;
+  constructor(repository: IBaseRepository<TInterface, TClass>, tenantConnection: TenantConnection) {
+    this._repository = repository;
+    this._databaseType = tenantConnection.databaseType;
+    this.tenantConnection = tenantConnection;
+  }
+
+  get databaseType(){
+    return this._databaseType;
+  }
+
+  get repository(){
+    return this._repository;
   }
 
   create(data: TClass): Promise<TClass> {
@@ -24,28 +34,52 @@ export default class BaseService<TInterface, TClass> implements IBaseService<TIn
     return this.repository.findAll(limitPerPage, offset);
   }
 
-  findOne(query: TInterface): Promise<TClass> {
-    return this.repository.findOne(query);
+  async findOne(query: TInterface): Promise<TClass> {
+    const returnedValue = await this.repository.findOne(query);
+
+    if(returnedValue == null){
+      throw new NotFoundError("Not found data");
+    }
+
+    return returnedValue;
   }
 
   findMany(query: TInterface): Promise<TClass[]> {
     return this.repository.findMany(query);
   }
 
-  findById(id: number): Promise<TClass> {
-    return this.repository.findById(id);
+  async findById(id: number): Promise<TClass> {
+    const returnedValue = await this.repository.findById(id);
+
+    if(returnedValue == null){
+      throw new NotFoundError("Not found data");
+    }
+
+    return returnedValue;
   }
 
   getCount(): Promise<number> {
     return this.repository.getCount();
   }
   
-  update(id: number, data: Object): Promise<TClass | null> {
-    return this.repository.update(id, data);
+  async update(id: number, data: Object): Promise<TClass> {
+    const returnedValue = await this.repository.update(id, data);
+
+    if(returnedValue == null){
+      throw new NotFoundError("Not found data");
+    }
+
+    return returnedValue;
   }
 
-  delete(id: number): Promise<TClass | null> {
-    return this.repository.delete(id);
+  async delete(id: number): Promise<TClass> {
+    const returnedValue = await this.repository.delete(id);
+
+    if(returnedValue == null){
+      throw new NotFoundError("Not found data");
+    }
+
+    return returnedValue;
   }
 
   deleteAll(): Promise<void> {

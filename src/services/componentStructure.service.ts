@@ -1,17 +1,18 @@
-import { DatabaseType } from "../adapters/createDb.adapter";
-import { ComponentStructure, IComponentStructure } from "../models/componentStructure.model";
+import { ComponentStructure, IComponentStructureDatabaseModel } from "../models/componentStructure.model";
+import TenantConnection from "../models/tenantConnection.model";
 import ComponentStructureRepository from "../repositories/componentStructure.repository";
 import BaseService from "./base.service";
 
-export class ComponentStructureService extends BaseService<IComponentStructure, ComponentStructure> {
+export class ComponentStructureService extends BaseService<IComponentStructureDatabaseModel, ComponentStructure> {
   private componentStructureRepository: ComponentStructureRepository;
 
-  constructor(databaseType: DatabaseType, databaseConnection: any) {
+  constructor(tenantConnection: TenantConnection) {
     //Cria o repositório com dados para obter o banco de dados
-    var repository: ComponentStructureRepository = new ComponentStructureRepository(databaseType, databaseConnection);
-    super(repository, databaseType, databaseConnection);
+    let repository: ComponentStructureRepository = new ComponentStructureRepository(tenantConnection);
+    super(repository, tenantConnection);
 
     this.componentStructureRepository = repository;
+
   }
 
 }

@@ -30,8 +30,6 @@ async function connectToDatabaseWithMongoose(databaseCredential: IDatabaseCreden
   try {
     const uri: string = buildMongoDBURI(databaseCredential);
 
-    console.log("URI: ", uri);
-
     const connection = await mongoose.createConnection(uri).asPromise();
 
     console.log("Conexão com banco de dados MongoDB feita!");

@@ -1,16 +1,16 @@
-import createDbAdapter, { DatabaseType } from "../adapters/createDb.adapter";
+import createDbAdapter from "../adapters/createDb.adapter";
 import { IDatabaseAdapter } from "../adapters/IDatabase.adapter";
 import { FunctionSystemRole, IFunctionSystemRoleDatabaseModel } from "../models/functionSystemRole.model";
 import TenantConnection from "../models/tenantConnection.model";
 import BaseRepository from "./base.repository";
 
 export default class FunctionSystemRoleRepository extends BaseRepository<IFunctionSystemRoleDatabaseModel ,FunctionSystemRole> {
-  private databaseModels: any;
+  private _tenantConnection: TenantConnection;
 
-  constructor(databaseType: DatabaseType, tenantConnection: TenantConnection) {
-    const _adapter: IDatabaseAdapter<IFunctionSystemRoleDatabaseModel ,FunctionSystemRole> = createDbAdapter<IFunctionSystemRoleDatabaseModel ,FunctionSystemRole>(tenantConnection.models!.get("FunctionSystemRole"), databaseType, tenantConnection.connection, FunctionSystemRole.fromJson);
+  constructor(tenantConnection: TenantConnection) {
+    const _adapter: IDatabaseAdapter<IFunctionSystemRoleDatabaseModel ,FunctionSystemRole> = createDbAdapter<IFunctionSystemRoleDatabaseModel ,FunctionSystemRole>(tenantConnection.models!.get("FunctionSystemRole"), tenantConnection.databaseType, tenantConnection.connection, FunctionSystemRole.fromJson);
     super(_adapter, tenantConnection);
-    this.databaseModels = tenantConnection.models;
+    this._tenantConnection = tenantConnection;
   }
 
   async isUserHaveAccessToRoute(userUID: string, method: string, route: string): Promise<boolean | null> {
@@ -94,13 +94,13 @@ export default class FunctionSystemRoleRepository extends BaseRepository<IFuncti
         },
         include: [
           {
-            model: this.databaseModels["UserRole"],
+            model: this._tenantConnection.models!.get("UserRole"),
             required: true,
             include: {
-              model: this.databaseModels["FunctionSystemRole"],
+              model: this._tenantConnection.models!.get("FunctionSystemRole"),
               required: true,
               include: {
-                model: this.databaseModels["FuctionSystem"],
+                model: this._tenantConnection.models!.get("FunctionSystem"),
                 where: {
                   method: method,
                   route: route
@@ -192,31 +192,22 @@ export default class FunctionSystemRoleRepository extends BaseRepository<IFuncti
   }
 
   async isPublicRouteSequelizeImplementation(method: string, route: string){
-    const userTenants = await this.adapter.model.findAll({
-      //Encotrar documento com nome "guest"
-      
+    const userTenants = await this._tenantConnection.models!.get("FunctionSystem").findAll({
+      where: {
+        route: route,
+        method: method
+      },
       include: [
-        
         {
-          model: this.databaseModels["role"],
+          model: this._tenantConnection.models!.get("Role"),
           required: true,
           where: {
             name: "guest",
           }
         },
-        {
-          model: this.databaseModels["functionSystem"],
-          required: true,
-          where: {
-            route: route,
-            method: method
-          }
-          
-        },
       ],
     });
 
-    console.log("Retorno UserTenants: ", userTenants);
     if (userTenants.length <= 0) {
       return false;
     }

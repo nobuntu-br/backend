@@ -1,17 +1,18 @@
-import { DatabaseType } from "../adapters/createDb.adapter";
 import { DatabaseCredential, IDatabaseCredential } from "../models/databaseCredential.model";
+import TenantConnection from "../models/tenantConnection.model";
 import DatabaseCredentialRepository from "../repositories/databaseCredential.repository";
 import BaseService from "./base.service";
 
 export class DatabaseCredentialService extends BaseService<IDatabaseCredential, DatabaseCredential> {
-  private tenantCredentialRepository: DatabaseCredentialRepository;
+  private databaseCredentialRepository: DatabaseCredentialRepository; 
 
-  constructor(databaseType: DatabaseType, databaseConnection: any) {
+  constructor(tenantConnection: TenantConnection) {
     //Cria o repositório com dados para obter o banco de dados
-    var repository : DatabaseCredentialRepository = new DatabaseCredentialRepository(databaseType, databaseConnection);
-    super(repository, databaseType, databaseConnection);
+    let repository: DatabaseCredentialRepository = new DatabaseCredentialRepository(tenantConnection);
+    super(repository, tenantConnection);
 
-    this.tenantCredentialRepository = repository;
+    this.databaseCredentialRepository = repository;
+
   }
 
 }

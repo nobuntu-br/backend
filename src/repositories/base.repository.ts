@@ -21,7 +21,7 @@ export default abstract class BaseRepository<TInterface, TClass> implements IBas
     return this.adapter.findAll(limitPerPage, offset);
   }
 
-  findOne(query: TInterface): Promise<TClass> {
+  findOne(query: TInterface): Promise<TClass | null> {
     return this.adapter.findOne(query);
   }
 
@@ -29,7 +29,7 @@ export default abstract class BaseRepository<TInterface, TClass> implements IBas
     return this.adapter.findMany(query);
   }
 
-  findById(id: number): Promise<TClass> {
+  findById(id: number): Promise<TClass | null> {
     return this.adapter.findById(id);
   }
 
@@ -85,7 +85,7 @@ export default abstract class BaseRepository<TInterface, TClass> implements IBas
     return this.adapter.findAllWithAagerLoading(limitPerPage, offset);
   }
 
-  findOneWithEagerLoading(query: TInterface): Promise<TClass> {
+  findOneWithEagerLoading(query: TInterface): Promise<TClass | null> {
     return this.adapter.findOneWithEagerLoading(query);
   }
 
@@ -93,7 +93,7 @@ export default abstract class BaseRepository<TInterface, TClass> implements IBas
     return this.adapter.findManyWithEagerLoading(query);
   }
 
-  findByIdWithEagerLoading(id: number): Promise<TClass> {
+  findByIdWithEagerLoading(id: number): Promise<TClass | null> {
     return this.adapter.findByIdWithEagerLoading(id);
   }
 

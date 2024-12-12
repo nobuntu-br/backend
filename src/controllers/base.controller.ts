@@ -174,7 +174,7 @@ export class BaseController<TInterface, TClass> implements IBaseController {
     try {
       const filterValues = req.body.filterValues; 
       const filterConditions = req.body.conditions; 
-      const model = req.body.databaseConnection.models[this.entityName];
+      const model = req.body.tenantConnection.models[this.entityName];
 
       const data = await this.service.findCustom(filterValues, filterConditions, model);
 

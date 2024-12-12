@@ -9,12 +9,12 @@ export class OrderController {
   async create(req: Request, res: Response, next: NextFunction) {
 
     try {
-      if (req.body.databaseConnection == undefined) {
+      if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const orderService: OrderService = new OrderService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
+      const orderService: OrderService = new OrderService(req.body.tenantConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<IOrder, Order> = new BaseController(orderService, "Order");
 
@@ -26,12 +26,12 @@ export class OrderController {
 
   async findAll(req: Request, res: Response, next: NextFunction) {
     try {
-      if (req.body.databaseConnection == undefined) {
+      if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const orderService: OrderService = new OrderService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
+      const orderService: OrderService = new OrderService(req.body.tenantConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<IOrder, Order> = new BaseController(orderService, "Order");
 
@@ -43,12 +43,12 @@ export class OrderController {
 
   async findById(req: Request, res: Response, next: NextFunction) {
     try {
-      if (req.body.databaseConnection == undefined) {
+      if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const orderService: OrderService = new OrderService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
+      const orderService: OrderService = new OrderService(req.body.tenantConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<IOrder, Order> = new BaseController(orderService, "Order");
 
@@ -60,12 +60,12 @@ export class OrderController {
 
   async getCount(req: Request, res: Response, next: NextFunction) {
     try {
-      if (req.body.databaseConnection == undefined) {
+      if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const orderService: OrderService = new OrderService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
+      const orderService: OrderService = new OrderService(req.body.tenantConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<IOrder, Order> = new BaseController(orderService, "Order");
 
@@ -77,12 +77,12 @@ export class OrderController {
 
   async update(req: Request, res: Response, next: NextFunction) {
     try {
-      if (req.body.databaseConnection == undefined) {
+      if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const orderService: OrderService = new OrderService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
+      const orderService: OrderService = new OrderService(req.body.tenantConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<IOrder, Order> = new BaseController(orderService, "Order");
 
@@ -94,12 +94,12 @@ export class OrderController {
 
   async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      if (req.body.databaseConnection == undefined) {
+      if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const orderService: OrderService = new OrderService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
+      const orderService: OrderService = new OrderService(req.body.tenantConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<IOrder, Order> = new BaseController(orderService, "Order");
 
@@ -111,12 +111,12 @@ export class OrderController {
 
   async deleteAll(req: Request, res: Response, next: NextFunction) {
     try {
-      if (req.body.databaseConnection == undefined) {
+      if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const orderService: OrderService = new OrderService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
+      const orderService: OrderService = new OrderService(req.body.tenantConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<IOrder, Order> = new BaseController(orderService, "Order");
 

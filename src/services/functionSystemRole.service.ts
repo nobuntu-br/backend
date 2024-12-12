@@ -1,18 +1,20 @@
-import { DatabaseType } from "../adapters/createDb.adapter";
 import { FunctionSystemRole, IFunctionSystemRole } from "../models/functionSystemRole.model";
+import TenantConnection from "../models/tenantConnection.model";
 import FunctionSystemRoleRepository from "../repositories/functionSystemRole.repository";
 import BaseService from "./base.service";
 
 export class FunctionSystemRoleService extends BaseService<IFunctionSystemRole, FunctionSystemRole> {
   private functionSystemRoleRepository: FunctionSystemRoleRepository;
 
-  constructor(databaseType: DatabaseType, databaseConnection: any) {
+  constructor(tenantConnection: TenantConnection) {
     //Cria o repositório com dados para obter o banco de dados
-    var repository: FunctionSystemRoleRepository = new FunctionSystemRoleRepository(databaseType, databaseConnection);
-    super(repository, databaseType, databaseConnection);
+    let repository: FunctionSystemRoleRepository = new FunctionSystemRoleRepository(tenantConnection);
+    super(repository, tenantConnection);
 
     this.functionSystemRoleRepository = repository;
+
   }
+
 
   async isPublicRoute(method: string, url: string): Promise<boolean> {
     try {

@@ -38,20 +38,20 @@ export class AzureADService implements IidentityService {
   ) {
 
     if (
-      process.env.CLIENT_ID === undefined ||
-      process.env.CLIENT_SECRET === undefined ||
-      process.env.TENANT_ID === undefined ||
+      process.env.AZURE_CLIENT_ID === undefined ||
+      process.env.AZURE_CLIENT_SECRET === undefined ||
+      process.env.AZURE_TENANT_ID === undefined ||
       process.env.AZURE_SCOPE === undefined ||
-      process.env.DOMAIN_NAME === undefined
+      process.env.AZURE_DOMAIN_NAME === undefined
     ) {
       throw new NotFoundError("Dados relacionados as requisições nos serviços da Azure não estão contidos nas variáveis ambiente");
     }
 
-    this.clientId = process.env.CLIENT_ID;
-    this.clientSecret = process.env.CLIENT_SECRET;
-    this.tenantID = process.env.TENANT_ID;
+    this.clientId = process.env.AZURE_CLIENT_ID;
+    this.clientSecret = process.env.AZURE_CLIENT_SECRET;
+    this.tenantID = process.env.AZURE_TENANT_ID;
     this.scope = process.env.AZURE_SCOPE;
-    this.domainName = process.env.DOMAIN_NAME;
+    this.domainName = process.env.AZURE_DOMAIN_NAME;
   }
 
   /**

@@ -12,12 +12,12 @@ export class TenantController {
 
     try {
 
-      if (req.body.databaseConnection == undefined) {
+      if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
+      const tenantService: TenantService = new TenantService(req.body.tenantConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<ITenant, Tenant> = new BaseController(tenantService, "Tenant");
 
@@ -31,12 +31,12 @@ export class TenantController {
   async findAll(req: Request, res: Response, next: NextFunction) {
 
     try {
-      if (req.body.databaseConnection == undefined) {
+      if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
+      const tenantService: TenantService = new TenantService(req.body.tenantConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<ITenant, Tenant> = new BaseController(tenantService, "Tenant");
 
@@ -50,12 +50,12 @@ export class TenantController {
   async findById(req: Request, res: Response, next: NextFunction) {
 
     try {
-      if (req.body.databaseConnection == undefined) {
+      if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
+      const tenantService: TenantService = new TenantService(req.body.tenantConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<ITenant, Tenant> = new BaseController(tenantService, "Tenant");
 
@@ -69,12 +69,12 @@ export class TenantController {
   async getCount(req: Request, res: Response, next: NextFunction) {
 
     try {
-      if (req.body.databaseConnection == undefined) {
+      if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
+      const tenantService: TenantService = new TenantService(req.body.tenantConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<ITenant, Tenant> = new BaseController(tenantService, "Tenant");
 
@@ -88,12 +88,12 @@ export class TenantController {
   async update(req: Request, res: Response, next: NextFunction) {
 
     try {
-      if (req.body.databaseConnection == undefined) {
+      if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
+      const tenantService: TenantService = new TenantService(req.body.tenantConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<ITenant, Tenant> = new BaseController(tenantService, "Tenant");
 
@@ -107,12 +107,12 @@ export class TenantController {
   async delete(req: Request, res: Response, next: NextFunction) {
 
     try {
-      if (req.body.databaseConnection == undefined) {
+      if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
+      const tenantService: TenantService = new TenantService(req.body.tenantConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<ITenant, Tenant> = new BaseController(tenantService, "Tenant");
 
@@ -126,12 +126,12 @@ export class TenantController {
   async deleteAll(req: Request, res: Response, next: NextFunction) {
 
     try {
-      if (req.body.databaseConnection == undefined) {
+      if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
+      const tenantService: TenantService = new TenantService(req.body.tenantConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<ITenant, Tenant> = new BaseController(tenantService, "Tenant");
 
@@ -145,11 +145,11 @@ export class TenantController {
   async findByUserUID(req: Request, res: Response) {
     try {
 
-      if (req.body.databaseConnection == undefined) {
+      if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
-      const databasePermissionRepository: DatabasePermissionRepository = new DatabasePermissionRepository(req.body.databaseConnection.databaseType, req.body.databaseConnection);
+      const databasePermissionRepository: DatabasePermissionRepository = new DatabasePermissionRepository(req.body.tenantConnection);
       const getUserTenantsUseCase : GetUserTenantsUseCase = new GetUserTenantsUseCase(databasePermissionRepository);
       const usertenants = await getUserTenantsUseCase.execute(req.params.UID);
 
@@ -168,14 +168,13 @@ export class TenantController {
    */
   async findTenantsUserIsAdmin(req: Request, res: Response, next: NextFunction){
     try {
-      if (req.body.databaseConnection == undefined) {
+      if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
-
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantService: TenantService = new TenantService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
+      const tenantService: TenantService = new TenantService(req.body.tenantConnection);
 
-      const tenantsUserIsAdmin : Tenant[] = await tenantService.findTenantsUserIsAdmin(req.body.userUID);
+      const tenantsUserIsAdmin : Tenant[] = await tenantService.findTenantsUserIsAdmin(req.params.userUID);
 
       if (tenantsUserIsAdmin == null) {
         throw new NotFoundError("Não foram encontrados tenants que esse usuário é administrador");

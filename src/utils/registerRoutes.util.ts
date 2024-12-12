@@ -1,6 +1,5 @@
 import TenantConnection from "../models/tenantConnection.model";
 import FunctionSystemRepository from "../repositories/functionSystem.repository";
-import { FunctionSystemService } from "../services/functionSystem.service";
 
 const fs = require('fs-extra');
 const path = require('path');
@@ -11,7 +10,7 @@ const path = require('path');
 export async function saveRoutes(databaseConnection: TenantConnection) {
 
   var routesData = readRoutes();
-  const functionSystemRepository: FunctionSystemRepository = new FunctionSystemRepository(databaseConnection.databaseType, databaseConnection);
+  const functionSystemRepository: FunctionSystemRepository = new FunctionSystemRepository(databaseConnection);
 
   for (let routeIndex = 0; routeIndex < routesData.length; routeIndex++) {
     const _description = getDescription(routesData[routeIndex].fileName, routesData[routeIndex].method, routesData[routeIndex].path);
@@ -28,7 +27,6 @@ export async function saveRoutes(databaseConnection: TenantConnection) {
       if (route != null) {
         await functionSystemRepository.update(route.id!, { description: _description, route: _route, method: _method, classname: _classname });
       } else {
-        console.log(_route);
         const newRoute = await functionSystemRepository.create({ description: _description, route: _route, method: _method, className: _classname });
       }
     }

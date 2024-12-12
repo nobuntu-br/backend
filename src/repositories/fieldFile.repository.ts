@@ -1,4 +1,4 @@
-import createDbAdapter, { DatabaseType } from "../adapters/createDb.adapter"; 
+import createDbAdapter from "../adapters/createDb.adapter"; 
 import { IDatabaseAdapter } from "../adapters/IDatabase.adapter"; 
 import { FieldFile, IFieldFileDatabaseModel } from "../models/fieldFile.model"; 
 import TenantConnection from "../models/tenantConnection.model";
@@ -6,8 +6,8 @@ import BaseRepository from "./base.repository";
 
 export default class FieldFileRepository extends BaseRepository<IFieldFileDatabaseModel, FieldFile>{ 
 
-  constructor(databaseType: DatabaseType, tenantConnection: TenantConnection){ 
-    const _adapter : IDatabaseAdapter<IFieldFileDatabaseModel, FieldFile> = createDbAdapter<IFieldFileDatabaseModel, FieldFile>(tenantConnection.models!.get("FieldFile"), databaseType, tenantConnection.connection, FieldFile.fromJson);
+  constructor(tenantConnection: TenantConnection){ 
+    const _adapter : IDatabaseAdapter<IFieldFileDatabaseModel, FieldFile> = createDbAdapter<IFieldFileDatabaseModel, FieldFile>(tenantConnection.models!.get("FieldFile"), tenantConnection.databaseType, tenantConnection.connection, FieldFile.fromJson);
     super(_adapter, tenantConnection); 
     
   } 

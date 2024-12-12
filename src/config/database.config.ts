@@ -33,7 +33,7 @@ export async function getTenantConnection(tenantId: number, userUID: string): Pr
     const defaultTenantConnection: TenantConnection = await getSecurityTenantConnectionUseCase.execute();
 
     //Cria o serviço de UserTenant com base na conexão com o banco de dados
-    const userTenantService: UserTenantService = new UserTenantService(defaultTenantConnection.databaseType, defaultTenantConnection.connection);
+    const userTenantService: UserTenantService = new UserTenantService(defaultTenantConnection);
     //Verifica se o usuário tem acesso ao tenant
     if (await userTenantService.userHasAccessToTenant(userUID, tenantId) == false) {
       return null;
@@ -44,7 +44,7 @@ export async function getTenantConnection(tenantId: number, userUID: string): Pr
 
     if (tenantConnection == null) {
 
-      const tenantCredentialService: DatabaseCredentialService = new DatabaseCredentialService(defaultTenantConnection.databaseType, defaultTenantConnection.connection);
+      const tenantCredentialService: DatabaseCredentialService = new DatabaseCredentialService(defaultTenantConnection);
       const databaseCredential = await tenantCredentialService.findById(tenantId);
 
       if (databaseCredential == null || databaseCredential.type == null || databaseCredential.host == null) {
@@ -77,10 +77,13 @@ export async function connectTenant(tenantId: number, databaseCredential: IDatab
   if (databaseCredential.type == undefined || databaseCredential.type == null || databaseCredential.password == null) {
     throw new Error("Erro ao realizar a conexão com o banco de dados. Tipo de banco de dados não definido");
   }
+  
 
   try {
     //Descriptgrafar a senha do tenant
-    databaseCredential.password = decryptDatabasePassword(databaseCredential.password)!;
+    if(databaseCredential.password != undefined && databaseCredential.password != ""){
+      databaseCredential.password = decryptDatabasePassword(databaseCredential.password)!;
+    }
 
     //TODO Descriptogradar as chaves SSL
     
@@ -92,7 +95,11 @@ export async function connectTenant(tenantId: number, databaseCredential: IDatab
     tenantConnection = await connectToDatabase(databaseCredential, false);
     tenantConnection.models = await getModels(databaseType, tenantConnection);
 
-    await saveRoutes(tenantConnection);
+    try {
+      await saveRoutes(tenantConnection);
+    } catch (error) {
+      throw new Error("")
+    }
 
     const tenantConnectionService: TenantConnectionService = TenantConnectionService.instance;
     tenantConnectionService.setOnTenantConnectionPool(tenantId, tenantConnection);

@@ -14,13 +14,13 @@ export class DatabaseCredentialController {
   async create(req: Request, res: Response, next: NextFunction) {
 
     try {
-      if (req.body.databaseConnection == undefined) {
+      if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
-      const tenantCredentialRepository: DatabaseCredentialRepository = new DatabaseCredentialRepository(req.body.databaseConnection.databaseType, req.body.databaseConnection);
-      const userTenantRepository: UserTenantRepository = new UserTenantRepository(req.body.databaseConnection.databaseType, req.body.databaseConnection);
-      const userRepository: UserRepository = new UserRepository(req.body.databaseConnection.databaseType, req.body.databaseConnection);
+      const tenantCredentialRepository: DatabaseCredentialRepository = new DatabaseCredentialRepository(req.body.tenantConnection);
+      const userTenantRepository: UserTenantRepository = new UserTenantRepository(req.body.tenantConnection);
+      const userRepository: UserRepository = new UserRepository(req.body.tenantConnection);
 
       //Use case para realizar operações mais complexas
       const registerTenantCredentialUseCase: RegisterTenantCredentialUseCase = new RegisterTenantCredentialUseCase(tenantCredentialRepository, userTenantRepository, userRepository);
@@ -55,12 +55,12 @@ export class DatabaseCredentialController {
   async findAll(req: Request, res: Response, next: NextFunction) {
 
     try {
-      if (req.body.databaseConnection == undefined) {
+      if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantCredentialService: DatabaseCredentialService = new DatabaseCredentialService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
+      const tenantCredentialService: DatabaseCredentialService = new DatabaseCredentialService(req.body.tenantConnection);
 
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<IDatabaseCredential, DatabaseCredential> = new BaseController(tenantCredentialService, "DatabaseCredential");
@@ -74,12 +74,12 @@ export class DatabaseCredentialController {
 
   async findById(req: Request, res: Response, next: NextFunction) {
     try {
-      if (req.body.databaseConnection == undefined) {
+      if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantCredentialService: DatabaseCredentialService = new DatabaseCredentialService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
+      const tenantCredentialService: DatabaseCredentialService = new DatabaseCredentialService(req.body.tenantConnection);
 
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<IDatabaseCredential, DatabaseCredential> = new BaseController(tenantCredentialService, "DatabaseCredential");
@@ -92,12 +92,12 @@ export class DatabaseCredentialController {
 
   async getCount(req: Request, res: Response, next: NextFunction) {
     try {
-      if (req.body.databaseConnection == undefined) {
+      if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantCredentialService: DatabaseCredentialService = new DatabaseCredentialService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
+      const tenantCredentialService: DatabaseCredentialService = new DatabaseCredentialService(req.body.tenantConnection);
 
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<IDatabaseCredential, DatabaseCredential> = new BaseController(tenantCredentialService, "DatabaseCredential");
@@ -110,12 +110,12 @@ export class DatabaseCredentialController {
 
   async update(req: Request, res: Response, next: NextFunction) {
     try {
-      if (req.body.databaseConnection == undefined) {
+      if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantCredentialService: DatabaseCredentialService = new DatabaseCredentialService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
+      const tenantCredentialService: DatabaseCredentialService = new DatabaseCredentialService(req.body.tenantConnection);
 
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<IDatabaseCredential, DatabaseCredential> = new BaseController(tenantCredentialService, "DatabaseCredential");
@@ -128,12 +128,12 @@ export class DatabaseCredentialController {
 
   async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      if (req.body.databaseConnection == undefined) {
+      if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantCredentialService: DatabaseCredentialService = new DatabaseCredentialService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
+      const tenantCredentialService: DatabaseCredentialService = new DatabaseCredentialService(req.body.tenantConnection);
 
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<IDatabaseCredential, DatabaseCredential> = new BaseController(tenantCredentialService, "DatabaseCredential");
@@ -146,12 +146,12 @@ export class DatabaseCredentialController {
 
   async deleteAll(req: Request, res: Response, next: NextFunction) {
     try {
-      if (req.body.databaseConnection == undefined) {
+      if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const tenantCredentialService: DatabaseCredentialService = new DatabaseCredentialService(req.body.databaseConnection.databaseType, req.body.databaseConnection);
+      const tenantCredentialService: DatabaseCredentialService = new DatabaseCredentialService(req.body.tenantConnection);
 
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<IDatabaseCredential, DatabaseCredential> = new BaseController(tenantCredentialService, "DatabaseCredential");

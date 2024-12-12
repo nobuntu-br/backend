@@ -10,7 +10,7 @@ export class GetUserTenantsUseCase {
   async execute(userUID: string): Promise<DatabasePermissionDetailOutputDTO[]> {
     try {
       
-      const tenants : DatabasePermissionDetailOutputDTO[] = await this.userTenantRepository.getTenantsWithDefaultTenantByUserUID(userUID);
+      const tenants : DatabasePermissionDetailOutputDTO[] = await this.userTenantRepository.getTenantsUserHasAccess(userUID);
       
       if(tenants == null || tenants.length == 0){
         throw new NotFoundError("Não foram encontrados tenants que pertencem a esse usuário");

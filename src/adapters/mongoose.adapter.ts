@@ -53,13 +53,13 @@ export class MongooseAdapter<TInterface, TClass> implements IDatabaseAdapter<TIn
     
   }
 
-  async findOne(query: TInterface): Promise<TClass> {
+  async findOne(query: TInterface): Promise<TClass | null> {
 
     try {
       const returnedValue = await this.model.findOne( query! );
 
       if (returnedValue == null) {
-        throw new NotFoundError("Not found document");
+        return null;
       }
 
       return this.jsonDataToResource(returnedValue);
@@ -77,12 +77,12 @@ export class MongooseAdapter<TInterface, TClass> implements IDatabaseAdapter<TIn
     throw new Error("Method not implemented");
   }
 
-  async findById(id: number): Promise<TClass> {
+  async findById(id: number): Promise<TClass | null> {
     try {
       const returnedValue = await this._model.findById(id).exec();
 
       if(returnedValue == null){
-        throw new NotFoundError("Not found document");
+        return null;
       }
 
       return this.jsonDataToResource(returnedValue);
@@ -262,7 +262,7 @@ export class MongooseAdapter<TInterface, TClass> implements IDatabaseAdapter<TIn
     throw new Error("Method not implemented");
   }
 
-  async findOneWithEagerLoading(query: TInterface): Promise<TClass>{
+  async findOneWithEagerLoading(query: TInterface): Promise<TClass | null>{
     throw new Error("Method not implemented");
   }
 
@@ -270,7 +270,7 @@ export class MongooseAdapter<TInterface, TClass> implements IDatabaseAdapter<TIn
     throw new Error("Method not implemented");
   }
 
-  async findByIdWithEagerLoading(id: number): Promise<TClass>{
+  async findByIdWithEagerLoading(id: number): Promise<TClass | null>{
     throw new Error("Method not implemented");
   }
 }

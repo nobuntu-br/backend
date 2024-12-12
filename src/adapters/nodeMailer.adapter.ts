@@ -3,7 +3,8 @@ import { IEmailAdapter } from './iemail.adapter';
 import { NotFoundError } from '../errors/notFound.error';
 
 interface IEmailServerData {
-  emailServerHost: string, port: number;
+  host: string, 
+  port: number;
   user: string;
   emailServerUser: string;
   emailServerPassword: string;
@@ -22,7 +23,7 @@ export class NodemailerAdapter implements IEmailAdapter {
   createTransport(emailServerData: IEmailServerData): Transporter {
     try {
       return nodemailer.createTransport({
-        host: emailServerData.emailServerHost,
+        host: emailServerData.host,
         port: emailServerData.port,
         secure: false,
         auth: {

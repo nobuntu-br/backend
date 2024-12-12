@@ -58,8 +58,11 @@ export class GetDefaultTenantConnectionUseCase {
       //Se ele já tiver registrado, só conecta
       if (tenantConnection == null) {
 
-        const encryptedDatabasePassword = encryptDatabasePassword(databaseCredential.password!);
-        databaseCredential.password = encryptedDatabasePassword;
+        if (databaseCredential.password != undefined && databaseCredential.password != "") {
+          const encryptedDatabasePassword = encryptDatabasePassword(databaseCredential.password);
+          databaseCredential.password = encryptedDatabasePassword;
+        }
+
         const newTenantCredential = await this.saveDefaultTenantOnSecurityTenant(databaseCredential);
 
         tenantConnection = await connectTenant(
@@ -93,55 +96,50 @@ export class GetDefaultTenantConnectionUseCase {
     const getSecurityTenantConnectionUseCase: GetSecurityTenantConnectionUseCase = new GetSecurityTenantConnectionUseCase();
     const securityTenantConnection: TenantConnection = await getSecurityTenantConnectionUseCase.execute();
 
-    const tenantRepository: TenantRepository = new TenantRepository(securityTenantConnection.databaseType, securityTenantConnection);
+    const tenantRepository: TenantRepository = new TenantRepository(securityTenantConnection);
 
     const transaction = await tenantRepository.startTransaction();
 
     //Cria o tenant
-    let tenant: Tenant;
+    let tenant: Tenant | null;
+
     try {
       tenant = await tenantRepository.findOne({ name: defaultTenantName });
-      console.log("Tenant retorno do tenant: ", tenant);
-    } catch (error) {
-      console.log(error);
-      if (error instanceof NotFoundError) {
+      if (tenant == null) {
         tenant = await tenantRepository.createWithTransaction({ name: defaultTenantName }, transaction);
-        console.log("Tenant criado: ", tenant);
-      } else {
-        throw new UnknownError("Unknown error on Save Default Tenant on Security Tenant function. Unknown error on create Tenant. Detail: " + error);
       }
+    } catch (error) {
+      throw new UnknownError("Unknown error on Save Default Tenant on Security Tenant function. Unknown error on create Tenant. Detail: " + error);
     }
 
     //Cria o databaseCredential
-    const databaseCredentialRepository: DatabaseCredentialRepository = new DatabaseCredentialRepository(securityTenantConnection.databaseType, securityTenantConnection);
+    const databaseCredentialRepository: DatabaseCredentialRepository = new DatabaseCredentialRepository(securityTenantConnection);
 
-    let _databaseCredential: DatabaseCredential;
+    let _databaseCredential: DatabaseCredential | null;
+
     try {
       _databaseCredential = await databaseCredentialRepository.findOne({ name: databaseCredential.name });
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        console.log("Database Credential não encontrado!");
+      if (_databaseCredential == null) {
         _databaseCredential = new DatabaseCredential(await databaseCredentialRepository.createWithTransaction(databaseCredential, transaction));
-      } else {
-        throw new UnknownError("Unknown error on Save Default Tenant on Security Tenant function. Unknown error on create Database Credential. Detail: " + error);
       }
+    } catch (error) {
+      throw new UnknownError("Unknown error on Save Default Tenant on Security Tenant function. Unknown error on create Database Credential. Detail: " + error);
     }
 
     //Cria o databasePermission
-    const databasePermissionRepository: DatabasePermissionRepository = new DatabasePermissionRepository(securityTenantConnection.databaseType, securityTenantConnection);
+    const databasePermissionRepository: DatabasePermissionRepository = new DatabasePermissionRepository(securityTenantConnection);
 
     try {
       let databasePermission = await databasePermissionRepository.findOne({ tenantId: tenant.id, databaseCredentialId: _databaseCredential.id });
-    } catch (error) {
-      if (error instanceof NotFoundError) {
+      if (databasePermission == null) {
         await databasePermissionRepository.createWithTransaction({
           tenantId: tenant.id,
-          // databaseCredentialId: _databaseCredential.id,
-          
+          databaseCredentialId: _databaseCredential.id,
+
         }, transaction);
-      } else {
-        throw new UnknownError("Unknown error on Save Default Tenant on Security Tenant function. Detail: " + error);
       }
+    } catch (error) {
+      throw new UnknownError("Unknown error on Save Default Tenant on Security Tenant function. Detail: " + error);
     }
 
     await tenantRepository.commitTransaction(transaction);
