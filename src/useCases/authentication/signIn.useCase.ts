@@ -1,6 +1,7 @@
-import { IUserAccessData } from "../../models/userAcessData.model";
 import { SignInDTO, SignInOutputDTO } from "../../models/DTO/signin.DTO";
 import { IidentityService } from "../../services/Iidentity.service";
+import { ValidationError } from "../../errors/validation.error";
+import { UnknownError } from "../../errors/unknown.error";
 
 export class SignInUseCase {
 
@@ -13,8 +14,13 @@ export class SignInUseCase {
       const user = await this.identityService.loginUser(input.email, input.password);
 
       return user;
-    } catch (error) {
-      throw new Error("Erro ao realizar o acesso. Detalhes: "+error);
+    } catch (error: any) {
+      if(error instanceof ValidationError){
+        throw error;
+      } else {
+        throw new UnknownError("Error to signin. Detalhes: "+error);
+      }
+
     }
   }
 }

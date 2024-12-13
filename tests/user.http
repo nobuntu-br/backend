@@ -1,15 +1,4 @@
-POST http://localhost:8080/api/user/signin
-###
-POST http://localhost:8080/api/user/signup
-content-type: application/json
 
-{
-  "userName": "jef",
-  "firstName": "Jeferson",
-  "lastName":"Carlos Martin",
-  "email":"jefersoncmnn@gmail.com",
-  "password":"adminN123"
-}
 ###
 #GET http://localhost:8080/api/user/get-user-image/:id
 ###

@@ -26,7 +26,7 @@ async function getJWKS(jwksUri: string): Promise<any[]> {
  * @returns 
  */
 export async function verifyAccess(req: Request, res: Response, next: NextFunction): Promise<void> {
-  const getSecurityTenantConnectionUseCase : GetSecurityTenantConnectionUseCase = new GetSecurityTenantConnectionUseCase();
+  const getSecurityTenantConnectionUseCase: GetSecurityTenantConnectionUseCase = new GetSecurityTenantConnectionUseCase();
 
   const databaseConnection = await getSecurityTenantConnectionUseCase.execute();
 
@@ -52,17 +52,16 @@ export async function verifyAccess(req: Request, res: Response, next: NextFuncti
 
     // Se não retornou o OID (não tem access_token)
     if (userOID == null) {
-      res.status(401).send({ message: "Acesso não autorizado. Usuário não identificado" });
+      res.send(new UnauthorizedError("Token inválido"));
     } else {
       // Se tem o OID verifica se tem permissão pra rota
       if (await isAuthorizedUrl(userOID, req.method, req.originalUrl, databaseConnection)) {
         next();
       } else {
-        res.status(401).send({ message: "Acesso não autorizado. Rota não autorizada" });
+        res.send(new UnauthorizedError("Acesso não autorizado."));
       }
     }
   } else {
-    // res.status(401).send({ message: "Token não fornecido ou inválido" });
     res.send(new UnauthorizedError("Token não fornecido ou inválido"));
   }
 }
@@ -79,8 +78,8 @@ async function verifyAccessTokenIsValid(accessToken: string, res: Response): Pro
   }
 
   const JWKsUri: string | undefined = process.env.JWKsUri;
-  
-  if(JWKsUri == undefined){
+
+  if (JWKsUri == undefined) {
     throw new Error("Não foi possível obter o link para obter o Java Web Key Set (Chaves para validar o token) das variáveis ambiente");
   }
 
@@ -137,7 +136,7 @@ async function isAuthorizedUrl(userUID: string, method: string, url: string, dat
   return userHaveAccessToRoute;
 }
 
-async function isUserHaveAccessToRoute(userUID: string, method: string, url: string, databaseConnection: TenantConnection): Promise<boolean | null>{
+async function isUserHaveAccessToRoute(userUID: string, method: string, url: string, databaseConnection: TenantConnection): Promise<boolean | null> {
   //TODO se for pra fazer isso, tem que ser com cache
   const functionSystemRoleRepository: FunctionSystemRoleRepository = new FunctionSystemRoleRepository(databaseConnection);
   return await functionSystemRoleRepository.isUserHaveAccessToRoute(userUID, method, url);

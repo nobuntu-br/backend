@@ -1,6 +1,6 @@
 import { Application, Router } from 'express';
 import validateHeaders from './validators/index.validator';
-import changeTenant from '../middlewares/tenant.middleware';
+import getUserTenant from '../middlewares/tenant.middleware';
 import { OrderController } from '../controllers/order.controller';
 import { createNewOrderValidator, findAllOrderValidator } from './validators/order.validator';
 import { verifyAccess } from '../middlewares/auth.middleware';
@@ -14,9 +14,9 @@ export default function defineRoute(app: Application){
   const router: Router = Router();
   
   //Create a new
-  router.post('/', [verifyAccess, changeTenant, ...createNewOrderValidator, validateHeaders], controller.create);
+  router.post('/', [verifyAccess, getUserTenant, ...createNewOrderValidator, validateHeaders], controller.create);
   //Find all
-  router.get('/', [verifyAccess, changeTenant, ...findAllOrderValidator, validateHeaders], controller.findAll);
+  router.get('/', [verifyAccess, getUserTenant, ...findAllOrderValidator, validateHeaders], controller.findAll);
   //Find count
   router.get('/count', controller.getCount);
   //Find by id

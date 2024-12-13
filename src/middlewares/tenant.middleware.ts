@@ -16,7 +16,7 @@ declare global {
 /**
  * Função responsável por retornar por obter dados de qual tenant o usuário está fazendo uso, para tal tenant ser usado em alguma operação da API.
  */
-export default async function changeTenant(req: Request, res: Response, next: NextFunction) {
+export default async function getUserTenant(req: Request, res: Response, next: NextFunction) {
 
   const tenantId : number = Number(req.header('X-Tenant-ID'));
 

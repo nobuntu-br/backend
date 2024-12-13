@@ -1,32 +1,33 @@
+import { UnknownError } from '../../errors/unknown.error';
 import { DatabasePermission } from '../../models/databasePermission.model';
 import DatabasePermissionRepository from '../../repositories/databasePermission.repository';
 
 export class DeleteTenantPermissionUseCase {
   constructor(private databasePermissionRepository: DatabasePermissionRepository) { }
 
-  async execute(databasePermissionId: number): Promise<DatabasePermission | Error> {
+  async execute(databasePermissionId: number): Promise<DatabasePermission> {
 
     try {
 
       //Verificar se a permissão existe
-      const userTenant = await this.databasePermissionRepository.findById(databasePermissionId);
+      const databasePermission = await this.databasePermissionRepository.findById(databasePermissionId);
 
-      if (userTenant == null) {
+      if (databasePermission == null) {
         //Se permissão não existe, dá erro
-        return new Error("Erro ao registrar novo UserTenant. Registro não existente!");
+        throw new UnknownError("Erro to register new permission.");
       }
 
       //Remove a permissão
       const removedUserTenant = await this.databasePermissionRepository.delete(databasePermissionId)!;
 
       if(removedUserTenant == null){
-        return Error("Erro ao remover a permissão do tenant.");
+        throw new UnknownError("Erro ao remover a permissão do tenant.");
       }
 
       return removedUserTenant;
 
     } catch (error) {
-      return Error("Erro ao atualizar as permissões do Tenant: " + error);
+      throw new UnknownError("Erro ao atualizar as permissões do Tenant: " + error);
     }
 
   }

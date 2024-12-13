@@ -1,9 +1,11 @@
 import { Application } from 'express';
 import userRoutes from './user.route';
+import authenticationRoutes from './authentication.route';
 import tenantRoutes from './tenant.route';
 import roleRoutes from './role.route';
 import databaseCredentialRoutes from './databaseCredential.route';
 import databasePermissionRoutes from './databasePermission.route'; 
+import componentStructureRoutes from './componentStructure.route';
 //TODO Essas importações precisarão ser geradas
 import tenantDirectoryRoutes from './tenantDirectory.route'
 import applicationRoutes from './application.route';
@@ -21,6 +23,8 @@ export function setRoutes(app: Application) {
 
   userRoutes(app);
 
+  authenticationRoutes(app);
+
   databaseCredentialRoutes(app);
 
   tenantRoutes(app);
@@ -30,6 +34,8 @@ export function setRoutes(app: Application) {
   applicationRoutes(app);
 
   tenantDirectoryRoutes(app);
+
+  componentStructureRoutes(app);
 
   //TODO serão gerados esses segmentos pelo mapper
 

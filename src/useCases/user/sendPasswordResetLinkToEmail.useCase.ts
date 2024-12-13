@@ -1,9 +1,11 @@
 import { EmailService } from '../../services/email.service';
 import { SendResetPasswordLinkToEmailDTO } from '../../models/DTO/sendResetPasswordLinkToEmail.DTO';
+import { TokenGenerator } from '../../utils/tokenGenerator';
 
-export class SendChangeUserPasswordLinkToEmailUseCase {
+export class SendPasswordResetLinkToEmailUseCase {
   constructor(
-    private emailService: EmailService
+    private emailService: EmailService,
+    private tokenGenerator: TokenGenerator
   ) { }
 
   async execute(input: SendResetPasswordLinkToEmailDTO): Promise<boolean> {
@@ -15,14 +17,13 @@ export class SendChangeUserPasswordLinkToEmailUseCase {
       throw new Error("Dados relacionados a envio de email de alteraçãod e senha da conta não estão preechidos nas variáveis ambiente!");
     }
 
-    //TODO gerar um JWT que irá ser enviado junto com o link do SPA para recuperação da senha
-
+    const resetPasswordToken : string = this.tokenGenerator.generateToken({email: input.email}, 300000);
     
     try {
 
       await this.emailService.sendEmail({
         subject: "Recuperação de email do serviço "+process.env.APPLICATION_NAME,
-        text: `Para alterar a senha da sua conta faça o acesso a esse link: `+ process.env.RESET_ACCOUNT_PASSWORD_PATH,
+        text: `Para alterar a senha da sua conta faça o acesso a esse link: `+ process.env.RESET_ACCOUNT_PASSWORD_PATH + "/" + resetPasswordToken,
         to: input.email
       });
 

@@ -43,10 +43,6 @@ export class GetDefaultTenantConnectionUseCase {
       sslCertificate: process.env.SECURITY_TENANT_DATABASE_SSL_CERTIFICATE
     });
 
-    // if (validateDatabaseCredential(databaseCredential) == false || tenantId == undefined) {
-    //   throw new Error(`Dados ausentes ao realizar a conexão com o banco padrão`);
-    // }
-
     try {
 
       const tenantConnectionService: TenantConnectionService = TenantConnectionService.instance;

@@ -52,7 +52,6 @@ export class GetSecurityTenantConnectionUseCase {
       let tenantConnection: TenantConnection | null = tenantConnectionService.findOneConnection(tenantId);
 
       if (tenantConnection != null) {
-        console.log("Instancia já existente de conexão de tenant sendo retornado!");
         return tenantConnection;
       }
 

@@ -5,12 +5,10 @@ import TenantConnection from "../models/tenantConnection.model";
 import BaseRepository from "./base.repository";
 
 export default class FunctionSystemRoleRepository extends BaseRepository<IFunctionSystemRoleDatabaseModel ,FunctionSystemRole> {
-  private _tenantConnection: TenantConnection;
 
   constructor(tenantConnection: TenantConnection) {
     const _adapter: IDatabaseAdapter<IFunctionSystemRoleDatabaseModel ,FunctionSystemRole> = createDbAdapter<IFunctionSystemRoleDatabaseModel ,FunctionSystemRole>(tenantConnection.models!.get("FunctionSystemRole"), tenantConnection.databaseType, tenantConnection.connection, FunctionSystemRole.fromJson);
     super(_adapter, tenantConnection);
-    this._tenantConnection = tenantConnection;
   }
 
   async isUserHaveAccessToRoute(userUID: string, method: string, route: string): Promise<boolean | null> {

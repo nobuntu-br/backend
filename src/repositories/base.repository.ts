@@ -3,14 +3,19 @@ import { Transaction } from "sequelize";
 import { IDatabaseAdapter } from "../adapters/IDatabase.adapter";
 import { FilterValue } from "../utils/mongoose/customQuery.util";
 import { IBaseRepository } from "./ibase.repository";
+import TenantConnection from "../models/tenantConnection.model";
 
 export default abstract class BaseRepository<TInterface, TClass> implements IBaseRepository<TInterface, TClass>{
   public adapter: IDatabaseAdapter<TInterface, TClass>;
-  public databaseConnection: any;
+  public _tenantConnection: TenantConnection;
 
-  constructor(adapter: IDatabaseAdapter<TInterface, TClass>, databaseConnection: any){
+  constructor(adapter: IDatabaseAdapter<TInterface, TClass>, tenantConnection: TenantConnection){
     this.adapter = adapter;
-    this.databaseConnection = databaseConnection;
+    this._tenantConnection = tenantConnection;
+  }
+
+  get tenantConnection(){
+    return this._tenantConnection;
   }
   
   create(data: TClass): Promise<TClass> {

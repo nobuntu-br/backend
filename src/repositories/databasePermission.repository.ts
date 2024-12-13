@@ -9,12 +9,10 @@ import { Tenant } from "../models/tenant.model";
 import { UnknownError } from "../errors/unknown.error";
 
 export default class DatabasePermissionRepository extends BaseRepository<IDatabasePermissionDatabaseModel, DatabasePermission> {
-  private _tenantConnection: TenantConnection;
 
   constructor(tenantConnection: TenantConnection) {
     const _adapter: IDatabaseAdapter<IDatabasePermissionDatabaseModel, DatabasePermission> = createDbAdapter<IDatabasePermissionDatabaseModel, DatabasePermission>(tenantConnection.models!.get("DatabasePermission"), tenantConnection.databaseType, tenantConnection.connection, DatabasePermission.fromJson);
     super(_adapter, tenantConnection);
-    this._tenantConnection = tenantConnection;
   }
 
   async getTenantsUserHasAccess(UserUID: string): Promise<DatabasePermissionDetailOutputDTO[]> {

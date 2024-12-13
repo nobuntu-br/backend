@@ -1,0 +1,32 @@
+@hostname = http://localhost:8080 
+
+POST {{hostname}}/api/authentication/signup
+content-type: application/json
+
+{
+  "userName": "jef",
+  "firstName": "Jeferson",
+  "lastName":"Carlos Martin",
+  "email":"jefersoncmnn@gmail.com",
+  "password":"adminN123"
+}
+
+###
+
+POST {{hostname}}/api/authentication/signin
+content-type: application/json
+
+{
+  "password":"admiN12s3",
+  "email":"jefersoncmnn@gmail.com"
+}
+###
+POST {{hostname}}/api/authentication/check-email-exist
+content-type: application/json
+
+{
+  "email":"jefersoncmnn@gmail.com"
+}
+###
+
+GET {{hostname}}/api/authentication//refresh-token

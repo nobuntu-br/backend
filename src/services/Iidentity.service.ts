@@ -3,6 +3,7 @@ import { SignInOutputDTO } from "../models/DTO/signin.DTO";
 
 export interface IidentityService {
   getAccessToken(): Promise<string>;
+  refreshAccessToken(refreshToken: string): Promise<string>;
   getUserByEmail(email: string): Promise<IUser>;
   createUser(user: IUser): Promise<IUser>;
   loginUser(username: string, password: string): Promise<SignInOutputDTO>;

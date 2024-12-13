@@ -4,6 +4,7 @@ import { IUser } from "../models/user.model";
 import { SignInOutputDTO } from "../models/DTO/signin.DTO";
 import { IidentityService } from "./Iidentity.service";
 import { GetUserImageOutputDTO } from "../models/DTO/getUserImage.DTO";
+import { ValidationError } from "../errors/validation.error";
 
 export interface IAzureAdUser {
   businessPhones: string[];
@@ -101,9 +102,9 @@ export class AzureADService implements IidentityService {
 
       //É retornado pela Azure um Array com todos os grupos que o usuário faz parte
       if (userResponse.data.value.length > 0 && userResponse.data.value[0] != null) {
-        var userGroups : IAzureUserGroup[] = [];
+        var userGroups: IAzureUserGroup[] = [];
 
-        userResponse.data.value.forEach((group : any) => {
+        userResponse.data.value.forEach((group: any) => {
           userGroups.push({
             id: group.id,
             displayName: group.displayName
@@ -119,7 +120,7 @@ export class AzureADService implements IidentityService {
     }
   }
 
-  async refreshToken(refreshToken: string): Promise<string> {
+  async refreshAccessToken(refreshToken: string): Promise<string> {
     const policies = 'b2c_1_ropc';
 
     try {
@@ -276,10 +277,12 @@ export class AzureADService implements IidentityService {
         }
       }
     } catch (error: any) {
-      // console.log(error);
-      if (error.response) {
-        console.log(error.response.data);
+      //   console.log(error.response.status);
+
+      if(error.response.status == 400){
+        throw new ValidationError("Error to access account.")
       }
+
       throw error;
     }
 
@@ -402,12 +405,12 @@ export class AzureADService implements IidentityService {
     }
   }
 
-  async getUserImage(userID: string): Promise<GetUserImageOutputDTO>{
+  async getUserImage(userID: string): Promise<GetUserImageOutputDTO> {
     try {
       const accessToken: string = await this.getAccessToken();
 
       // Buscar o usuário pelo e-mail usando filtro, incluindo otherMails
-      const userResponse = await axios.get(this.graphAPIUrl + "v1.0/users/"+ userID + "/photo/$value", {
+      const userResponse = await axios.get(this.graphAPIUrl + "v1.0/users/" + userID + "/photo/$value", {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json'
@@ -416,7 +419,7 @@ export class AzureADService implements IidentityService {
 
       console.dir(userResponse.data, { depth: null });
 
-      return {imageUrl: "ddd"};
+      return { imageUrl: "ddd" };
 
       throw new NotFoundError("Nenhum usuário encontrado");
     } catch (error: any) {
