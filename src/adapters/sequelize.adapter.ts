@@ -34,12 +34,10 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
 
   async create(data: TClass): Promise<TClass> {
     try {
-
       const newItem = await this._model.create(data!);
       return this.jsonDataToResource(newItem);
 
     } catch (error: any) {
-      console.log(error);
       // Manipula erros específicos
       if (error.name === 'SequelizeUniqueConstraintError') {
         throw new Error("Error to save data usign sequelize. One data is unique. Detail: " + error);
@@ -137,7 +135,7 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
 
   }
 
-  async update(id: number, data: Object): Promise<TClass> {
+  async update(id: number, data: Object): Promise<TClass | null> {
     try {
 
       //Irá obter a quantidade de linhas alteradas
@@ -149,7 +147,7 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
 
       //Se nenhum registro foi atualizado
       if (affectedCount == 0) {
-        throw new NotFoundError("Not found data");
+        return null;
       }
 
       //A opção de retornar o registro editado da função update só funciona pra msql e postgres, então na dúvida eu prefiro pesquisar novamente o registro pra não dar problemas (sei que duas buscas não é o ideial mas, o ambiente é complexo).
@@ -170,13 +168,20 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
 
   }
 
-  async delete(id: number): Promise<TClass> {
+  async delete(id: number): Promise<TClass | null> {
 
     try {
-      //Essa busca é feita para retornar o objeto que será reovido
-      const removedValue = await this.findById(id);
 
-      await this._model.destroy({
+      //Essa busca é feita para retornar o objeto que será reovido
+      //  await this.findById(id);
+
+      const removedValue = this.model.findOne({ where: { id: id }}); 
+
+      if(removedValue == null){
+        return null;
+      }
+
+      await this.model.destroy({
         where: {
           id: id,
         },

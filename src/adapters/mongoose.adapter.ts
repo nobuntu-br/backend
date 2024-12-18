@@ -104,12 +104,12 @@ export class MongooseAdapter<TInterface, TClass> implements IDatabaseAdapter<TIn
     }
   }
 
-  async update(id: number, data: Object): Promise<TClass> {
+  async update(id: number, data: Object): Promise<TClass | null> {
     try {
       const returnedValue = await this._model.findByIdAndUpdate(id, data, { useFindAndModify: false, new: true });
 
       if(returnedValue == null){
-        throw new NotFoundError("Not found document");
+        return null;
       }
 
       return this.jsonDataToResource(returnedValue);
@@ -123,13 +123,13 @@ export class MongooseAdapter<TInterface, TClass> implements IDatabaseAdapter<TIn
     }
   }
 
-  async delete(id: number): Promise<TClass> {
+  async delete(id: number): Promise<TClass | null> {
     
     try {
       const returnedValue = await this._model.findByIdAndDelete(id);
 
       if(returnedValue == null){
-        throw new NotFoundError("Not found document");
+        return null;
       }
 
       return this.jsonDataToResource(returnedValue);

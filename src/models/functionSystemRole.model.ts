@@ -18,7 +18,15 @@ export class FunctionSystemRole extends BaseResourceModel implements IFunctionSy
   functionSystem?: FunctionSystem | number;
   authorized?: boolean;
 
+  constructor(input: IFunctionSystemRole){
+    super();
+    this.id = input.id;
+    this.role = input.role;
+    this.functionSystem = input.functionSystem;
+    this.authorized = input.authorized;
+  }
+
   static fromJson(jsonData: any) : FunctionSystemRole {
-    return Object.assign(new FunctionSystemRole(), jsonData);
+    return new FunctionSystemRole(jsonData);
   }
 }

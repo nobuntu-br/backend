@@ -42,11 +42,11 @@ export default abstract class BaseRepository<TInterface, TClass> implements IBas
     return this.adapter.getCount();
   }
 
-  update(id: number, data: Object): Promise<TClass> {
+  update(id: number, data: Object): Promise<TClass | null> {
     return this.adapter.update(id, data);
   }
 
-  delete(id: number): Promise<TClass> {
+  delete(id: number): Promise<TClass | null> {
     return this.adapter.delete(id);
   }
 

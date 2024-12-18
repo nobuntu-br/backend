@@ -28,6 +28,7 @@ export class VerificationEmail extends BaseResourceModel implements IVerificatio
 
   constructor(data: IVerificationEmail) {
     super();
+    this.id = data.id;
     this.email = data.email;
     this.verificationCode = data.verificationCode;
     this.isVerified = data.isVerified;

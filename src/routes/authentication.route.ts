@@ -2,8 +2,8 @@ import { Application, Router } from 'express';
 import { AuthenticationController } from '../controllers/authentication.controller';
 import validateHeaders from './validators/index.validator';
 import getUserTenant, { getSecurityTenant } from '../middlewares/tenant.middleware';
-import { refreshTokenValidator } from './validators/authentication.validator';
-import { changePasswordLinkValidator, changePasswordValidator, checkEmailExistValidator, createNewUserValidator, inviteUserValidator, sendVerificationEmailCodeValidator, signinValidator, validateVerificationEmailCodeValidator } from './validators/user.validator';
+import { refreshTokenValidator, resetPasswordValidator, sendPasswordResetLintToEmailValidator } from './validators/authentication.validator';
+import { checkEmailExistValidator, createNewUserValidator, inviteUserValidator, sendVerificationEmailCodeValidator, signinValidator, validateVerificationEmailCodeValidator } from './validators/user.validator';
 import { verifyAccess } from '../middlewares/auth.middleware';
 
 /**
@@ -30,9 +30,9 @@ export default function defineRoute(app: Application) {
    */
   router.post('/validate-verification-email-code', [getSecurityTenant, ...validateVerificationEmailCodeValidator, validateHeaders], controller.validateVerificationEmailCode);
 
-  router.post('/send-password-reset-link-to-email', [getSecurityTenant, ...changePasswordLinkValidator, validateHeaders], controller.sendPasswordResetLinkToEmail);
+  router.post('/send-password-reset-link-to-email', [getSecurityTenant, ...sendPasswordResetLintToEmailValidator, validateHeaders], controller.sendPasswordResetLinkToEmail);
 
-  router.patch('/change-password', [getSecurityTenant, ...changePasswordValidator, validateHeaders], controller.changePassword);
+  router.patch('/reset-password', [getSecurityTenant, ...resetPasswordValidator, validateHeaders], controller.resetPassword);
 
   router.post('/invite-user', [getSecurityTenant, ...inviteUserValidator, validateHeaders], controller.inviteUser)
 

@@ -9,8 +9,8 @@ export interface IBaseRepository<TInterface, TClass> {
   findMany(query: TInterface): Promise<TClass[]>;
   findById(id: number): Promise<TClass | null>;
   getCount(): Promise<number>;
-  update(id: number, data: Object): Promise<TClass>;
-  delete(id: number): Promise<TClass>;
+  update(id: number, data: Object): Promise<TClass | null>;
+  delete(id: number): Promise<TClass | null>;
   deleteAll(): Promise<void>;
   findCustom(filterValues: FilterValue[], filterConditions: string[], model: Model<any> | ModelStatic<any>): Promise<TClass[] | null>;
   findUsingCustomQuery(query: any): Promise<TClass[]>;

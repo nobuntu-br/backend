@@ -14,7 +14,7 @@ export class SendPasswordResetLinkToEmailUseCase {
     const resetAccountPasswordPath = process.env.RESET_ACCOUNT_PASSWORD_PATH;
 
     if(applicationName == undefined || applicationName == '' || resetAccountPasswordPath == undefined || resetAccountPasswordPath == ''){
-      throw new Error("Dados relacionados a envio de email de alteraçãod e senha da conta não estão preechidos nas variáveis ambiente!");
+      throw new Error("Dados relacionados a envio de email de alteração de senha da conta não estão preechidos nas variáveis ambiente!");
     }
 
     const resetPasswordToken : string = this.tokenGenerator.generateToken({email: input.email}, 300000);

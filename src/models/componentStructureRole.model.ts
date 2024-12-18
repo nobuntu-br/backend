@@ -3,12 +3,12 @@ import { ComponentStructure } from "./componentStructure.model";
 import { Role } from "./role.model";
 
 //I<NomeDaClasse>DatabaseModel
-export interface IComponentStructureRoleDatabaseModel {
+export interface IComponentStructureRoleDatabaseModel extends BaseResourceModel{
   roleId?: number;
   componentStructureId?: number;
 }
 
-export interface IComponentStructureRole {
+export interface IComponentStructureRole  extends BaseResourceModel{
   role?: Role;
   componentStructure?: ComponentStructure;
 }
@@ -17,13 +17,14 @@ export class ComponentStructureRole extends BaseResourceModel implements ICompon
   role?: Role;
   componentStructure?: ComponentStructure;
 
+  constructor(data: IComponentStructureRole){
+    super();
+    this.id = data.id;
+    this.role = data.role;
+    this.componentStructure = data.componentStructure;
+  }
+
   static fromJson(jsonData: any) : ComponentStructureRole {
-    return Object.assign(new ComponentStructureRole(), jsonData);
+    return new ComponentStructureRole(jsonData);
   }
 }
-
-//tem que ter 1 interface para pesquisa que tenha o mesmo nome das colunas
-
-//Tem que ter 1 classe que é a entidade real com as regras de negócio
-  //No futuro dentro das entidades terão as regras complexas que deverão ser realizadas na classe. Se for entre classes é no UseCase
-//Tem que ter 1 interface da entidade

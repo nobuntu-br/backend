@@ -35,10 +35,8 @@ export default class UserRepository extends BaseRepository<IUserDatabaseModel, U
       const users: User[] = await this.adapter.findAll(1, 1);
 
       if (users.length == 0) {
-        console.log("Já existe usuário cadastrado nessa aplicação!");
         return true;
       }
-      console.log("Não existe usuário cadastrado nessa aplicação!");
       return false;
 
     } catch (error) {

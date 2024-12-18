@@ -98,7 +98,7 @@ export async function connectTenant(tenantId: number, databaseCredential: IDatab
     try {
       await saveRoutes(tenantConnection);
     } catch (error) {
-      throw new Error("")
+      throw new Error("Error to Sabe Routes on tenant Database.")
     }
 
     const tenantConnectionService: TenantConnectionService = TenantConnectionService.instance;

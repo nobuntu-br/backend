@@ -11,7 +11,13 @@ export interface ITenant extends BaseResourceModel{
 export class Tenant extends BaseResourceModel implements ITenant {
   name?: string;
 
+  constructor(data: ITenant){
+    super();
+    this.id = data.id;
+    this.name = data.name;
+  }
+
   static fromJson(jsonData: any): Tenant {
-    return Object.assign(new Tenant(), jsonData);
+    return new Tenant(jsonData);
   }
 }

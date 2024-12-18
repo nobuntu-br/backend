@@ -196,8 +196,6 @@ export class AzureADService implements IidentityService {
 
       const domainName: string = await this.getDomainName(accessToken);
 
-      console.log(user);
-
       const _user = {
         accountEnabled: true,
         displayName: user.userName,
@@ -234,7 +232,7 @@ export class AzureADService implements IidentityService {
       }
     } catch (error: any) {
       console.dir(error, { depth: null });
-      throw new Error("Erro ao criar o usuário. Detalhes: " + error);
+      throw new Error("Error to create user on Azure services.");
     }
 
   }
@@ -277,7 +275,7 @@ export class AzureADService implements IidentityService {
         }
       }
     } catch (error: any) {
-      //   console.log(error.response.status);
+        console.log(error.response);
 
       if(error.response.status == 400){
         throw new ValidationError("Error to access account.")
@@ -314,7 +312,7 @@ export class AzureADService implements IidentityService {
     throw new Error("Método não implementado");
   }
 
-  async changeUserPassword(userUID: string, newPassword: string): Promise<string> {
+  async resetUserPassword(userUID: string, newPassword: string): Promise<string> {
 
     try {
       const accessToken: string = await this.getAccessToken();

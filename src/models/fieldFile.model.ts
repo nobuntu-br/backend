@@ -11,15 +11,24 @@ export interface IFieldFileDatabaseModel extends BaseResourceModel {
 export interface IFieldFile extends BaseResourceModel {
   fieldType?: string;
   user?: User;
-  files?: File[] | number[];
+  files?: File[] ;
 }
 
 export class FieldFile extends BaseResourceModel implements IFieldFile {
   fieldType?: string;
   user?: User;
-  files?: File[] | number[];//eager loading | lazy loading
+  files?: File[];//eager loading | lazy loading
 
-  static fromJson(jsonData: any): FieldFile {
-    return Object.assign(new FieldFile(), jsonData);
+  constructor(input: IFieldFile){
+    super();
+    this.id = input.id;
+    this.fieldType = input.fieldType;
+    this.user = input.user;
+    this.files = input.files;
   }
+
+  static fromJson(jsonData: any): File {
+    return new FieldFile(jsonData);
+  }
+  
 }

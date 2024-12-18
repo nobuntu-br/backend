@@ -14,7 +14,7 @@ export class SendVerificationCodeToEmailUseCase {
 
     try {
 
-      const verificationEmail: IVerificationEmail | null = await this.verificationEmailRepository.findOne({
+      const verificationEmail: VerificationEmail | null = await this.verificationEmailRepository.findOne({
         email: input.email
       });
 
@@ -49,7 +49,7 @@ export class SendVerificationCodeToEmailUseCase {
         verificationCode: verificationCode,
         email: input.email,
         isVerified: false,
-        expirationDate: new Date(currentTime.getTime() + 10 * 60 * 1000)//Adiciona 10 minutos
+        expirationDate: new Date(currentTime.getTime() + 30 * 60 * 1000)//Adiciona 30 minutos
       }));
 
       return true;

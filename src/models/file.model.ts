@@ -23,7 +23,16 @@ export class File extends BaseResourceModel implements IFile {
   dataBlob?: Blob;
   fieldFile?: number;
 
+  constructor(input: IFile){
+    super();
+    this.id = input.id;
+    this.size = input.size;
+    this.extension = input.extension;
+    this.dataBlob = input.dataBlob;
+    this.fieldFile = input.fieldFile;
+  }
+
   static fromJson(jsonData: any): File {
-    return Object.assign(new File(), jsonData);
+    return new File(jsonData);
   }
 }

@@ -1,4 +1,4 @@
-export interface RegisterNewUserDTO {
+export interface signupDTO {
   userName: string;
   firstName: string;
   lastName: string;

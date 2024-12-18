@@ -9,7 +9,7 @@ import VerificationEmailRepository from "../repositories/verificationEmail.repos
 import { SendVerificationCodeToEmailUseCase } from "../useCases/user/sendVerificationCodeToEmail.useCase";
 import { ValidateEmailVerificationCodeUseCase } from "../useCases/user/validateEmailVerificationCode.useCase";
 import { EmailService } from "../services/email.service";
-import { ChangeUserPasswordUseCase } from "../useCases/user/changeUserPassword.useCase";
+import { ResetUserPasswordUseCase } from "../useCases/user/resetUserPassword.useCase";
 import { SendPasswordResetLinkToEmailUseCase } from "../useCases/user/sendPasswordResetLinkToEmail.useCase";
 import DatabasePermissionRepository from "../repositories/databasePermission.repository";
 import { InviteUserToApplicationUseCase } from "../useCases/user/inviteUserToApplication.useCase";
@@ -89,7 +89,7 @@ export class AuthenticationController {
     try {
 
       if (req.body.tenantConnection == undefined) {
-        throw new NotFoundError("Não foi definido tenant para uso.")
+        throw new NotFoundError("Não foi definido tenant para uso.");
       }
 
       const verificationEmailRepository: VerificationEmailRepository = new VerificationEmailRepository(req.body.tenantConnection);
@@ -140,12 +140,18 @@ export class AuthenticationController {
     }
   }
 
-  async changePassword(req: Request, res: Response, next: NextFunction) {
+  async resetPassword(req: Request, res: Response, next: NextFunction) {
     try {
 
+      if (req.body.tenantConnection == undefined) {
+        throw new NotFoundError("Não foi definido tenant para uso.")
+      }
+
       const azureADService: AzureADService = new AzureADService();
-      const changeUserPasswordUseCase: ChangeUserPasswordUseCase = new ChangeUserPasswordUseCase(azureADService);
-      const result = await changeUserPasswordUseCase.execute({ email: req.body.email, password: req.body.password });
+      const tokenGenerator: TokenGenerator = new TokenGenerator();
+      const userRepository: UserRepository = new UserRepository(req.body.tenantConnection);
+      const resetUserPasswordUseCase: ResetUserPasswordUseCase = new ResetUserPasswordUseCase(azureADService, tokenGenerator, userRepository);
+      const result = await resetUserPasswordUseCase.execute({ password: req.body.password, resetPasswordToken: req.body.changePasswordToken });
 
       return res.status(200).send(result);
     } catch (error) {

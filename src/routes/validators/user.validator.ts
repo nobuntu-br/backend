@@ -29,14 +29,6 @@ export const sendResetPasswordLinkToEmailValidator = [
   check('email').isEmail().withMessage('email is required'),
 ];
 
-export const changePasswordLinkValidator = [
-  check('email').isEmail().withMessage('email is required'),
-];
-
-export const changePasswordValidator = [
-  check('password').notEmpty().withMessage('password is required'),
-  check('email').isEmail().withMessage('email is required'),
-];
 
 export const findUserByUIDValidator = [
   param('UID').notEmpty().withMessage('UID is required')

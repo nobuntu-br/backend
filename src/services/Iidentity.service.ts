@@ -8,7 +8,7 @@ export interface IidentityService {
   createUser(user: IUser): Promise<IUser>;
   loginUser(username: string, password: string): Promise<SignInOutputDTO>;
   updateUser(user: IUser): Promise<IUser>;
-  changeUserPassword(userUID: string, newPassword: string): Promise<string>;
+  resetUserPassword(userUID: string, newPassword: string): Promise<string>;
   deleteUser(userID: string): Promise<string>;
   getUserImage(userID: string): any;
 }

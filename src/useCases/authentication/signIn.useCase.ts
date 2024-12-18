@@ -12,6 +12,8 @@ export class SignInUseCase {
   async execute(input: SignInDTO): Promise<SignInOutputDTO> {
     try {
       const user = await this.identityService.loginUser(input.email, input.password);
+      
+      //TODO verificar se o usuário está presente no grupo que dá permissão a aplicação para permitir ou não ele de realizar o acesso
 
       return user;
     } catch (error: any) {

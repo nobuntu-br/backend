@@ -1,6 +1,6 @@
 import { BaseResourceModel } from "./baseResource.model";
 
-export interface IUserDatabaseModel extends BaseResourceModel{
+export interface IUserDatabaseModel extends BaseResourceModel {
   UID?: string;
   tenantUID?: string;
   userName?: string;
@@ -12,7 +12,7 @@ export interface IUserDatabaseModel extends BaseResourceModel{
   password?: string;
 }
 
-export interface IUser extends BaseResourceModel{
+export interface IUser extends BaseResourceModel {
   UID?: string;
   tenantUID?: string;
   userName?: string;
@@ -26,7 +26,7 @@ export interface IUser extends BaseResourceModel{
 
 export class User extends BaseResourceModel implements IUser {
   password?: string | undefined;
-  UID?: string;
+  UID?: string; //Isso é da Azure
   tenantUID?: string;
   userName?: string;
   firstName?: string;
@@ -35,11 +35,25 @@ export class User extends BaseResourceModel implements IUser {
   memberType?: string;
   email?: string;
 
-  static fromJson(jsonData: any) : User {
-    return Object.assign(new User(), jsonData);
+  constructor(data: IUser) {
+    super();
+    this.id = data.id;
+    this.password = data.password;
+    this.UID = data.UID;
+    this.tenantUID = data.tenantUID;
+    this.userName = data.userName;
+    this.firstName = data.firstName;
+    this.lastName = data.lastName;
+    this.isAdministrator = data.isAdministrator;
+    this.memberType = data.memberType;
+    this.email = data.email;
   }
 
-  // getFullName(){
-  //   return this.firstName+' '+this.lastName; 
-  // }
+  static fromJson(jsonData: any): User {
+    return new User(jsonData);
+  }
+
+  getFullName(){
+    return this.firstName+' '+this.lastName; 
+  }
 }

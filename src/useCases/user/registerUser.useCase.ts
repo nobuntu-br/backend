@@ -1,6 +1,6 @@
 import { NotFoundError } from "../../errors/notFound.error";
-import { RegisterNewUserDTO } from "../../models/DTO/registerNewUser.DTO";
-import { IUser } from "../../models/user.model";
+import { signupDTO } from "../../models/DTO/signup.DTO";
+import { IUser, User } from "../../models/user.model";
 import UserRepository from "../../repositories/user.repository";
 import { IidentityService } from "../../services/Iidentity.service";
 import { VerificationEmailService } from "../../services/verificationEmail.service";
@@ -15,14 +15,12 @@ export class RegisterUserUseCase {
     private tokenGenerator: TokenGenerator
   ) { }
 
-  async execute(input: RegisterNewUserDTO): Promise<IUser> {
+  async execute(input: signupDTO): Promise<IUser> {
     try {
 
       if (input.invitedTenantsToken != null) {
         //TODO tem que verificar se contém o JWT que informa se o usuário será cadastrado em um tenant diretamente
         const data = this.tokenGenerator.verifyToken(input.invitedTenantsToken);
-
-        console.log(data);
       }
 
       //Verifica se usuário já existe
@@ -47,16 +45,22 @@ export class RegisterUserUseCase {
         userWillBeAdministrator = true;
       }
 
+      const tenantUID = process.env.TENANT_ID;
+
+      if(tenantUID == undefined){
+        throw new Error("TENANT_ID environment variables not populed");
+      }
+
       //Registra o usuário no banco de dados
-      const newUser: IUser = await this.userRepository.create({
+      const newUser: IUser = await this.userRepository.create(new User({
         UID: user.UID,//UID do servidor de identidade
         userName: input.userName,
         firstName: input.firstName,
         lastName: input.lastName,
         isAdministrator: userWillBeAdministrator,
         email: input.email,
-        tenantUID: process.env.TENANT_ID
-      });
+        tenantUID: tenantUID
+      }));
 
       return newUser;
 
@@ -66,7 +70,7 @@ export class RegisterUserUseCase {
     }
   }
 
-  async registerUserOnIdentifyServer(input: RegisterNewUserDTO): Promise<IUser> {
+  async registerUserOnIdentifyServer(input: signupDTO): Promise<IUser> {
     return await this.identityService.createUser({
       email: input.email,
       firstName: input.firstName,

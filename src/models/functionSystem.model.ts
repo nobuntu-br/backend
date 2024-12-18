@@ -20,7 +20,16 @@ export class FunctionSystem extends BaseResourceModel implements IFunctionSystem
   method?: string;
   className?: string;
 
+  constructor(data: IFunctionSystem){
+    super();
+    this.id = data.id;
+    this.description = data.description;
+    this.route = data.route;
+    this.method = data.method;
+    this.className = data.className;
+  }
+
   static fromJson(jsonData: any) : FunctionSystem {
-    return Object.assign(new FunctionSystem(), jsonData);
+    return new FunctionSystem(jsonData);
   }
 }
