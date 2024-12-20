@@ -151,6 +151,10 @@ export class MongooseAdapter<TInterface, TClass> implements IDatabaseAdapter<TIn
     }
   }
 
+  async executeQuery(query: string): Promise<Object>{
+    throw new Error("Method not implemented");
+  }
+
   async findCustom(filterValues: any[], filterConditions: string[], model: Model<any>): Promise<TClass[] | null> {
     try{
       const items = await findDataByCustomQuery(filterValues, filterConditions, model);

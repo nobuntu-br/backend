@@ -54,6 +54,10 @@ export default abstract class BaseRepository<TInterface, TClass> implements IBas
     return this.adapter.deleteAll();
   }
 
+  executeQuery(query: string): Promise<Object> {
+    return this.adapter.executeQuery(query);
+  }
+
   findCustom(filterValues: FilterValue[], filterConditions: string[], model: any): Promise<TClass[] | null>{
     return this.adapter.findCustom(filterValues, filterConditions, model);
   }

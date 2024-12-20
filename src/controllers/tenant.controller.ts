@@ -5,6 +5,7 @@ import { ITenant, Tenant } from "../models/tenant.model";
 import { GetUserTenantsUseCase } from "../useCases/tenant/getUserTenants.useCase";
 import { NotFoundError } from "../errors/notFound.error";
 import DatabasePermissionRepository from "../repositories/databasePermission.repository";
+import { DatabaseType } from "../adapters/createDb.adapter";
 
 export class TenantController {
 
@@ -184,4 +185,21 @@ export class TenantController {
       next(error);
     }
   }
+
+  async getDatabaseType(req: Request, res: Response, next: NextFunction): Promise<any> {
+    try {
+      if (req.body.tenantConnection == undefined) {
+        throw new NotFoundError("Não foi definido tenant para uso.")
+      }
+      //O Service será criado com base no tipo de banco de dados e o model usado
+      const tenantService: TenantService = new TenantService(req.body.tenantConnection);
+
+      const databaseType : DatabaseType = tenantService.getDatabaseType();
+
+      return res.status(200).send(databaseType);
+    } catch (error) {
+      next(error);
+    }
+  }
+
 }

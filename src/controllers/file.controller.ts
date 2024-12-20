@@ -13,7 +13,7 @@ export class FileController {
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
     const  fileService : FileService = new FileService(req.body.tenantConnection); 
-    const baseController : BaseController<IFile, File> = new BaseController(fileService,  "file"); 
+    const baseController : BaseController<IFile, File> = new BaseController(fileService,  "File"); 
 
     baseController.create(req, res, next); 
     } catch (error) { 
@@ -28,7 +28,7 @@ export class FileController {
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
     const  fileService : FileService = new FileService(req.body.tenantConnection); 
-    const baseController : BaseController<IFile, File> = new BaseController(fileService,  "file"); 
+    const baseController : BaseController<IFile, File> = new BaseController(fileService,  "File"); 
 
     baseController.findAll(req, res, next); 
     } catch (error) { 
@@ -43,7 +43,7 @@ export class FileController {
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
     const  fileService : FileService = new FileService(req.body.tenantConnection); 
-    const baseController : BaseController<IFile, File> = new BaseController(fileService,  "file"); 
+    const baseController : BaseController<IFile, File> = new BaseController(fileService,  "File"); 
 
     baseController.findById(req, res, next); 
     } catch (error) { 
@@ -58,7 +58,7 @@ export class FileController {
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
     const  fileService : FileService = new FileService(req.body.tenantConnection); 
-    const baseController : BaseController<IFile, File> = new BaseController(fileService,  "file"); 
+    const baseController : BaseController<IFile, File> = new BaseController(fileService,  "File"); 
 
     baseController.update(req, res, next); 
     } catch (error) { 
@@ -73,7 +73,7 @@ export class FileController {
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
     const  fileService : FileService = new FileService(req.body.tenantConnection); 
-    const baseController : BaseController<IFile, File> = new BaseController(fileService,  "file"); 
+    const baseController : BaseController<IFile, File> = new BaseController(fileService,  "File"); 
 
     baseController.getCount(req, res, next); 
     } catch (error) { 
@@ -88,7 +88,7 @@ export class FileController {
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
     const  fileService : FileService = new FileService(req.body.tenantConnection); 
-    const baseController : BaseController<IFile, File> = new BaseController(fileService,  "file"); 
+    const baseController : BaseController<IFile, File> = new BaseController(fileService,  "File"); 
 
     baseController.delete(req, res, next); 
     } catch (error) { 
@@ -103,7 +103,7 @@ export class FileController {
       } 
       //O Service será criado com base no tipo de banco de dados e o model usado 
     const  fileService : FileService = new FileService(req.body.tenantConnection); 
-    const baseController : BaseController<IFile, File> = new BaseController(fileService,  "file"); 
+    const baseController : BaseController<IFile, File> = new BaseController(fileService,  "File"); 
 
       baseController.findCustom(req, res, next); 
     } catch (error) { 

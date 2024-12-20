@@ -3,6 +3,7 @@ import TenantRepository from "../repositories/tenant.repository";
 import DatabasePermissionRepository from "../repositories/databasePermission.repository";
 import BaseService from "./base.service";
 import TenantConnection from "../models/tenantConnection.model";
+import { DatabaseType } from "../adapters/createDb.adapter";
 
 export default class TenantService extends BaseService<ITenant, Tenant> {
   private tenantRepository: TenantRepository;
@@ -27,6 +28,10 @@ export default class TenantService extends BaseService<ITenant, Tenant> {
    */
   async findTenantsUserIsAdmin(userUID: string): Promise<Tenant[]> {
     return this.databasePermissionRepository.findTenantsUserIsAdmin(userUID);
+  }
+
+  getDatabaseType(): DatabaseType {
+    return this.databaseType;
   }
 
 }

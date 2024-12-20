@@ -184,4 +184,17 @@ export class BaseController<TInterface, TClass> implements IBaseController {
     }
   }
 
+  async executeQuery(req: Request, res: Response, next: NextFunction): Promise<any> {
+    try {
+      const data = await this.service.executeQuery(req.body.query);
+      if (!data){
+        return res.status(404).send({ message: "A entidade com id " + req.params.id + " não foi encontrada!" });
+      }
+
+      return res.status(200).send(data);
+    } catch (error) {
+      next(error);
+    }
+  }
+
 }

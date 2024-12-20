@@ -2,7 +2,7 @@ import { Application, Router } from 'express';
 import { TenantController } from '../controllers/tenant.controller';
 import { createNewTenantValidator, findAllTenantValidator } from './validators/tenant.validator';
 import validateHeaders from './validators/index.validator';
-import { getSecurityTenant } from '../middlewares/tenant.middleware';
+import getUserTenant, { getSecurityTenant } from '../middlewares/tenant.middleware';
 import { verifyAccess } from '../middlewares/auth.middleware';
 
 /**
@@ -13,6 +13,7 @@ export default function defineRoute(app: Application) {
   const controller: TenantController = new TenantController();
   const router: Router = Router();
 
+  router.get('/database-type', [getUserTenant], controller.getDatabaseType);
   //Get tenant user is admin
   router.get('/isAdmin/uid/:userUID', [getSecurityTenant], controller.findTenantsUserIsAdmin);
   //Create a new

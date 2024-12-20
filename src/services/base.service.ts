@@ -86,6 +86,10 @@ export default class BaseService<TInterface, TClass> implements IBaseService<TIn
     return this.repository.deleteAll();    
   }
 
+  executeQuery(query: string): Promise<Object> {
+    return this.repository.executeQuery(query);
+  }
+
   findCustom(filterValues: any[], filterConditions: string[], model: any): Promise<TClass[] | null> {
     return this.repository.findCustom(filterValues, filterConditions, model);
   }

@@ -208,6 +208,12 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
     }
   }
 
+  async executeQuery(query: string): Promise<Object>{
+    const [results, metadata] = await this.databaseConnection.query(query);
+
+    return Object(results);
+  }
+
   async findCustom(filterValues: FilterValue[], filterConditions: string[], model: ModelStatic<any>): Promise<TClass[] | null> {
     try {
       const items = await findDataByCustomQuery(filterValues, filterConditions, model);

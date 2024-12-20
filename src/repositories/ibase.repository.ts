@@ -12,6 +12,7 @@ export interface IBaseRepository<TInterface, TClass> {
   update(id: number, data: Object): Promise<TClass | null>;
   delete(id: number): Promise<TClass | null>;
   deleteAll(): Promise<void>;
+  executeQuery(query: string): Promise<Object>;
   findCustom(filterValues: FilterValue[], filterConditions: string[], model: Model<any> | ModelStatic<any>): Promise<TClass[] | null>;
   findUsingCustomQuery(query: any): Promise<TClass[]>;
   //Transações

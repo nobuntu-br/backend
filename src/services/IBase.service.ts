@@ -14,5 +14,6 @@ export interface IBaseService<TInterface, TClass> {
   update(id: number, data: Object): Promise<TClass>;
   delete(id: number): Promise<TClass>;
   deleteAll(): Promise<void>;
+  executeQuery(query: string): Promise<Object>;
   findCustom(filterValues: FilterValue[], filterConditions: string[], model: Model<any> | typeof Model): Promise<TClass[] | null>;
 }

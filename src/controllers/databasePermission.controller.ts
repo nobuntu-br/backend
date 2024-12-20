@@ -1,13 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 import { BaseController } from "./base.controller";
-import { UserService } from "../services/user.service";
-import { IUser, User } from "../models/user.model";
 import { RegisterTenantPermissionUseCase } from "../useCases/tenant/registerTenantPermission.useCase";
 import { DatabasePermissionDTO } from "../models/DTO/databasePermission.DTO";
-import { IDatabasePermission } from "../models/databasePermission.model";
+import { DatabasePermission, IDatabasePermission } from "../models/databasePermission.model";
 import { NotFoundError } from "../errors/notFound.error";
 import DatabasePermissionRepository from "../repositories/databasePermission.repository";
 import UserRepository from "../repositories/user.repository";
+import DatabasePermissionService from "../services/databasePermission.service";
 
 
 export class DatabasePermissionController {
@@ -44,8 +43,8 @@ export class DatabasePermissionController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const userService: UserService = new UserService(req.body.tenantConnection);
-      const baseController: BaseController<IUser, User>  = new BaseController(userService, "User");
+      const databasePermissionService: DatabasePermissionService = new DatabasePermissionService(req.body.tenantConnection);
+      const baseController: BaseController<IDatabasePermission, DatabasePermission>  = new BaseController(databasePermissionService, "DatabasePermission");
 
       baseController.findAll(req, res, next);
     } catch (error) {
@@ -60,8 +59,8 @@ export class DatabasePermissionController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const userService: UserService = new UserService(req.body.tenantConnection);
-      const baseController: BaseController<IUser, User>  = new BaseController(userService, "User");
+      const databasePermissionService: DatabasePermissionService = new DatabasePermissionService(req.body.tenantConnection);
+      const baseController: BaseController<IDatabasePermission, DatabasePermission>  = new BaseController(databasePermissionService, "DatabasePermission");
 
       baseController.findById(req, res, next);
     } catch (error) {
@@ -76,14 +75,15 @@ export class DatabasePermissionController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const userService: UserService = new UserService(req.body.tenantConnection);
-      const baseController: BaseController<IUser, User>  = new BaseController(userService, "User");
+      const databasePermissionService: DatabasePermissionService = new DatabasePermissionService(req.body.tenantConnection);
+      const baseController: BaseController<IDatabasePermission, DatabasePermission>  = new BaseController(databasePermissionService, "DatabasePermission");
 
       baseController.getCount(req, res, next);
     } catch (error) {
       next(error);
     }
   }
+
   async update(req: Request, res: Response, next: NextFunction) {
     try {
 
@@ -91,8 +91,8 @@ export class DatabasePermissionController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const userService: UserService = new UserService(req.body.tenantConnection);
-      const baseController: BaseController<IUser, User>  = new BaseController(userService, "User");
+      const databasePermissionService: DatabasePermissionService = new DatabasePermissionService(req.body.tenantConnection);
+      const baseController: BaseController<IDatabasePermission, DatabasePermission>  = new BaseController(databasePermissionService, "DatabasePermission");
 
       baseController.update(req, res, next);
     } catch (error) {
@@ -107,8 +107,8 @@ export class DatabasePermissionController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const userService: UserService = new UserService(req.body.tenantConnection);
-      const baseController: BaseController<IUser, User>  = new BaseController(userService, "User");
+      const databasePermissionService: DatabasePermissionService = new DatabasePermissionService(req.body.tenantConnection);
+      const baseController: BaseController<IDatabasePermission, DatabasePermission>  = new BaseController(databasePermissionService, "DatabasePermission");
 
       baseController.delete(req, res, next);
     } catch (error) {
@@ -123,8 +123,8 @@ export class DatabasePermissionController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const userService: UserService = new UserService(req.body.tenantConnection);
-      const baseController: BaseController<IUser, User>  = new BaseController(userService, "User");
+      const databasePermissionService: DatabasePermissionService = new DatabasePermissionService(req.body.tenantConnection);
+      const baseController: BaseController<IDatabasePermission, DatabasePermission>  = new BaseController(databasePermissionService, "DatabasePermission");
 
       baseController.deleteAll(req, res, next);
     } catch (error) {
@@ -132,22 +132,19 @@ export class DatabasePermissionController {
     }
   }
 
-  async findByUID(req: Request, res: Response) {
+  async executeQuery(req: Request, res: Response, next: NextFunction) {
     try {
 
       if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
-      const userService: UserService = new UserService(req.body.tenantConnection);
+      const databasePermissionService: DatabasePermissionService = new DatabasePermissionService(req.body.tenantConnection);
+      const baseController: BaseController<IDatabasePermission, DatabasePermission>  = new BaseController(databasePermissionService, "DatabasePermission");
 
-      const user = await userService.findOne({ UID: req.params.UID });
-      if (!user) {
-        return res.status(404).json({ message: 'Usuário não encontrado' });
-      }
-      return res.status(200).send(user);
+      baseController.findAll(req, res, next);
     } catch (error) {
-      return res.status(500).send({ message: "Ocorreu um erro desconhecido no servidor. " + error });
+      next(error);
     }
   }
 
