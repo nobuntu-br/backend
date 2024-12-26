@@ -6,17 +6,19 @@ import { IidentityService } from "../services/Iidentity.service";
 import { AzureADService } from "../services/azureAD.service";
 import { SignInUseCase } from "../useCases/authentication/signIn.useCase";
 import VerificationEmailRepository from "../repositories/verificationEmail.repository";
-import { SendVerificationCodeToEmailUseCase } from "../useCases/user/sendVerificationCodeToEmail.useCase";
-import { ValidateEmailVerificationCodeUseCase } from "../useCases/user/validateEmailVerificationCode.useCase";
+import { SendVerificationCodeToEmailUseCase } from "../useCases/authentication/sendVerificationCodeToEmail.useCase";
+import { ValidateEmailVerificationCodeUseCase } from "../useCases/authentication/validateEmailVerificationCode.useCase";
 import { EmailService } from "../services/email.service";
-import { ResetUserPasswordUseCase } from "../useCases/user/resetUserPassword.useCase";
+import { ResetUserPasswordUseCase } from "../useCases/authentication/resetUserPassword.useCase";
 import { SendPasswordResetLinkToEmailUseCase } from "../useCases/user/sendPasswordResetLinkToEmail.useCase";
 import DatabasePermissionRepository from "../repositories/databasePermission.repository";
 import { InviteUserToApplicationUseCase } from "../useCases/user/inviteUserToApplication.useCase";
 import { TokenGenerator } from "../utils/tokenGenerator";
 import { VerificationEmailService } from "../services/verificationEmail.service";
 import { RegisterUserUseCase } from "../useCases/user/registerUser.useCase";
-import { CheckEmailExistUseCase } from "../useCases/user/checkEmailExist.useCase";
+import { CheckEmailExistUseCase } from "../useCases/authentication/checkEmailExist.useCase";
+import { ValidateAccessTokenUseCase } from "../useCases/authentication/validateAccessToken.useCase";
+import { UnauthorizedError } from "../errors/unauthorized.error";
 
 export class AuthenticationController {
 
@@ -71,13 +73,54 @@ export class AuthenticationController {
         throw new NotFoundError("Não foi definido tenant para uso.");
       }
 
-      const userRepository: UserRepository = new UserRepository(req.body.tenantConnection);
       const identityService: IidentityService = new AzureADService();
 
-      const refreshTokenUseCase: RefreshTokenUseCase = new RefreshTokenUseCase(userRepository, identityService);
-      const response = refreshTokenUseCase.execute({
+      const refreshTokenUseCase: RefreshTokenUseCase = new RefreshTokenUseCase(identityService);
+      const response = await refreshTokenUseCase.execute({
         refreshToken: req.body.refreshToken
       });
+
+      return res.status(200).send(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async silentSingleSignOn(req: Request, res: Response, next: NextFunction) {
+    try {
+
+      const JWKsUri: string | undefined = process.env.JWKsUri;
+
+      if (JWKsUri == undefined) {
+        throw new Error("Não foi possível obter o link para obter o Java Web Key Set (Chaves para validar o token) das variáveis ambiente");
+      }
+
+      const issuer: string | undefined = process.env.AZURE_ISSUER;
+      
+      if(issuer == undefined){
+        throw new NotFoundError("Issuer not populated on environment variables.");
+      }
+
+      const clientId: string | undefined = process.env.AZURE_CLIENT_ID;
+
+      if(clientId == undefined){
+        throw new NotFoundError("Client Id not populated on environment variables.");
+      }
+
+      const authorizationHeader = req.headers['authorization'];
+      
+      if(authorizationHeader == undefined || authorizationHeader == null || authorizationHeader == ""){
+        throw new UnauthorizedError("Access token invalid.");
+      }
+
+      const accessToken = authorizationHeader && authorizationHeader.split(' ')[1];
+
+      if(accessToken == undefined){
+        throw new UnauthorizedError("Access token invalid.");
+      }
+
+      const validateAccessTokenUseCase: ValidateAccessTokenUseCase = new ValidateAccessTokenUseCase();
+      const response = await validateAccessTokenUseCase.execute(accessToken, { issuer: issuer, audience: clientId });
 
       return res.status(200).send(response);
     } catch (error) {
@@ -191,11 +234,11 @@ export class AuthenticationController {
       if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
-      
+
       const azureADService: AzureADService = new AzureADService();
       const checkEmailExistUseCase: CheckEmailExistUseCase = new CheckEmailExistUseCase(azureADService);
       const emailIsValid = await checkEmailExistUseCase.execute(req.body);
-      
+
       return res.status(200).send(emailIsValid);
     } catch (error) {
       next(error);

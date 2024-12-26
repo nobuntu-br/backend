@@ -1,6 +1,9 @@
 import { EmailService } from '../../services/email.service';
-import { SendResetPasswordLinkToEmailDTO } from '../../models/DTO/sendResetPasswordLinkToEmail.DTO';
 import { TokenGenerator } from '../../utils/tokenGenerator';
+
+export type SendPasswordResetLinkToEmailInputDTO = {
+  email: string;
+}
 
 export class SendPasswordResetLinkToEmailUseCase {
   constructor(
@@ -8,7 +11,7 @@ export class SendPasswordResetLinkToEmailUseCase {
     private tokenGenerator: TokenGenerator
   ) { }
 
-  async execute(input: SendResetPasswordLinkToEmailDTO): Promise<boolean> {
+  async execute(input: SendPasswordResetLinkToEmailInputDTO): Promise<boolean> {
 
     const applicationName = process.env.APPLICATION_NAME;
     const resetAccountPasswordPath = process.env.RESET_ACCOUNT_PASSWORD_PATH;

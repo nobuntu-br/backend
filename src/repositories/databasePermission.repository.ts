@@ -3,10 +3,10 @@ import createDbAdapter from "../adapters/createDb.adapter";
 import { IDatabaseAdapter } from "../adapters/IDatabase.adapter";
 import { DatabasePermission, IDatabasePermissionDatabaseModel } from "../models/databasePermission.model";
 import BaseRepository from "./base.repository";
-import { DatabasePermissionDetailOutputDTO } from "../models/DTO/databasePermission.DTO";
 import TenantConnection from "../models/tenantConnection.model";
 import { Tenant } from "../models/tenant.model";
 import { UnknownError } from "../errors/unknown.error";
+import { DatabasePermissionDetailOutputDTO } from "../useCases/tenant/getUserTenants.useCase";
 
 export default class DatabasePermissionRepository extends BaseRepository<IDatabasePermissionDatabaseModel, DatabasePermission> {
 

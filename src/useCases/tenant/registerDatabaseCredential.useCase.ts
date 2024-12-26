@@ -1,18 +1,41 @@
 import { encryptDatabasePassword } from '../../utils/crypto.util';
-import { DatabaseCredentialInputDTO } from '../../models/DTO/databaseCredential.DTO';
 import DatabasePermissionRepository from '../../repositories/databasePermission.repository';
 import DatabaseCredentialRepository from '../../repositories/databaseCredential.repository';
 import UserRepository from '../../repositories/user.repository';
 import { DatabaseCredential } from '../../models/databaseCredential.model';
+import { DatabaseType } from "../../adapters/createDb.adapter";
 
-export class RegisterTenantCredentialUseCase {
+type RegisterDatabaseCredentialInputDTO = {
+  name?: string;
+  type: DatabaseType;
+  username?: string;
+  password?: string;
+  host?: string;
+  port?: string;
+  srvEnabled: boolean; // Indica se usa protocolo SRV (mongodb)
+  options?: string;
+  storagePath?: string;
+  sslEnabled: boolean;
+  poolSize?: number;
+  timeOutTime?: number;
+
+  //SSL data
+  sslCertificateAuthority?: string; //Serve para verificar que o certificado apresentado pelo servidor ou cliente é confiável e foi emitido por uma CA válida.
+  sslPrivateKey?: string; //Usada para descriptografar mensagens recebidas e assinar mensagens enviadas. Deve ser mantido em segredo.
+  sslCertificate?: string; //Informações públicas, como o domínio, entidade responsável e a CertificateAuthority que o emitiu.
+
+  tenant?: number;
+  userUID?: string;
+}
+
+export class RegisterDatabaseCredentialUseCase {
   constructor(
     private databaseCredentialRepository: DatabaseCredentialRepository,
     private databasePermissionRepository: DatabasePermissionRepository,
     private userRepository: UserRepository
   ) { }
 
-  async execute(input: DatabaseCredentialInputDTO): Promise<string | Error> {
+  async execute(input: RegisterDatabaseCredentialInputDTO): Promise<string | Error> {
 
     try {
       //Verificar se o usuário é válido

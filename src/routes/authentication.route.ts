@@ -1,10 +1,9 @@
 import { Application, Router } from 'express';
 import { AuthenticationController } from '../controllers/authentication.controller';
 import validateHeaders from './validators/index.validator';
-import getUserTenant, { getSecurityTenant } from '../middlewares/tenant.middleware';
+import { getSecurityTenant } from '../middlewares/tenant.middleware';
 import { refreshTokenValidator, resetPasswordValidator, sendPasswordResetLintToEmailValidator } from './validators/authentication.validator';
 import { checkEmailExistValidator, createNewUserValidator, inviteUserValidator, sendVerificationEmailCodeValidator, signinValidator, validateVerificationEmailCodeValidator } from './validators/user.validator';
-import { verifyAccess } from '../middlewares/auth.middleware';
 
 /**
  * Irá definir as rotas da entidade
@@ -18,7 +17,9 @@ export default function defineRoute(app: Application) {
 
   router.post('/signin', [getSecurityTenant, ...signinValidator, validateHeaders], controller.signin);
 
-  router.get('/refresh-token', [...refreshTokenValidator, validateHeaders], controller.refreshToken);
+  router.get('/refresh-token', [ getSecurityTenant, ...refreshTokenValidator, validateHeaders], controller.refreshToken);
+
+  router.get('/silent-single-sign-on', controller.silentSingleSignOn);
 
   /**
    * Envia código de verificação para email

@@ -1,11 +1,11 @@
-import { ITenant, Tenant } from "../models/tenant.model";
+import { ITenantDatabaseModel, Tenant } from "../models/tenant.model";
 import TenantRepository from "../repositories/tenant.repository";
 import DatabasePermissionRepository from "../repositories/databasePermission.repository";
 import BaseService from "./base.service";
 import TenantConnection from "../models/tenantConnection.model";
 import { DatabaseType } from "../adapters/createDb.adapter";
 
-export default class TenantService extends BaseService<ITenant, Tenant> {
+export default class TenantService extends BaseService<ITenantDatabaseModel, Tenant> {
   private tenantRepository: TenantRepository;
   private databasePermissionRepository: DatabasePermissionRepository;
 

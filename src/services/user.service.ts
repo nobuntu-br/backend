@@ -1,10 +1,9 @@
-import { NotFoundError } from "../errors/notFound.error";
 import TenantConnection from "../models/tenantConnection.model";
-import { IUser, User } from "../models/user.model";
+import { IUserDatabaseModel, User } from "../models/user.model";
 import UserRepository from "../repositories/user.repository";
 import BaseService from "./base.service";
 
-export class UserService extends BaseService<IUser, User> {
+export class UserService extends BaseService<IUserDatabaseModel, User> {
   private userRepository: UserRepository;
 
   constructor(tenantConnection: TenantConnection) {

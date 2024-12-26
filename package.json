@@ -29,6 +29,7 @@
     "fs-extra": "^11.2.0",
     "jsonwebtoken": "^9.0.2",
     "jwk-to-pem": "^2.0.5",
+    "jwks-rsa": "^3.1.0",
     "moment-timezone": "^0.5.45",
     "mongoose": "^8.4.5",
     "mysql2": "^3.11.0",

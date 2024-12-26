@@ -1,9 +1,9 @@
-import { FunctionSystemRole, IFunctionSystemRole } from "../models/functionSystemRole.model";
+import { FunctionSystemRole, IFunctionSystemRoleDatabaseModel } from "../models/functionSystemRole.model";
 import TenantConnection from "../models/tenantConnection.model";
 import FunctionSystemRoleRepository from "../repositories/functionSystemRole.repository";
 import BaseService from "./base.service";
 
-export class FunctionSystemRoleService extends BaseService<IFunctionSystemRole, FunctionSystemRole> {
+export class FunctionSystemRoleService extends BaseService<IFunctionSystemRoleDatabaseModel, FunctionSystemRole> {
   private functionSystemRoleRepository: FunctionSystemRoleRepository;
 
   constructor(tenantConnection: TenantConnection) {

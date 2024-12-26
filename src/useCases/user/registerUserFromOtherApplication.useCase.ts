@@ -1,7 +1,9 @@
-import { RegisterUserFromOtherApplicationDTO } from "../../models/DTO/registerUserFromOtherApplication.DTO";
-import { IUser } from "../../models/user.model";
 import { IidentityService } from "../../services/Iidentity.service";
 import { UserService } from "../../services/user.service";
+
+export type RegisterUserFromOtherApplicationInputDTO = {
+  accessToken: string;
+}
 
 export class RegisterUserFromOtherApplicationUseCase {
 
@@ -10,7 +12,7 @@ export class RegisterUserFromOtherApplicationUseCase {
     private identityService: IidentityService
   ) {}
 
-  async execute(input: RegisterUserFromOtherApplicationDTO): Promise<any> {
+  async execute(input: RegisterUserFromOtherApplicationInputDTO): Promise<any> {
     throw new Error("Method not implemented yet");
 
     //TODO obter o token de acesso do usuário

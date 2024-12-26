@@ -1,10 +1,10 @@
 import { myCache } from "../config/database.config";
-import { DatabasePermission, IDatabasePermission } from "../models/databasePermission.model";
+import { DatabasePermission, IDatabasePermissionDatabaseModel } from "../models/databasePermission.model";
 import TenantConnection from "../models/tenantConnection.model";
 import DatabasePermissionRepository from "../repositories/databasePermission.repository";
 import BaseService from "./base.service";
 
-export default class DatabasePermissionService extends BaseService<IDatabasePermission, DatabasePermission> {
+export default class DatabasePermissionService extends BaseService<IDatabasePermissionDatabaseModel, DatabasePermission> {
   private databasePermissionRepository: DatabasePermissionRepository;
 
   constructor(tenantConnection: TenantConnection) {

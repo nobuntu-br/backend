@@ -1,10 +1,9 @@
-import { DatabaseType } from "../adapters/createDb.adapter";
-import { FunctionSystem, IFunctionSystem } from "../models/functionSystem.model";
+import { FunctionSystem, IFunctionSystemDatabaseModel } from "../models/functionSystem.model";
 import TenantConnection from "../models/tenantConnection.model";
 import FunctionSystemRepository from "../repositories/functionSystem.repository";
 import BaseService from "./base.service";
 
-export class FunctionSystemService extends BaseService<IFunctionSystem, FunctionSystem> {
+export class FunctionSystemService extends BaseService<IFunctionSystemDatabaseModel, FunctionSystem> {
   private functionSystemRepository: FunctionSystemRepository;
 
   constructor(tenantConnection: TenantConnection) {

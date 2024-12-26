@@ -15,6 +15,8 @@ export default function defineRoute(app: Application) {
 
   router.get('/get-user-image/:id', controller.getUserImage);
 
+  router.get('/get-user-groups', controller.getUserGroups);
+
   //Criar novo usuário para salvar no banco de dados de alguma empresa
   router.post('/client/signup', [verifyAccess, getUserTenant], controller.createUserForSpecificTenant);
 

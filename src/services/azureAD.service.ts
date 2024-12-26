@@ -1,10 +1,11 @@
 import axios from "axios";
 import { NotFoundError } from "../errors/notFound.error";
 import { IUser } from "../models/user.model";
-import { SignInOutputDTO } from "../models/DTO/signin.DTO";
 import { IidentityService } from "./Iidentity.service";
-import { GetUserImageOutputDTO } from "../models/DTO/getUserImage.DTO";
 import { ValidationError } from "../errors/validation.error";
+import { SignInOutputDTO } from "../useCases/authentication/signIn.useCase";
+import { GetUserProfilePhotoOutputDTO } from "../useCases/user/getUserProfilePhoto.useCase";
+
 
 export interface IAzureAdUser {
   businessPhones: string[];
@@ -90,7 +91,6 @@ export class AzureADService implements IidentityService {
 
   async getUserGroups(userId: string): Promise<IAzureUserGroup[]> {
     try {
-
       const accessToken: string = await this.getAccessToken();
 
       const userResponse = await axios.get(this.graphAPIUrl + `v1.0/users/` + userId + `/memberOf`, {
@@ -99,6 +99,9 @@ export class AzureADService implements IidentityService {
           'Content-Type': 'application/json'
         }
       });
+
+      console.log("get user groups");
+      console.log(userResponse.data);
 
       //É retornado pela Azure um Array com todos os grupos que o usuário faz parte
       if (userResponse.data.value.length > 0 && userResponse.data.value[0] != null) {
@@ -115,7 +118,9 @@ export class AzureADService implements IidentityService {
       }
 
       throw new NotFoundError("Nenhum usuário encontrado");
-    } catch (error) {
+    } catch (error: any) {
+      console.log(error.data);
+      console.dir(error, { depth: null });
       throw error;
     }
   }
@@ -124,18 +129,16 @@ export class AzureADService implements IidentityService {
     const policies = 'b2c_1_ropc';
 
     try {
-      //TODO definir o link no .env também, muitas coisas pra por lá. ai ai
       const getTokenUrl = 'https://allystore.b2clogin.com/' + this.domainName + '/oauth2/v2.0/token?p=' + policies;
 
       const urlSearchParams = new URLSearchParams({
         client_id: this.clientId,
         refresh_token: refreshToken,
-        // scope: 'https://' + this.domainName + '/tasks-api2/tasks.read openid' + " offline_access",
-        scope: 'https://' + this.domainName + this.scope + ' openid offline_access',
+        scope: this.scope,
         grant_type: 'refresh_token'
       });
 
-      // Obter o access token
+      // Realiza a requisição no servidor da Azure para obter o novo access token
       const tokenResponse = await axios.post(getTokenUrl, urlSearchParams.toString(), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -245,7 +248,7 @@ export class AzureADService implements IidentityService {
       'username': username,
       'password': password,
       // deve incluir openid para obter o token de ID e offline_access para obter o refresh token
-      'scope': this.scope + ' openid offline_access' //Esse é o padrão
+      'scope': this.scope + ' openid offline_access'
     });
 
     try {
@@ -403,12 +406,12 @@ export class AzureADService implements IidentityService {
     }
   }
 
-  async getUserImage(userID: string): Promise<GetUserImageOutputDTO> {
+  async getUserProfilePhoto(userID: string): Promise<GetUserProfilePhotoOutputDTO> {
     try {
       const accessToken: string = await this.getAccessToken();
 
-      // Buscar o usuário pelo e-mail usando filtro, incluindo otherMails
-      const userResponse = await axios.get(this.graphAPIUrl + "v1.0/users/" + userID + "/photo/$value", {
+      // Requisição para obter imagem de perfil do usuário no servidor da Azure
+      const userResponse = await axios.get(this.graphAPIUrl + "v1.0/users/" + userID + "/photo", {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json'
@@ -418,6 +421,26 @@ export class AzureADService implements IidentityService {
       console.dir(userResponse.data, { depth: null });
 
       return { imageUrl: "ddd" };
+
+      throw new NotFoundError("Nenhum usuário encontrado");
+    } catch (error: any) {
+      console.dir(error.response.data, { depth: null });
+      throw error;
+    }
+  }
+
+  //Requer permissão User.ReadWrite.All ativo
+  async updateUserProfilePhoto(accessToken: string, photoBlob: Blob): Promise<boolean>{
+    try {
+      // Requisição para alterar imagem de perfil do usuário no servidor da Azure
+      const userResponse = await axios.put(this.graphAPIUrl + "v1.0/me/photo/$value", photoBlob, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': "image/jpeg"
+        }
+      });
+
+      return true;
 
       throw new NotFoundError("Nenhum usuário encontrado");
     } catch (error: any) {

@@ -1,9 +1,9 @@
 import TenantConnection from "../models/tenantConnection.model";
-import { IVerificationEmail, VerificationEmail } from "../models/verificationEmail.model";
+import { IVerificationEmailDatabaseModel, VerificationEmail } from "../models/verificationEmail.model";
 import VerificationEmailRepository from "../repositories/verificationEmail.repository";
 import BaseService from "./base.service";
 
-export class VerificationEmailService extends BaseService<IVerificationEmail, VerificationEmail> {
+export class VerificationEmailService extends BaseService<IVerificationEmailDatabaseModel, VerificationEmail> {
   private verificationEmailRepository: VerificationEmailRepository;
 
   constructor(tenantConnection: TenantConnection) {

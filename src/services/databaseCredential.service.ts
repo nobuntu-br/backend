@@ -1,9 +1,9 @@
-import { DatabaseCredential, IDatabaseCredential } from "../models/databaseCredential.model";
+import { DatabaseCredential, IDatabaseCredentialDatabaseModel } from "../models/databaseCredential.model";
 import TenantConnection from "../models/tenantConnection.model";
 import DatabaseCredentialRepository from "../repositories/databaseCredential.repository";
 import BaseService from "./base.service";
 
-export class DatabaseCredentialService extends BaseService<IDatabaseCredential, DatabaseCredential> {
+export class DatabaseCredentialService extends BaseService<IDatabaseCredentialDatabaseModel, DatabaseCredential> {
   private databaseCredentialRepository: DatabaseCredentialRepository; 
 
   constructor(tenantConnection: TenantConnection) {

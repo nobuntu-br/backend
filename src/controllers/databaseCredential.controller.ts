@@ -2,11 +2,11 @@ import { NextFunction, Request, Response } from "express";
 import { BaseController } from "./base.controller";
 import { DatabaseCredentialService } from "../services/databaseCredential.service";
 import { DatabaseCredential, IDatabaseCredential } from "../models/databaseCredential.model";
-import { RegisterTenantCredentialUseCase } from "../useCases/tenant/registerTenantCredential.useCase";
 import { NotFoundError } from "../errors/notFound.error";
 import DatabaseCredentialRepository from "../repositories/databaseCredential.repository";
 import UserTenantRepository from "../repositories/databasePermission.repository";
 import UserRepository from "../repositories/user.repository";
+import { RegisterDatabaseCredentialUseCase } from "../useCases/tenant/registerDatabaseCredential.useCase";
 
 
 export class DatabaseCredentialController {
@@ -23,9 +23,9 @@ export class DatabaseCredentialController {
       const userRepository: UserRepository = new UserRepository(req.body.tenantConnection);
 
       //Use case para realizar operações mais complexas
-      const registerTenantCredentialUseCase: RegisterTenantCredentialUseCase = new RegisterTenantCredentialUseCase(tenantCredentialRepository, userTenantRepository, userRepository);
+      const registerDatabaseCredentialUseCase: RegisterDatabaseCredentialUseCase = new RegisterDatabaseCredentialUseCase(tenantCredentialRepository, userTenantRepository, userRepository);
 
-      const data = await registerTenantCredentialUseCase.execute({
+      const data = await registerDatabaseCredentialUseCase.execute({
         name: req.body.databaseName,
         type: req.body.databaseType,
         username: req.body.databaseUsername,

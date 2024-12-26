@@ -1,8 +1,4 @@
 import { Application, Router } from 'express';
-import validateHeaders from './validators/index.validator';
-import getUserTenant from '../middlewares/tenant.middleware';
-import { createNewOrderValidator, findAllOrderValidator } from './validators/order.validator';
-import { verifyAccess } from '../middlewares/auth.middleware';
 import { ApplicationController } from '../controllers/application.controller';
 
 /**

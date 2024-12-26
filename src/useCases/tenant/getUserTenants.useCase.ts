@@ -1,6 +1,18 @@
 import { NotFoundError } from "../../errors/notFound.error";
-import { DatabasePermissionDetailOutputDTO } from "../../models/DTO/databasePermission.DTO";
 import UserTenantRepository from "../../repositories/databasePermission.repository";
+
+export type DatabasePermissionDetailOutputDTO = {
+  tenant: {
+    id: number,
+    name: string
+  };
+  databaseCredential: {
+    id: number,
+
+  };
+  userUID: string;
+  isAdmin?: boolean;
+}
 
 export class GetUserTenantsUseCase {
   constructor(

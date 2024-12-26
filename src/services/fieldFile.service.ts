@@ -1,9 +1,9 @@
 import FieldFileRepository from "../repositories/fieldFile.repository";
-import { FieldFile, IFieldFile } from "../models/fieldFile.model";
+import { FieldFile, IFieldFile, IFieldFileDatabaseModel } from "../models/fieldFile.model";
 import BaseService from "./base.service";
 import TenantConnection from "../models/tenantConnection.model";
 
-export class FieldFileService extends BaseService<IFieldFile, FieldFile> {
+export class FieldFileService extends BaseService<IFieldFileDatabaseModel, FieldFile> {
   private fieldFileRepository: FieldFileRepository;
 
   constructor(tenantConnection: TenantConnection) {

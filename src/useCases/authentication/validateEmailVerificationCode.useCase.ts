@@ -1,14 +1,17 @@
 import { NotFoundError } from "../../errors/notFound.error";
-import { ValidateEmailVerificationCodeDTO } from "../../models/DTO/validateEmailVerificationCode.DTO";
 import { IVerificationEmail } from "../../models/verificationEmail.model";
 import VerificationEmailRepository from "../../repositories/verificationEmail.repository";
+
+export type ValidateEmailVerificationCodeInputDTO = {
+  verificationEmailCode: string;
+}
 
 export class ValidateEmailVerificationCodeUseCase {
   constructor(
     private verificationEmailRepository: VerificationEmailRepository 
   ) {}
 
-  async execute(input: ValidateEmailVerificationCodeDTO): Promise<boolean> {
+  async execute(input: ValidateEmailVerificationCodeInputDTO): Promise<boolean> {
 
     try {
       //Encontrar o código de email que foi enviado para o email do usuário
