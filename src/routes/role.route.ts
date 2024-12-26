@@ -2,7 +2,7 @@ import { Application, Router } from 'express';
 import { RoleController } from '../controllers/role.controller';
 import validateHeaders from './validators/index.validator';
 import { createNewRoleValidator, findAllRoleValidator } from './validators/role.validator';
-import changeTenant from '../middlewares/tenant.middleware';
+import getUserTenant from '../middlewares/tenant.middleware';
 
 /**
  * Irá definir as rotas da entidade
@@ -13,7 +13,7 @@ export default function defineRoute(app: Application){
   const router: Router = Router();
   
   //Create a new
-  router.post('/', [changeTenant, ...createNewRoleValidator, validateHeaders], controller.create);
+  router.post('/', [getUserTenant, ...createNewRoleValidator, validateHeaders], controller.create);
   //Find all
   router.get('/', [...findAllRoleValidator, validateHeaders], controller.findAll);
   //Find count

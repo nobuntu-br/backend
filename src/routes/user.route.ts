@@ -1,8 +1,9 @@
 import { Application, Router } from 'express';
 import validateHeaders from './validators/index.validator';
 import { UserController } from '../controllers/user.controller';
-import { checkEmailExistValidator, createNewUserValidator, findAllUserValidator, findUserByUIDValidator } from './validators/user.validator';
-import changeTenant, { getSecurityTenant } from '../middlewares/tenant.middleware';
+import { findAllUserValidator, findUserByUIDValidator } from './validators/user.validator';
+import getUserTenant, { getSecurityTenant } from '../middlewares/tenant.middleware';
+import { verifyAccess } from '../middlewares/auth.middleware';
 
 /**
  * Irá definir as rotas da entidade
@@ -12,11 +13,11 @@ export default function defineRoute(app: Application) {
   const controller: UserController = new UserController();
   const router: Router = Router();
 
+  router.get('/get-user-image/:id', controller.getUserImage);
 
-  // //Mandar o codigo de verificaocao
-  // router.post('/send-verification-code', controller.sendVerificationCodeToEmail);
-  //Create a new
-  router.post('/', [getSecurityTenant, ...createNewUserValidator, validateHeaders], controller.create);
+  //Criar novo usuário para salvar no banco de dados de alguma empresa
+  router.post('/client/signup', [verifyAccess, getUserTenant], controller.createUserForSpecificTenant);
+
   //Find all
   router.get('/', [getSecurityTenant, ...findAllUserValidator, validateHeaders], controller.findAll);
   //Find count
@@ -31,13 +32,6 @@ export default function defineRoute(app: Application) {
   router.delete('/all', controller.deleteAll);
   //Delete
   router.delete('/:id', controller.delete);
-
-  router.post('/check-email-exist', [...checkEmailExistValidator, validateHeaders], controller.checkEmailExist);
-
-  router.post('/send-verification-email-code', [...findAllUserValidator, validateHeaders], controller.sendVerificationEmailCodeToEmail);
-
-  router.post('/validate-vericiation-email-code', [...findAllUserValidator, validateHeaders], controller.validateVerificationEmailCode);
-  //TODO adicionar rota de pegar item de forma paginada
 
   app.use('/api/user', router);
 } 

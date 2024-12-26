@@ -1,26 +1,59 @@
-import { BaseResourceModel } from "./base-resource.model";
+import { BaseResourceModel } from "./baseResource.model";
 
-export interface IUser {
-  id?: string;
-  name?: string;
+export interface IUserDatabaseModel extends BaseResourceModel {
   UID?: string;
+  tenantUID?: string;
   userName?: string;
   firstName?: string;
   lastName?: string;
   isAdministrator?: boolean;
   memberType?: string;
+  email?: string;
+  password?: string;
+}
+
+export interface IUser extends BaseResourceModel {
+  UID?: string;
+  tenantUID?: string;
+  userName?: string;
+  firstName?: string;
+  lastName?: string;
+  isAdministrator?: boolean;
+  memberType?: string;
+  email?: string;
+  password?: string;
 }
 
 export class User extends BaseResourceModel implements IUser {
-  name?: string;
-  UID?: string;
+  password?: string | undefined;
+  UID?: string; //Isso é da Azure
+  tenantUID?: string;
   userName?: string;
   firstName?: string;
   lastName?: string;
   isAdministrator?: boolean;
   memberType?: string;
+  email?: string;
 
-  static fromJson(jsonData: any) : User {
-    return Object.assign(new User(), jsonData);
+  constructor(data: IUser) {
+    super();
+    this.id = data.id;
+    this.password = data.password;
+    this.UID = data.UID;
+    this.tenantUID = data.tenantUID;
+    this.userName = data.userName;
+    this.firstName = data.firstName;
+    this.lastName = data.lastName;
+    this.isAdministrator = data.isAdministrator;
+    this.memberType = data.memberType;
+    this.email = data.email;
+  }
+
+  static fromJson(jsonData: any): User {
+    return new User(jsonData);
+  }
+
+  getFullName(){
+    return this.firstName+' '+this.lastName; 
   }
 }

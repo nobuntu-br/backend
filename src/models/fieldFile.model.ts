@@ -1,19 +1,34 @@
-import { BaseResourceModel } from "./base-resource.model" 
+import { BaseResourceModel } from "./baseResource.model"
 import { File } from "./file.model";
 import { User } from "./user.model";
 
+export interface IFieldFileDatabaseModel extends BaseResourceModel {
+  fieldType?: string;
+  userId?: number;
+  filesId?: number[];
+}
 
-interface IFieldFile { 
-    fieldType?: string;
-    user?: User;
-    files?: File[];
-} 
-export class FieldFile extends BaseResourceModel implements IFieldFile{ 
-    fieldType?: string;
-    user?: User;
-    files?: File[];
+export interface IFieldFile extends BaseResourceModel {
+  fieldType?: string;
+  user?: User;
+  files?: File[] ;
+}
 
-  static fromJson(jsonData: any) : FieldFile { 
-    return Object.assign(new FieldFile(), jsonData); 
-  } 
+export class FieldFile extends BaseResourceModel implements IFieldFile {
+  fieldType?: string;
+  user?: User;
+  files?: File[];//eager loading | lazy loading
+
+  constructor(input: IFieldFile){
+    super();
+    this.id = input.id;
+    this.fieldType = input.fieldType;
+    this.user = input.user;
+    this.files = input.files;
+  }
+
+  static fromJson(jsonData: any): File {
+    return new FieldFile(jsonData);
+  }
+  
 }

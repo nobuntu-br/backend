@@ -1,17 +1,18 @@
-import { DbType } from "../adapters/createDb.adapter";
-import { Order } from "../models/order.model";
-import OrderRepository from "../repository/order.repository";
+import { IOrder, Order } from "../models/order.model";
+import TenantConnection from "../models/tenantConnection.model";
+import OrderRepository from "../repositories/order.repository";
 import BaseService from "./base.service";
 
-export default class OrderSercice extends BaseService<Order> {
+export default class OrderSercice extends BaseService<IOrder, Order> {
   private orderRepository: OrderRepository;
 
-  constructor(dbType: DbType, model: any, databaseConnection: any) {
+  constructor(tenantConnection: TenantConnection) {
     //Cria o repositório com dados para obter o banco de dados
-    var repository : OrderRepository = new OrderRepository(dbType, model, databaseConnection);
-    super(repository, dbType, model, databaseConnection);
+    let repository: OrderRepository = new OrderRepository(tenantConnection);
+    super(repository, tenantConnection);
 
     this.orderRepository = repository;
+
   }
 
 }

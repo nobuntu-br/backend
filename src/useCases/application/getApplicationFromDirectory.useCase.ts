@@ -1,35 +1,14 @@
 import axios from "axios";
+import { IidentityService } from "../../services/Iidentity.service";
 
 export class GetApplicationFromDirectoryUseCase {
-  constructor() { }
+  constructor(private identityService: IidentityService) { }
 
   async execute(): Promise<any | Error> {
 
-    const tokenUrl = `https://login.microsoftonline.com/${process.env.TENANT_ID}/oauth2/v2.0/token`;
-
-    const clientId = process.env.CLIENT_ID;
-    const clientSecret = process.env.CLIENT_SECRET;
-
-    if(clientId == undefined || clientSecret == undefined ){
-      return null;
-    }
-
-    const data = new URLSearchParams({
-      grant_type: 'client_credentials',
-      client_id: clientId,
-      client_secret: clientSecret,
-      scope: 'https://graph.microsoft.com/.default'
-    });
-
     try {
-      // Obter o access token
-      const tokenResponse = await axios.post(tokenUrl, data.toString(), {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
-      });
 
-      const accessToken = tokenResponse.data.access_token;
+      const accessToken : string = await this.identityService.getAccessToken();
 
       // Buscar todas as aplicações do tenant
       const applicationsResponse = await axios.get('https://graph.microsoft.com/v1.0/applications', {
@@ -78,6 +57,6 @@ export class GetApplicationFromDirectoryUseCase {
     } catch (error) {
       // res.status(500).json({ error: error.message });
       throw new Error("Erro ao obter as aplicações do usuário. "+error)
-    }
+    } 
   }
 }

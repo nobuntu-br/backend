@@ -1,41 +1,27 @@
-import { DbType } from "../adapters/createDb.adapter";
-import { IUser } from "../models/user.model";
-import UserRepository from "../repository/user.repository";
+import { NotFoundError } from "../errors/notFound.error";
+import TenantConnection from "../models/tenantConnection.model";
+import { IUser, User } from "../models/user.model";
+import UserRepository from "../repositories/user.repository";
 import BaseService from "./base.service";
 
-export class UserService extends BaseService<IUser> {
+export class UserService extends BaseService<IUser, User> {
   private userRepository: UserRepository;
 
-  constructor(dbType: DbType, model: any, databaseConnection: any) {
+  constructor(tenantConnection: TenantConnection) {
     //Cria o repositório com dados para obter o banco de dados
-    var repository: UserRepository = new UserRepository(dbType, model, databaseConnection);
-    super(repository, dbType, model, databaseConnection);
-    
+    let repository: UserRepository = new UserRepository(tenantConnection);
+    super(repository, tenantConnection);
+
     this.userRepository = repository;
+
+  }
+  
+  async isUserAdmin(userUID: string): Promise<boolean> {
+    return this.userRepository.isUserAdmin(userUID);
   }
 
-  /**
-   * Verifica se usuário é administrador
-   * @param {*} userUID identificador universal do usuário
-   * @param {*} databaseConnection instância da conexão com o banco de dados
-   * @returns "True" caso usuário for adminitrador, caso contrário, retorna "False"
-   */
-  async isUserAdmin(userUID: string): Promise<boolean> {
-    try {
-      const _user = await this.repository.findOne({UID: userUID});
-
-      if (_user != null && _user.isAdministrator != null) {
-        //Se o usuário é administrador
-        if (_user.isAdministrator == true) {
-          return true;
-        }
-      } 
-      return false;
-
-    } catch (error) {
-      console.error({ message: "Erro ao obter o usuário", details: error });
-      return false;
-    }
+  async IfApplicationHasRegisteredUsers() {
+    return this.userRepository.IfApplicationHasRegisteredUsers();
   }
 
 }

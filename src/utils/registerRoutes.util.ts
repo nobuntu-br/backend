@@ -1,5 +1,5 @@
 import TenantConnection from "../models/tenantConnection.model";
-import { FunctionSystemService } from "../services/functionSystem.service";
+import FunctionSystemRepository from "../repositories/functionSystem.repository";
 
 const fs = require('fs-extra');
 const path = require('path');
@@ -8,8 +8,9 @@ const path = require('path');
  * Registra todas as rotas dessa API no banco de dados.
  */
 export async function saveRoutes(databaseConnection: TenantConnection) {
+
   var routesData = readRoutes();
-  const functionSystemService: FunctionSystemService = new FunctionSystemService(databaseConnection.databaseType, databaseConnection.models["functionSystem"], databaseConnection.connection);
+  const functionSystemRepository: FunctionSystemRepository = new FunctionSystemRepository(databaseConnection);
 
   for (let routeIndex = 0; routeIndex < routesData.length; routeIndex++) {
     const _description = getDescription(routesData[routeIndex].fileName, routesData[routeIndex].method, routesData[routeIndex].path);
@@ -18,13 +19,18 @@ export async function saveRoutes(databaseConnection: TenantConnection) {
     const _classname = routesData[routeIndex].fileName;
     const _method = routesData[routeIndex].method[0];
 
-    const route = await functionSystemService.findOne({ route: _route, method: _method });
+    let route;
 
-    if (route != null) {
-      await functionSystemService.update(route.id!, { description: _description, route: _route, method: _method, classname: _classname });
-    } else {
-      const newRoute = await functionSystemService.create({ description: _description, route: _route, method: _method, className: _classname });
+    try {
+      route = await functionSystemRepository.findOne({ route: _route, method: _method });
+    } catch (error) {
+      if (route != null) {
+        await functionSystemRepository.update(route.id!, { description: _description, route: _route, method: _method, classname: _classname });
+      } else {
+        const newRoute = await functionSystemRepository.create({ description: _description, route: _route, method: _method, className: _classname });
+      }
     }
+
   }
 
   console.log("Salvamento ou atualização de registro de rotas no banco de dados realizado na tabela FunctionSystem");
@@ -114,7 +120,7 @@ function readRoutes() {
 
     } else if (path.extname(file) === '.ts') { //Se for um arquivo .js
       const routerFn = require(filePath);
-      
+
       const app = {
         use: (path: any, router: { stack: any[]; }) => {
           //Percorre cada registro que está armazenado na instância router que fica registrado as rotas

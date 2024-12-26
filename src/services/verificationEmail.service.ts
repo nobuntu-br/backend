@@ -1,17 +1,30 @@
-import { DbType } from "../adapters/createDb.adapter";
-import { IVerificationEmail } from "../models/verificationEmail.model";
-import VerificationEmailRepository from "../repository/verificationEmail.repository";
+import TenantConnection from "../models/tenantConnection.model";
+import { IVerificationEmail, VerificationEmail } from "../models/verificationEmail.model";
+import VerificationEmailRepository from "../repositories/verificationEmail.repository";
 import BaseService from "./base.service";
 
-export class VerificationEmailService extends BaseService<IVerificationEmail> {
+export class VerificationEmailService extends BaseService<IVerificationEmail, VerificationEmail> {
   private verificationEmailRepository: VerificationEmailRepository;
 
-  constructor(dbType: DbType, model: any, databaseConnection: any) {
+  constructor(tenantConnection: TenantConnection) {
     //Cria o repositório com dados para obter o banco de dados
-    var repository: VerificationEmailRepository = new VerificationEmailRepository(dbType, model, databaseConnection);
-    super(repository, dbType, model, databaseConnection);
-    
+    let repository: VerificationEmailRepository = new VerificationEmailRepository(tenantConnection);
+    super(repository, tenantConnection);
+
     this.verificationEmailRepository = repository;
+
+  }
+
+  async ifEmailWasValidated(email: string): Promise<boolean> {
+    return this.verificationEmailRepository.ifEmailWasValidated(email);
+  }
+
+  async checkIfExpired(email: string): Promise<boolean> {
+    try {
+      return this.verificationEmailRepository.checkIfExpired(email);
+    } catch (error) {
+      throw new Error("Erro ao verificar se o código de verificação de email está valido");
+    }
   }
 
 }

@@ -1,0 +1,30 @@
+
+###
+#GET http://localhost:8080/api/user/get-user-image/:id
+###
+POST http://localhost:8080/api/user/check-email-exist
+content-type: application/json
+
+{
+  "email": "jefersoncmnn@gmail.com"
+}
+###
+POST http://localhost:8080/api/user/send-verification-email-code
+content-type: application/json
+
+{
+  "email": "jefersoncmn@gmail.com"
+}
+
+###
+POST http://localhost:8080/api/user/validate-verification-email-code
+
+###
+POST http://localhost:8080/api/user/invite-user
+
+{
+  "invitingUserUID": "0",
+  "invitingUserEmail": "jefersoncmnn@gmail.com",//Email do usuário que está convidando alguém
+  "invitedUserEmail": "jefersoncmn@hotmail.com",//Email do usuário que está sendo convidado
+  "invitedUserTenantIds": "0"
+}

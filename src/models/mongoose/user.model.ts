@@ -1,24 +1,43 @@
-import mongoose, { Mongoose, Schema } from "mongoose";
+import mongoose, { Connection } from "mongoose";
+import { updateCounter } from "./counter.model";
 
-export default function defineModel(mongooseConnection: Mongoose){
-  // Verifica se o modelo já foi criado para a conexão específica (Toda vez que é feito a conexão nova ao banco de dados, é preciso setar os models, porém só pode fazer isso uma vez por conexão, se fizer mais de uma vez dá erro. Por isso é verificado se dentro dos models da conexão existe o model)
-  if (mongooseConnection.models.user) {
-    return mongooseConnection.models.user;
-  }
+export default function defineModel(mongooseConnection: Connection) {
 
   var schema = new mongoose.Schema({
+    _id: {
+      type: Number,
+      required: false
+    },
     UID: {
       type: String,
       required: true,
       unique: true
     },
-    TenantUID: String,
-    userName: String,
-    firstName: String,
-    lastName: String,
-    isAdministrator: Boolean,
+    tenantUID: {
+      type: String,
+      required: true
+    },
+    userName: {
+      type: String,
+      required: true
+    },
+    firstName: {
+      type: String,
+      required: true
+    },
+    lastName: {
+      type: String,
+      required: true
+    },
+    isAdministrator: {
+      type: Boolean,
+      required: true
+    },
     memberType: String,
-    Roles: [{ type: Schema.Types.ObjectId, ref: 'roles' }],
+    email: {
+      type: String,
+      required: true
+    },
   },
     { timestamps: true });
 
@@ -35,10 +54,17 @@ export default function defineModel(mongooseConnection: Mongoose){
     virtuals: true,
     versionKey: false,
     transform: (doc, ret) => {
-      ret.id = ret._id.toHexString();
+      ret.id = ret._id;
       delete ret._id;
     }
   });
 
-  return mongooseConnection.model("user", schema);
+  schema.pre('save', async function (next) {
+    if (!this.isNew) return next();
+  
+    this._id = await updateCounter(mongooseConnection, "User");
+    next();
+  });
+
+  return mongooseConnection.model("User", schema);
 };

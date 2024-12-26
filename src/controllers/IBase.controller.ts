@@ -9,5 +9,5 @@ export interface IBaseController {
   update(req: Request, res: Response, next: NextFunction): Promise<any>;
   delete(req: Request, res: Response, next: NextFunction): Promise<any>;
   deleteAll(req: Request, res: Response, next: NextFunction): Promise<any>;
-  
+  executeQuery(req: Request, res: Response, next: NextFunction): Promise<any>;
 }

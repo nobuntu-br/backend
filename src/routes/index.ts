@@ -1,14 +1,15 @@
 import { Application } from 'express';
 import userRoutes from './user.route';
+import authenticationRoutes from './authentication.route';
 import tenantRoutes from './tenant.route';
 import roleRoutes from './role.route';
-import tenantCredentialRoutes from './tenantCredential.route';
-import userTenantRoutes from './userTenant.route';
+import databaseCredentialRoutes from './databaseCredential.route';
+import databasePermissionRoutes from './databasePermission.route'; 
+import componentStructureRoutes from './componentStructure.route';
 //TODO Essas importações precisarão ser geradas
 import tenantDirectoryRoutes from './tenantDirectory.route'
 import applicationRoutes from './application.route';
 import orderRoutes from './order.route';
-import userDirectoryRoutes from './userDirectory.route'
 /**
  * Define as rotas da aplicação
  * @param app Instância do aplicação Express
@@ -22,17 +23,20 @@ export function setRoutes(app: Application) {
 
   userRoutes(app);
 
-  tenantCredentialRoutes(app);
+  authenticationRoutes(app);
+
+  databaseCredentialRoutes(app);
 
   tenantRoutes(app);
 
-  userTenantRoutes(app);
+  databasePermissionRoutes(app);
 
   applicationRoutes(app);
 
   tenantDirectoryRoutes(app);
 
-  userDirectoryRoutes(app);
+  componentStructureRoutes(app);
+
   //TODO serão gerados esses segmentos pelo mapper
 
   orderRoutes(app);

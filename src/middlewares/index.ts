@@ -3,7 +3,7 @@ import { Application } from "express";
 import express from 'express';
 import { errorHandler } from "./errorHandler.middleware";
 
-export default function setMiddlewares(app: Application){
+export function setMiddlewaresBeforeRoutes(app: Application){
 
   var corsOptions : CorsOptions = {
     origin: "*"
@@ -14,6 +14,9 @@ export default function setMiddlewares(app: Application){
   app.use(express.json());
   // parse requests of content-type - application/x-www-form-urlencoded
   app.use(express.urlencoded({ extended: true }));
+  
+}
 
+export function setMiddlewaresAfterRoutes(app: Application){
   app.use(errorHandler);
 }

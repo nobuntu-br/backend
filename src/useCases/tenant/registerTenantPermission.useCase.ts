@@ -1,36 +1,40 @@
-import UserTenantService from '../../services/userTenant.service';
-import { IUserTenant, UserTenant } from '../../models/userTenant.model';
-import { UserService } from '../../services/user.service';
-import { UserTenantDTO } from '../../models/DTO/userTenant.DTO';
+import { IDatabasePermission } from '../../models/databasePermission.model';
+import { DatabasePermissionDTO } from '../../models/DTO/databasePermission.DTO';
+import UserRepository from '../../repositories/user.repository';
+import DatabasePermissionRepository from '../../repositories/databasePermission.repository';
 
 export class RegisterTenantPermissionUseCase {
-  constructor(private userTenantService: UserTenantService, private userService: UserService) { }
+  constructor(
+    private databasePermissionRepository: DatabasePermissionRepository,
+    private userRepository: UserRepository
+  ) { }
 
-  async execute(userTenantDTO: UserTenantDTO): Promise<IUserTenant> {
+  async execute(input: DatabasePermissionDTO): Promise<IDatabasePermission> {
 
     try {
 
       //Verificar se a permissão existe
-      const userTenant = await this.userTenantService.findOne({ TenantId: userTenantDTO.TenantId, UserUID: userTenantDTO.UserUID, TenantCredentialId: userTenantDTO.TenantCredentialId });
+      const databaseCredential = await this.databasePermissionRepository.findOne({ tenantId: input.tenant, userUID: input.userUID, databaseCredentialId: input.databaseCredential });
       //Se permissão nÃo existir, crie
-      if (userTenant == null) {
+      if (databaseCredential == null) {
         throw new Error("Erro ao registrar novo UserTenant. Registro já existente!");
       }
 
       //Obter o ID do usuário pelo UID pra registrar
-      const user = await this.userService.findOne({UID: userTenantDTO.UserUID});
+      const user = await this.userRepository.findOne({UID: input.userUID});
 
       if(user == null){
         throw new Error("Erro ao registrar novo UserTenant. Usuário não existe!");
       }
 
-      return await this.userTenantService.create(
+      return await this.databasePermissionRepository.create(
         {
+          
           isAdmin: false,
-          TenantCredentialId: userTenantDTO.TenantCredentialId,
-          TenantId: userTenantDTO.TenantId,
-          UserId: user.UID,
-          UserUID: userTenantDTO.UserUID
+          databaseCredential: input.databaseCredential,
+          tenant: input.tenant,
+          user: user.id,
+          userUID: input.userUID
         }
       );
 

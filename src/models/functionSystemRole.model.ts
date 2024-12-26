@@ -1,17 +1,32 @@
-import { BaseResourceModel } from "./base-resource.model";
+import { BaseResourceModel } from "./baseResource.model";
+import { FunctionSystem } from "./functionSystem.model";
 
-interface IFunctionSystemRole {
-  Role?: string;
-  FunctionSystem?: string;
+export interface IFunctionSystemRoleDatabaseModel extends BaseResourceModel{
+  roleId?: number;
+  functionSystemId?: number;
+  authorized?: boolean;
+}
+
+export interface IFunctionSystemRole extends BaseResourceModel{
+  role?: string;
+  functionSystem?: FunctionSystem | number;
   authorized?: boolean;
 }
 
 export class FunctionSystemRole extends BaseResourceModel implements IFunctionSystemRole {
-  Role?: string
-  FunctionSystem?: string
+  role?: string
+  functionSystem?: FunctionSystem | number;
   authorized?: boolean;
 
+  constructor(input: IFunctionSystemRole){
+    super();
+    this.id = input.id;
+    this.role = input.role;
+    this.functionSystem = input.functionSystem;
+    this.authorized = input.authorized;
+  }
+
   static fromJson(jsonData: any) : FunctionSystemRole {
-    return Object.assign(new FunctionSystemRole(), jsonData);
+    return new FunctionSystemRole(jsonData);
   }
 }

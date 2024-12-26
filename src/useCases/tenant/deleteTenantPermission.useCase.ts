@@ -1,32 +1,33 @@
-import UserTenantService from '../../services/userTenant.service';
-import { IUserTenant } from '../../models/userTenant.model';
+import { UnknownError } from '../../errors/unknown.error';
+import { DatabasePermission } from '../../models/databasePermission.model';
+import DatabasePermissionRepository from '../../repositories/databasePermission.repository';
 
 export class DeleteTenantPermissionUseCase {
-  constructor(private userTenantService: UserTenantService) { }
+  constructor(private databasePermissionRepository: DatabasePermissionRepository) { }
 
-  async execute(userTenantId: string): Promise<IUserTenant | Error> {
+  async execute(databasePermissionId: number): Promise<DatabasePermission> {
 
     try {
 
       //Verificar se a permissão existe
-      const userTenant = await this.userTenantService.findById(userTenantId);
+      const databasePermission = await this.databasePermissionRepository.findById(databasePermissionId);
 
-      if (userTenant == null) {
+      if (databasePermission == null) {
         //Se permissão não existe, dá erro
-        return new Error("Erro ao registrar novo UserTenant. Registro não existente!");
+        throw new UnknownError("Erro to register new permission.");
       }
 
       //Remove a permissão
-      const removedUserTenant = await this.userTenantService.delete(userTenantId)!;
+      const removedUserTenant = await this.databasePermissionRepository.delete(databasePermissionId)!;
 
       if(removedUserTenant == null){
-        return Error("Erro ao remover a permissão do tenant.");
+        throw new UnknownError("Erro ao remover a permissão do tenant.");
       }
 
       return removedUserTenant;
 
     } catch (error) {
-      return Error("Erro ao atualizar as permissões do Tenant: " + error);
+      throw new UnknownError("Erro ao atualizar as permissões do Tenant: " + error);
     }
 
   }

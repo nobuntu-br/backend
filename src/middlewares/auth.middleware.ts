@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import axios from "axios";
-import { getSecurityTenantConnection } from "../adapters/databaseSecurity.config";
-import { FunctionSystemService } from "../services/functionSystem.service";
 import TenantConnection from "../models/tenantConnection.model";
 import { UserService } from "../services/user.service";
-import { FunctionSystemRoleService } from "../services/functionSystemRole.service";
+import { UnauthorizedError } from "../errors/unauthorized.error";
+import { GetSecurityTenantConnectionUseCase } from "../useCases/tenant/getSecurityTenantConnection.useCase";
+import FunctionSystemRoleRepository from "../repositories/functionSystemRole.repository";
 const jwkToPem = require("jwk-to-pem");
 
 async function getJWKS(jwksUri: string): Promise<any[]> {
@@ -26,7 +26,9 @@ async function getJWKS(jwksUri: string): Promise<any[]> {
  * @returns 
  */
 export async function verifyAccess(req: Request, res: Response, next: NextFunction): Promise<void> {
-  const databaseConnection = await getSecurityTenantConnection();
+  const getSecurityTenantConnectionUseCase: GetSecurityTenantConnectionUseCase = new GetSecurityTenantConnectionUseCase();
+
+  const databaseConnection = await getSecurityTenantConnectionUseCase.execute();
 
   if (!databaseConnection) {
     res.status(500).send({ message: "Erro no servidor" });
@@ -50,17 +52,17 @@ export async function verifyAccess(req: Request, res: Response, next: NextFuncti
 
     // Se não retornou o OID (não tem access_token)
     if (userOID == null) {
-      res.status(401).send({ message: "Acesso não autorizado. Usuário não identificado" });
+      res.send(new UnauthorizedError("Token inválido"));
     } else {
       // Se tem o OID verifica se tem permissão pra rota
       if (await isAuthorizedUrl(userOID, req.method, req.originalUrl, databaseConnection)) {
         next();
       } else {
-        res.status(401).send({ message: "Acesso não autorizado. Rota não autorizada" });
+        res.send(new UnauthorizedError("Acesso não autorizado."));
       }
     }
   } else {
-    res.status(401).send({ message: "Token não fornecido ou inválido" });
+    res.send(new UnauthorizedError("Token não fornecido ou inválido"));
   }
 }
 
@@ -76,10 +78,12 @@ async function verifyAccessTokenIsValid(accessToken: string, res: Response): Pro
   }
 
   const JWKsUri: string | undefined = process.env.JWKsUri;
-  
-  if(JWKsUri == undefined){
-    throw new Error("Não foi possível obter dados de ambiente");
+
+  if (JWKsUri == undefined) {
+    throw new Error("Não foi possível obter o link para obter o Java Web Key Set (Chaves para validar o token) das variáveis ambiente");
   }
+
+  // checkJwt(JWKsUri, accessToken); //Fazer a troca para essa
 
   const jwk = await getJWKS(JWKsUri);
 
@@ -132,9 +136,10 @@ async function isAuthorizedUrl(userUID: string, method: string, url: string, dat
   return userHaveAccessToRoute;
 }
 
-async function isUserHaveAccessToRoute(userUID: string, method: string, url: string, databaseConnection: TenantConnection): Promise<boolean | null>{
-  const functionSystemRoleService: FunctionSystemRoleService = new FunctionSystemRoleService(databaseConnection.databaseType, databaseConnection.models["functionSystemRole"], databaseConnection.connection);
-  return await functionSystemRoleService.isUserHaveAccessToRoute(userUID, method, url);
+async function isUserHaveAccessToRoute(userUID: string, method: string, url: string, databaseConnection: TenantConnection): Promise<boolean | null> {
+  //TODO se for pra fazer isso, tem que ser com cache
+  const functionSystemRoleRepository: FunctionSystemRoleRepository = new FunctionSystemRoleRepository(databaseConnection);
+  return await functionSystemRoleRepository.isUserHaveAccessToRoute(userUID, method, url);
 }
 
 /**
@@ -144,19 +149,19 @@ async function isUserHaveAccessToRoute(userUID: string, method: string, url: str
  * @returns Retorna se o usuário é administrador, sendo verdadeiro pra sim, falso pra não. Null caso der erros.
  */
 async function userIsAdmin(userUID: string, databaseConnection: TenantConnection): Promise<boolean | null> {
-  const userService: UserService = new UserService(databaseConnection.databaseType, databaseConnection.models["user"], databaseConnection.connection);
+  const userService: UserService = new UserService(databaseConnection);
   return await userService.isUserAdmin(userUID);
 }
 
 /**
  * Faz uma verificação para saber se a rota a ser usada é publica para todos os usuários ou não
- * @param {*} _method Métodos REST, exemplos: POST; GET; DELETE; PATCH ..
- * @param {*} _url Caminho, exemplos: order/:id
+ * @param {*} method Métodos REST, exemplos: POST; GET; DELETE; PATCH ..
+ * @param {*} url Caminho, exemplos: order/:id
  * @param {*} databaseConnection Instância de conexão com o banco de dados
  * @returns Retornará um valor booleano, sendo "True" se o a rota for pública, caso contrário retornará "False"
  */
-async function isPublicRoute(_method: string, _url: string, databaseConnection: TenantConnection): Promise<boolean | null> {
-  const functionSystemService: FunctionSystemService = new FunctionSystemService(databaseConnection.databaseType, databaseConnection.models["functionSystemService"], databaseConnection.connection);
-  
-  return await functionSystemService.isPublicRoute(_method, _url);
+async function isPublicRoute(method: string, url: string, databaseConnection: TenantConnection): Promise<boolean | null> {
+  //TODO se for pra fazer isso, tem que ser com cache
+  const functionSystemRoleRepository: FunctionSystemRoleRepository = new FunctionSystemRoleRepository(databaseConnection);
+  return await functionSystemRoleRepository.isPublicRoute(method, url);
 }

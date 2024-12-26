@@ -1,19 +1,19 @@
-import { DbType } from "../adapters/createDb.adapter";
-import FieldFileRepository from "../repository/fieldFile.repository";
-import { FieldFile } from "../models/fieldFile.model"; 
+import FieldFileRepository from "../repositories/fieldFile.repository";
+import { FieldFile, IFieldFile } from "../models/fieldFile.model";
 import BaseService from "./base.service";
-import { NextFunction, Request, Response } from "express";
+import TenantConnection from "../models/tenantConnection.model";
 
-export class FieldFileService extends BaseService<FieldFile>{
+export class FieldFileService extends BaseService<IFieldFile, FieldFile> {
+  private fieldFileRepository: FieldFileRepository;
 
-  fieldFileRepository: FieldFileRepository;
+  constructor(tenantConnection: TenantConnection) {
+    //Cria o repositório com dados para obter o banco de dados
+    let repository: FieldFileRepository = new FieldFileRepository(tenantConnection);
+    super(repository, tenantConnection);
 
-  constructor(dbType: DbType, model: any, databaseConnection: any) { 
-    //Cria o repositório com dados para obter o banco de dados 
-    var repository : FieldFileRepository = new FieldFileRepository(dbType, model, databaseConnection); 
-    super(repository, dbType, model, databaseConnection); 
-    this.fieldFileRepository = new FieldFileRepository(dbType, model, databaseConnection);
-  } 
+    this.fieldFileRepository = repository;
+
+  }
 
   async upload(fieldFile: FieldFile): Promise<string> {
     try {

@@ -1,0 +1,13 @@
+@hostname = http://localhost:8080 
+
+### Get Tenant User Is admin
+GET {{hostname}}/api/tenant/isAdmin/uid/22
+### Create a new
+POST {{hostname}}/api/tenant/
+### Find all (only admin)
+GET {{hostname}}/api/tenant/
+### Find by UserUID
+GET {{hostname}}/api/tenant/uid/:UID
+### Get databaseType
+GET {{hostname}}/api/tenant/database-type
+X-Tenant-ID:0

@@ -1,13 +1,23 @@
-import { BaseResourceModel } from "./base-resource.model";
+import { BaseResourceModel } from "./baseResource.model";
 
-interface IRole {
+export interface IRoleDataBaseModel extends BaseResourceModel{
+  name?: string;
+}
+
+export interface IRole extends BaseResourceModel{
   name?: string;
 }
 
 export class Role extends BaseResourceModel implements IRole {
   name?: string;
 
+  constructor(data: IRole){
+    super();
+    this.id = data.id;
+    this.name = data.name;
+  }
+
   static fromJson(jsonData: any) : Role {
-    return Object.assign(new Role(), jsonData);
+    return new Role(jsonData);
   }
 }

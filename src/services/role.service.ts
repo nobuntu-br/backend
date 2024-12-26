@@ -1,17 +1,18 @@
-import { DbType } from "../adapters/createDb.adapter";
-import { Role } from "../models/role.model";
-import RoleRepository from "../repository/role.repository";
+import { IRole, Role } from "../models/role.model";
+import TenantConnection from "../models/tenantConnection.model";
+import RoleRepository from "../repositories/role.repository";
 import BaseService from "./base.service";
 
-export default class RoleService extends BaseService<Role> {
+export default class RoleService extends BaseService<IRole, Role> {
   private roleRepository: RoleRepository;
 
-  constructor(dbType: DbType, model: any, databaseConnection: any) {
+  constructor(tenantConnection: TenantConnection) {
     //Cria o repositório com dados para obter o banco de dados
-    var repository : RoleRepository = new RoleRepository(dbType, model, databaseConnection);
-    super(repository, dbType, model, databaseConnection);
+    let repository: RoleRepository = new RoleRepository(tenantConnection);
+    super(repository, tenantConnection);
 
     this.roleRepository = repository;
+
   }
 
 }

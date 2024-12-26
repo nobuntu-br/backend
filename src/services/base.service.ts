@@ -1,64 +1,96 @@
-import { DbType } from "../adapters/createDb.adapter";
-import { IBaseRepository } from "../repository/ibase.repository";
+import { DatabaseType } from "../adapters/createDb.adapter";
+import { NotFoundError } from "../errors/notFound.error";
+import TenantConnection from "../models/tenantConnection.model";
+import { IBaseRepository } from "../repositories/ibase.repository";
 import { IBaseService } from "./IBase.service";
 
-export default class BaseService<T> implements IBaseService<T> {
-  dbType: DbType;
-  model: any;
-  repository: IBaseRepository<T>;
-  databaseConnection: any;
+export default class BaseService<TInterface, TClass> implements IBaseService<TInterface, TClass> {
+  _databaseType: DatabaseType;
+  _repository: IBaseRepository<TInterface, TClass>;
+  tenantConnection: TenantConnection;
 
   /**
-   * 
-   * @param repository Interface do repository com base no modelo usado
-   * @param dbType Tipo de banco de dados que foi feito a conexão
-   * @param model Modelo
    * @param databaseConnection Instância da conexão com banco de dados 
    */
-  constructor(repository: IBaseRepository<T>, dbType: DbType, model: any, databaseConnection: any) {
-    this.repository = repository;
-    this.dbType = dbType;
-    this.model = model;
-    this.databaseConnection = databaseConnection;
+  constructor(repository: IBaseRepository<TInterface, TClass>, tenantConnection: TenantConnection) {
+    this._repository = repository;
+    this._databaseType = tenantConnection.databaseType;
+    this.tenantConnection = tenantConnection;
   }
 
-  create(data: T): Promise<T> {
+  get databaseType(){
+    return this._databaseType;
+  }
+
+  get repository(){
+    return this._repository;
+  }
+
+  create(data: TClass): Promise<TClass> {
     return this.repository.create(data);
   }
 
-  findAll(limitPerPage: number, offset: number): Promise<T[] | null> {
+  findAll(limitPerPage: number, offset: number): Promise<TClass[] | null> {
     return this.repository.findAll(limitPerPage, offset);
   }
 
-  findOne(query: T): Promise<T | null> {
-    return this.repository.findOne(query);
+  async findOne(query: TInterface): Promise<TClass> {
+    const returnedValue = await this.repository.findOne(query);
+
+    if(returnedValue == null){
+      throw new NotFoundError("Not found data");
+    }
+
+    return returnedValue;
   }
 
-  findMany(query: T): Promise<T[] | null> {
+  findMany(query: TInterface): Promise<TClass[]> {
     return this.repository.findMany(query);
   }
 
-  findById(id: string): Promise<T | null> {
-    return this.repository.findById(id);
+  async findById(id: number): Promise<TClass> {
+    const returnedValue = await this.repository.findById(id);
+
+    if(returnedValue == null){
+      throw new NotFoundError("Not found data");
+    }
+
+    return returnedValue;
   }
 
-  getCount(): Promise<number | null> {
+  getCount(): Promise<number> {
     return this.repository.getCount();
   }
   
-  update(id: string, data: Object): Promise<T | null> {
-    return this.repository.update(id, data);
+  async update(id: number, data: Object): Promise<TClass> {
+    const returnedValue = await this.repository.update(id, data);
+
+    if(returnedValue == null){
+      throw new NotFoundError("Not found data");
+    }
+
+    return returnedValue;
   }
 
-  delete(id: string): Promise<T | null> {
-    return this.repository.delete(id);
+  async delete(id: number): Promise<TClass> {
+    const returnedValue = await this.repository.delete(id);
+
+    if(returnedValue == null){
+      throw new NotFoundError("Not found data");
+    }
+
+    return returnedValue;
   }
 
   deleteAll(): Promise<void> {
     return this.repository.deleteAll();    
   }
 
-  findCustom(filterValues: any[], filterConditions: string[], model: any): Promise<T[] | null> {
+  executeQuery(query: string): Promise<Object> {
+    return this.repository.executeQuery(query);
+  }
+
+  findCustom(filterValues: any[], filterConditions: string[], model: any): Promise<TClass[] | null> {
     return this.repository.findCustom(filterValues, filterConditions, model);
   }
 

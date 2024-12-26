@@ -1,7 +1,4 @@
 import { Application, Router } from 'express';
-import validateHeaders from './validators/index.validator';
-import changeTenant from '../middlewares/tenant.middleware';
-import { verifyAccess } from '../middlewares/auth.middleware';
 import { TenantDirectoryController } from '../controllers/tenantDirectory.controller';
 
 /**
@@ -15,5 +12,5 @@ export default function defineRoute(app: Application) {
   // Rota para obter o domínio do tenant
   router.get('/domain', controller.getTenantDomain);
 
-  app.use('/api/tenantDirectory', router);
+  app.use('/api/tenant-directory', router);
 }

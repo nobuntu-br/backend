@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { getTenantConnection } from "../adapters/database.config";
+import { getTenantConnection } from "../config/database.config";
 import TenantConnection from "../models/tenantConnection.model";
-import { getSecurityTenantConnection } from "../adapters/databaseSecurity.config";
+import { GetSecurityTenantConnectionUseCase } from "../useCases/tenant/getSecurityTenantConnection.useCase";
 var jwt = require('jsonwebtoken');
 
 declare global {
@@ -16,11 +16,11 @@ declare global {
 /**
  * Função responsável por retornar por obter dados de qual tenant o usuário está fazendo uso, para tal tenant ser usado em alguma operação da API.
  */
-export default async function changeTenant(req: Request, res: Response, next: NextFunction) {
+export default async function getUserTenant(req: Request, res: Response, next: NextFunction) {
 
-  const tenantId = req.header('X-Tenant-ID');
+  const tenantId : number = Number(req.header('X-Tenant-ID'));
 
-  if (tenantId == undefined) {
+  if (isNaN(tenantId)) {
     return res.status(401).send({ message: "Token do tenant não fornecido ou inválido" });
   }
 
@@ -35,13 +35,13 @@ export default async function changeTenant(req: Request, res: Response, next: Ne
 
   try {
     //Obtem a instância da conexão com banco de dados do usuário
-    const databaseConnection = await getTenantConnection(tenantId, decoded.sub);
+    const tenantConnection : TenantConnection | null = await getTenantConnection(tenantId, decoded.sub);
 
-    if (databaseConnection == null) {
+    if (tenantConnection == null) {
       return res.status(404).json({ message: 'Tenant não encontrado' });
     }
 
-    req.body.databaseConnection = databaseConnection;
+    req.body.tenantConnection = tenantConnection;
 
     next();
   } catch (error) {
@@ -54,7 +54,9 @@ export async function getSecurityTenant(req: Request, res: Response, next: NextF
   try {
     //TODO fazer uma verificação de permissão
 
-    req.body.databaseConnection = await getSecurityTenantConnection();
+    const getSecurityTenantConnectionUseCase: GetSecurityTenantConnectionUseCase = new GetSecurityTenantConnectionUseCase();
+
+    req.body.tenantConnection = await getSecurityTenantConnectionUseCase.execute();
 
     next();
   } catch (error) {

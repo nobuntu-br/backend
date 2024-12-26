@@ -1,14 +1,17 @@
-import { DbType } from "../adapters/createDb.adapter";
-import FileRepository from "../repository/file.repository";
-import { File } from "../models/file.model"; 
+import FileRepository from "../repositories/file.repository";
+import { File, IFile } from "../models/file.model";
 import BaseService from "./base.service";
+import TenantConnection from "../models/tenantConnection.model";
 
-export class FileService extends BaseService<File>{
+export class FileService extends BaseService<IFile, File> {
+  private fileRepository: FileRepository;
 
-  constructor(dbType: DbType, model: any, databaseConnection: any) { 
-    //Cria o repositório com dados para obter o banco de dados 
-    var repository : FileRepository = new FileRepository(dbType, model, databaseConnection); 
-    super(repository, dbType, model, databaseConnection); 
-  } 
+  constructor(tenantConnection: TenantConnection) {
+    //Cria o repositório com dados para obter o banco de dados
+    let repository: FileRepository = new FileRepository(tenantConnection);
+    super(repository, tenantConnection);
 
+    this.fileRepository = repository;
+
+  }
 }

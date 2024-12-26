@@ -1,4 +1,4 @@
-import { Mongoose } from "mongoose";
+import { Connection, Mongoose } from "mongoose";
 
 //TODO precisará ser gerada as importações
 import userModel from "./user.model";
@@ -10,13 +10,19 @@ import userRoleModel from "./userRole.model";
 import componentStructureModel from "./componentStructure.model";
 import componentStructureRoleModel from "./componentStructureRole.model";
 import verificationEmailModel from "./verificationEmail.model";
-
+import TenantConnection from "../tenantConnection.model";
+import counterModel from "./counter.model";
 /**
  * Define os modelos que serão usados pelos usuários da aplicação
- * @param mongooseConnection Instância da conexão com o banco de dados mongodb
+ * @param tenantConnection Instância da conexão tenant
  * @returns retorna os modelos do banco de dados para ser usado suas operações
  */
-export default async function setModels(mongooseConnection: Mongoose) {
+export default async function setModels(tenantConnection: TenantConnection) {
+  const mongooseConnection = tenantConnection.connection;
+
+  if(mongooseConnection instanceof Connection == false){
+    throw new Error("Instance of database connection is incompatible with setModels function on mongoose.");
+  }
 
   const order = orderModel(mongooseConnection);
   const user = userModel(mongooseConnection);
@@ -27,21 +33,24 @@ export default async function setModels(mongooseConnection: Mongoose) {
   const componentStructure = componentStructureModel(mongooseConnection);
   const componentStructureRole = componentStructureRoleModel(mongooseConnection);
   const verificationEmail = verificationEmailModel(mongooseConnection);
+  const counter = counterModel(mongooseConnection);
 
   //TODO precisará ser gerado várias linhas como essa abaixo, com o model diferente
 
-  const models = {
-    order,
-    user,
-    role,
-    userRole,
-    functionSystem,
-    functionSystemRole,
-    componentStructure,
-    componentStructureRole,
-    verificationEmail,
-    //Precisará ser gerado aqui os nomes das variáveis de cada model
-  }
+  const models = new Map<string, any>();
+  
+  models.set('User', user);
+  models.set('Role', role);
+  //Models de controle de acesso as rotas
+  models.set('UserRole', userRole);
+  models.set('FunctionSystem', functionSystem);
+  models.set('FunctionSystemRole', functionSystemRole);
+  //Models de controle de acesso a ambiente
+  models.set('ComponentStructure', componentStructure);
+  models.set('ComponentStructureRole', componentStructureRole);
+  
+  models.set('VerificationEmail', verificationEmail);
+  models.set('Counter', counter);
 
   return models;
 }

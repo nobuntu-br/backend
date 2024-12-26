@@ -1,3 +1,3 @@
-export interface EmailAdapter {
-  sendMail(to: string, subject: string, text: string): Promise<void>;
+export interface IEmailAdapter {
+  sendMail(from: string, to: string, subject: string, text: string): Promise<void>;
 }

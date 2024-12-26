@@ -1,23 +1,24 @@
-import mongoose, { Mongoose, Schema } from "mongoose";
+import mongoose, { Connection, Schema } from "mongoose";
+import { updateCounter } from "./counter.model";
 
-export default function defineModel(mongooseConnection: Mongoose) {
-
-  if (mongooseConnection.models.operation) {
-    return mongooseConnection.models.operation;
-  }
+export default function defineModel(mongooseConnection: Connection) {
 
   var schema = new mongoose.Schema(
     {
-      user: {
-        type: Schema.Types.ObjectId, ref: 'user',
+      _id: {
+        type: Number,
+        required: false
+      },
+      userId: {
+        type: Number, ref: 'User',
         required: true,
       },
       operationType: {
         type: String,
         required: true,
       },
-      tenant: {
-        type: Schema.Types.ObjectId, ref: 'tenant',
+      tenantId: {
+        type: Number, ref: 'Tenant',
         required: true,
       },
       ipAddress: {
@@ -45,10 +46,17 @@ export default function defineModel(mongooseConnection: Mongoose) {
     virtuals: true,
     versionKey: false,
     transform: (doc, ret) => {
-      ret.id = ret._id.toHexString();
+      ret.id = ret._id;
       delete ret._id;
     }
   });
 
-  return mongooseConnection.model("operation", schema);
+  schema.pre('save', async function (next) {
+    if (!this.isNew) return next();
+  
+    this._id = await updateCounter(mongooseConnection, "Operation");
+    next();
+  });
+
+  return mongooseConnection.model("Operation", schema);
 };

@@ -1,15 +1,19 @@
 import { Model } from "mongoose";
 import { FilterValue } from "../utils/mongoose/customQuery.util";
 
-export interface IBaseService<T> {
-  create(data: T): Promise<T>;
-  findAll(limitPerPage: number, offset: number): Promise<T[] | null>;
-  findOne(query: T): Promise<T | null>;
-  findMany(query: T): Promise<T[] | null>;
-  findById(id: string): Promise<T | null>;
-  getCount(): Promise<number | null>;
-  update(id: string, data: Object): Promise<T | null>;
-  delete(id: string): Promise<T | null>;
+export interface IBaseService<TInterface, TClass> {
+  readonly repository: any;
+  readonly databaseType: string;
+
+  create(data: TClass): Promise<TClass>;
+  findAll(limitPerPage: number, offset: number): Promise<TClass[] | null>;
+  findOne(query: TInterface): Promise<TClass>;
+  findMany(query: TInterface): Promise<TClass[]>;
+  findById(id: number): Promise<TClass>;
+  getCount(): Promise<number>;
+  update(id: number, data: Object): Promise<TClass>;
+  delete(id: number): Promise<TClass>;
   deleteAll(): Promise<void>;
-  findCustom(filterValues: FilterValue[], filterConditions: string[], model: Model<any> | typeof Model): Promise<T[] | null>;
+  executeQuery(query: string): Promise<Object>;
+  findCustom(filterValues: FilterValue[], filterConditions: string[], model: Model<any> | typeof Model): Promise<TClass[] | null>;
 }

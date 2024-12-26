@@ -1,23 +1,24 @@
-import { DbType } from "../adapters/createDb.adapter";
-import { Tenant } from "../models/tenant.model";
-import { UserTenant } from "../models/userTenant.model";
-import TenantRepository from "../repository/tenant.repository";
-import UserTenantRepository from "../repository/userTenant.repository";
+import { ITenant, Tenant } from "../models/tenant.model";
+import TenantRepository from "../repositories/tenant.repository";
+import DatabasePermissionRepository from "../repositories/databasePermission.repository";
 import BaseService from "./base.service";
+import TenantConnection from "../models/tenantConnection.model";
+import { DatabaseType } from "../adapters/createDb.adapter";
 
-export default class TenantService extends BaseService<Tenant> {
+export default class TenantService extends BaseService<ITenant, Tenant> {
   private tenantRepository: TenantRepository;
-  private userTenantRepository: UserTenantRepository;
+  private databasePermissionRepository: DatabasePermissionRepository;
 
-  constructor(dbType: DbType, model: any, databaseConnection: any) {
+  constructor(tenantConnection: TenantConnection) {
     //Cria o repositório com dados para obter o banco de dados
-    var repository : TenantRepository = new TenantRepository(dbType, model, databaseConnection);
-    super(repository, dbType, model, databaseConnection);
+    let repository: TenantRepository = new TenantRepository(tenantConnection);
+    super(repository, tenantConnection);
 
     this.tenantRepository = repository;
 
-    var userTenantRepository: UserTenantRepository = new UserTenantRepository(dbType, "userTenant", databaseConnection);
-    this.userTenantRepository = userTenantRepository;
+    var databasePermissionRepository: DatabasePermissionRepository = new DatabasePermissionRepository(tenantConnection);
+    this.databasePermissionRepository = databasePermissionRepository;
+
   }
 
   /**
@@ -26,29 +27,11 @@ export default class TenantService extends BaseService<Tenant> {
    * @returns "True" caso usuário for adminitrador, caso contrário, retorna "False"
    */
   async findTenantsUserIsAdmin(userUID: string): Promise<Tenant[]> {
-    try {
-      const userTenantsUserIsAdmin : UserTenant[] | null = await this.userTenantRepository.findMany({UserUID: userUID, isAdmin: true});
+    return this.databasePermissionRepository.findTenantsUserIsAdmin(userUID);
+  }
 
-      if(userTenantsUserIsAdmin == null){
-        throw new Error("O usuário não tem nenhum tenant que é administrador");
-      }
-
-      const tenantsUserIsAdmin : Tenant[] = [];
-
-      //TODO tirar isso e fazer em uma query só
-      userTenantsUserIsAdmin.forEach(async (userTenantUserIsAdmin : UserTenant) => {
-        const _tenantUserIsAdmin = await this.tenantRepository.findOne({id: userTenantUserIsAdmin.id})
-
-        if(_tenantUserIsAdmin != null){
-          tenantsUserIsAdmin.push(_tenantUserIsAdmin);
-        }
-      });
-
-      return tenantsUserIsAdmin;
-
-    } catch (error) {
-      throw error;
-    }
+  getDatabaseType(): DatabaseType {
+    return this.databaseType;
   }
 
 }

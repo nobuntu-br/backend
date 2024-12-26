@@ -1,17 +1,18 @@
-import { DbType } from "../adapters/createDb.adapter";
-import { ComponentStructureRole } from "../models/componentStructureRole.model";
-import ComponentStructureRoleRepository from "../repository/componentStructureRole.repository";
+import { ComponentStructureRole, IComponentStructureRoleDatabaseModel } from "../models/componentStructureRole.model";
+import TenantConnection from "../models/tenantConnection.model";
+import ComponentStructureRoleRepository from "../repositories/componentStructureRole.repository";
 import BaseService from "./base.service";
 
-export class ComponentStructureRoleService extends BaseService<ComponentStructureRole> {
+export class ComponentStructureRoleService extends BaseService<IComponentStructureRoleDatabaseModel, ComponentStructureRole> {
   private componentStructureRoleRepository: ComponentStructureRoleRepository;
 
-  constructor(dbType: DbType, model: any, databaseConnection: any) {
+  constructor(tenantConnection: TenantConnection) {
     //Cria o repositório com dados para obter o banco de dados
-    var repository: ComponentStructureRoleRepository = new ComponentStructureRoleRepository(dbType, model, databaseConnection);
-    super(repository, dbType, model, databaseConnection);
+    let repository: ComponentStructureRoleRepository = new ComponentStructureRoleRepository(tenantConnection);
+    super(repository, tenantConnection);
 
     this.componentStructureRoleRepository = repository;
+
   }
 
 }

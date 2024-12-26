@@ -2,6 +2,20 @@ import { Sequelize, DataTypes } from "sequelize";
 
 export default function defineModel(sequelize: Sequelize) {
   const schema = sequelize.define('FunctionSystemRole', {
+    roleId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Roles',
+        key: 'id',
+      },
+    },
+    functionSystemId: {
+      type: DataTypes.STRING,
+      references: {
+        model: 'FunctionSystems',
+        key: 'id',
+      },
+    },
     authorized: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
@@ -11,7 +25,7 @@ export default function defineModel(sequelize: Sequelize) {
     indexes: [
       {
         unique: true,
-        fields: ['RoleId', 'FunctionSystemId'],
+        fields: ['roleId', 'functionSystemId'],
       },
     ],
   });

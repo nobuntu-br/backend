@@ -1,13 +1,15 @@
 import { NextFunction, Request, Response } from "express";
 import { BaseController } from "./base.controller";
 import { GetApplicationFromDirectoryUseCase } from "../useCases/application/getApplicationFromDirectory.useCase";
+import { AzureADService } from "../services/azureAD.service";
 
 export class ApplicationController {
 
   async findAll(req: Request, res: Response, next: NextFunction) {
     try {
 
-      const getApplicationFromDirectoryUseCase : GetApplicationFromDirectoryUseCase = new GetApplicationFromDirectoryUseCase();
+      const azureADService: AzureADService = new AzureADService();
+      const getApplicationFromDirectoryUseCase : GetApplicationFromDirectoryUseCase = new GetApplicationFromDirectoryUseCase(azureADService);
 
       const applications = await getApplicationFromDirectoryUseCase.execute();
 

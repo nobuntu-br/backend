@@ -1,0 +1,12 @@
+@hostname = http://localhost:8080 
+
+### Get Tenant User Is admin
+POST {{hostname}}/api/component-structure/
+content-type: application/json
+Authorization:
+X-Tenant-ID:0
+
+{
+  "pageName":"order",
+  "userUID":"0"
+}
