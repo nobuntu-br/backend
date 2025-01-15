@@ -3,7 +3,7 @@ import { TenantController } from '../controllers/tenant.controller';
 import { createNewTenantValidator, findAllTenantValidator } from './validators/tenant.validator';
 import validateHeaders from './validators/index.validator';
 import getUserTenant, { getSecurityTenant } from '../middlewares/tenant.middleware';
-import { verifyAccess } from '../middlewares/auth.middleware';
+import { checkUserAccess } from '../middlewares/checkUserAccess.middleware';
 
 /**
  * Irá definir as rotas da entidade
@@ -19,19 +19,19 @@ export default function defineRoute(app: Application) {
   //Create a new
   router.post('/', [getSecurityTenant, ...createNewTenantValidator, validateHeaders], controller.create);
   //Find all
-  router.get('/', [verifyAccess, getSecurityTenant, ...findAllTenantValidator, validateHeaders], controller.findAll);
+  router.get('/', [checkUserAccess, getSecurityTenant, ...findAllTenantValidator, validateHeaders], controller.findAll);
   //Find count
   router.get('/count', [getSecurityTenant, validateHeaders], controller.getCount);
-  //Find by UserUID
-  router.get('/uid/:UID', [getSecurityTenant, validateHeaders], controller.findByUserUID);
+  //Find Tenant by UserUID
+  router.get('/uid/:UID', [checkUserAccess, getSecurityTenant, validateHeaders], controller.findByUserUID);
   //Find by id
   router.get('/:id', [getSecurityTenant], controller.findById);
   //Update
   router.put('/:id', [getSecurityTenant], controller.update);
   //Delete all
-  router.delete('/all', [verifyAccess, getSecurityTenant], controller.deleteAll);
+  router.delete('/all', [checkUserAccess, getSecurityTenant], controller.deleteAll);
   //Delete
-  router.delete('/:id', [verifyAccess, getSecurityTenant], controller.delete);
+  router.delete('/:id', [checkUserAccess, getSecurityTenant], controller.delete);
 
   app.use('/api/tenant', router);
 } 

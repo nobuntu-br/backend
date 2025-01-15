@@ -14,6 +14,7 @@ export interface IDatabaseCredentialDatabaseModel extends BaseResourceModel{
   sslEnabled?: boolean;
   poolSize?: number;
   timeOutTime?: number;
+  version?: number;
 
   //SSL data
   sslCertificateAuthority?: string; //Serve para verificar que o certificado apresentado pelo servidor ou cliente é confiável e foi emitido por uma CA válida.
@@ -35,6 +36,7 @@ export interface IDatabaseCredential extends BaseResourceModel{
   sslEnabled?: boolean;
   poolSize?: number;
   timeOutTime?: number;
+  version?: number;
 
   //SSL data
   sslCertificateAuthority?: string; //Serve para verificar que o certificado apresentado pelo servidor ou cliente é confiável e foi emitido por uma CA válida.
@@ -56,6 +58,7 @@ export class DatabaseCredential extends BaseResourceModel implements IDatabaseCr
   sslEnabled: boolean;
   poolSize?: number;
   timeOutTime?: number;
+  version: number;
 
   //SSL data
   sslCertificateAuthority?: string;
@@ -90,6 +93,12 @@ export class DatabaseCredential extends BaseResourceModel implements IDatabaseCr
     this.sslEnabled = data.sslEnabled || false;
     this.poolSize = data.poolSize;
     this.timeOutTime = data?.timeOutTime;
+    
+    if(data.version == undefined){
+      this.version = 0;
+    } else {
+      this.version = data.version;
+    }
 
     // Verificação dos campos de SSL
     if (this.sslEnabled == true) {

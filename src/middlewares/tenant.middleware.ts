@@ -12,15 +12,14 @@ declare global {
   }
 }
 
-
 /**
  * Função responsável por retornar por obter dados de qual tenant o usuário está fazendo uso, para tal tenant ser usado em alguma operação da API.
  */
 export default async function getUserTenant(req: Request, res: Response, next: NextFunction) {
 
-  const tenantId : number = Number(req.header('X-Tenant-ID'));
+  const databaseCredentialId : number = Number(req.header('X-Tenant-ID'));
 
-  if (isNaN(tenantId)) {
+  if (isNaN(databaseCredentialId)) {
     return res.status(401).send({ message: "Token do tenant não fornecido ou inválido" });
   }
 
@@ -35,7 +34,7 @@ export default async function getUserTenant(req: Request, res: Response, next: N
 
   try {
     //Obtem a instância da conexão com banco de dados do usuário
-    const tenantConnection : TenantConnection | null = await getTenantConnection(tenantId, decoded.sub);
+    const tenantConnection : TenantConnection | null = await getTenantConnection(databaseCredentialId, decoded.sub);
 
     if (tenantConnection == null) {
       return res.status(404).json({ message: 'Tenant não encontrado' });

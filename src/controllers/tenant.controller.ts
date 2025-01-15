@@ -145,13 +145,13 @@ export class TenantController {
 
   async findByUserUID(req: Request, res: Response) {
     try {
-
+      
       if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
       const databasePermissionRepository: DatabasePermissionRepository = new DatabasePermissionRepository(req.body.tenantConnection);
-      const getUserTenantsUseCase : GetUserTenantsUseCase = new GetUserTenantsUseCase(databasePermissionRepository);
+      const getUserTenantsUseCase: GetUserTenantsUseCase = new GetUserTenantsUseCase(databasePermissionRepository);
       const usertenants = await getUserTenantsUseCase.execute(req.params.UID);
 
       if (usertenants == null) {
@@ -167,7 +167,7 @@ export class TenantController {
    * Obter todos os tenants que o usuário que faz a requisição é administrador
    * @returns Retorna um array com todos os tenants que o usuário que faz a requisição é administrador
    */
-  async findTenantsUserIsAdmin(req: Request, res: Response, next: NextFunction){
+  async findTenantsUserIsAdmin(req: Request, res: Response, next: NextFunction) {
     try {
       if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
@@ -175,7 +175,7 @@ export class TenantController {
       //O Service será criado com base no tipo de banco de dados e o model usado
       const tenantService: TenantService = new TenantService(req.body.tenantConnection);
 
-      const tenantsUserIsAdmin : Tenant[] = await tenantService.findTenantsUserIsAdmin(req.params.userUID);
+      const tenantsUserIsAdmin: Tenant[] = await tenantService.findTenantsUserIsAdmin(req.params.userUID);
 
       if (tenantsUserIsAdmin == null) {
         throw new NotFoundError("Não foram encontrados tenants que esse usuário é administrador");
@@ -194,7 +194,7 @@ export class TenantController {
       //O Service será criado com base no tipo de banco de dados e o model usado
       const tenantService: TenantService = new TenantService(req.body.tenantConnection);
 
-      const databaseType : DatabaseType = tenantService.getDatabaseType();
+      const databaseType: DatabaseType = tenantService.getDatabaseType();
 
       return res.status(200).send(databaseType);
     } catch (error) {

@@ -73,8 +73,23 @@ export class MongooseAdapter<TInterface, TClass> implements IDatabaseAdapter<TIn
     }
   }
 
-  findMany(query: TInterface): Promise<TClass[]> {
-    throw new Error("Method not implemented");
+  async findMany(query: TInterface): Promise<TInterface[]> {
+    try {
+      const returnedValue = await this.model.find( query! );
+
+      if (returnedValue == null) {
+        return [];
+      }
+
+      return returnedValue;
+    } catch (error) {
+
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+
+      throw new UnknownError("Error to find many documents using mongoose. Detail: "+ error);
+    }
   }
 
   async findById(id: number): Promise<TClass | null> {
@@ -277,4 +292,5 @@ export class MongooseAdapter<TInterface, TClass> implements IDatabaseAdapter<TIn
   async findByIdWithEagerLoading(id: number): Promise<TClass | null>{
     throw new Error("Method not implemented");
   }
+
 }

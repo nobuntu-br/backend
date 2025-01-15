@@ -1,10 +1,18 @@
 import { NotFoundError } from "../../errors/notFound.error";
-import { signupDTO } from "../../models/DTO/signup.DTO";
 import { IUser, User } from "../../models/user.model";
 import UserRepository from "../../repositories/user.repository";
 import { IidentityService } from "../../services/Iidentity.service";
 import { VerificationEmailService } from "../../services/verificationEmail.service";
 import { TokenGenerator } from "../../utils/tokenGenerator";
+
+export type signupInputDTO = {
+  userName: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  invitedTenantsToken: string
+}
 
 export class RegisterUserUseCase {
 
@@ -15,7 +23,7 @@ export class RegisterUserUseCase {
     private tokenGenerator: TokenGenerator
   ) { }
 
-  async execute(input: signupDTO): Promise<IUser> {
+  async execute(input: signupInputDTO): Promise<IUser> {
     try {
 
       if (input.invitedTenantsToken != null) {
@@ -70,7 +78,7 @@ export class RegisterUserUseCase {
     }
   }
 
-  async registerUserOnIdentifyServer(input: signupDTO): Promise<IUser> {
+  async registerUserOnIdentifyServer(input: signupInputDTO): Promise<IUser> {
     return await this.identityService.createUser({
       email: input.email,
       firstName: input.firstName,

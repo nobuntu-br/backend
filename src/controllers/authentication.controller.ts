@@ -4,23 +4,26 @@ import UserRepository from "../repositories/user.repository";
 import { NotFoundError } from "../errors/notFound.error";
 import { IidentityService } from "../services/Iidentity.service";
 import { AzureADService } from "../services/azureAD.service";
-import { SignInUseCase } from "../useCases/authentication/signIn.useCase";
+import { SignInOutputDTO, SignInUseCase } from "../useCases/authentication/signIn.useCase";
 import VerificationEmailRepository from "../repositories/verificationEmail.repository";
-import { SendVerificationCodeToEmailUseCase } from "../useCases/user/sendVerificationCodeToEmail.useCase";
-import { ValidateEmailVerificationCodeUseCase } from "../useCases/user/validateEmailVerificationCode.useCase";
+import { SendVerificationCodeToEmailUseCase } from "../useCases/authentication/sendVerificationCodeToEmail.useCase";
+import { ValidateEmailVerificationCodeUseCase } from "../useCases/authentication/validateEmailVerificationCode.useCase";
 import { EmailService } from "../services/email.service";
-import { ResetUserPasswordUseCase } from "../useCases/user/resetUserPassword.useCase";
+import { ResetUserPasswordUseCase } from "../useCases/authentication/resetUserPassword.useCase";
 import { SendPasswordResetLinkToEmailUseCase } from "../useCases/user/sendPasswordResetLinkToEmail.useCase";
 import DatabasePermissionRepository from "../repositories/databasePermission.repository";
 import { InviteUserToApplicationUseCase } from "../useCases/user/inviteUserToApplication.useCase";
 import { TokenGenerator } from "../utils/tokenGenerator";
 import { VerificationEmailService } from "../services/verificationEmail.service";
 import { RegisterUserUseCase } from "../useCases/user/registerUser.useCase";
-import { CheckEmailExistUseCase } from "../useCases/user/checkEmailExist.useCase";
+import { CheckEmailExistUseCase } from "../useCases/authentication/checkEmailExist.useCase";
+import { ValidateAccessTokenUseCase } from "../useCases/authentication/validateAccessToken.useCase";
+import { UnauthorizedError } from "../errors/unauthorized.error";
+import { SignOutUseCase } from "../useCases/authentication/signOut.useCase";
 
 export class AuthenticationController {
 
-  async signup(req: Request, res: Response, next: NextFunction) {
+  async signUp(req: Request, res: Response, next: NextFunction) {
     try {
 
       if (req.body.tenantConnection == undefined) {
@@ -51,33 +54,170 @@ export class AuthenticationController {
     }
   }
 
-  async signin(req: Request, res: Response, next: NextFunction) {
+  async signIn(req: Request, res: Response, next: NextFunction) {
     try {
 
-      const azureADService: AzureADService = new AzureADService();
-      const signInUseCase: SignInUseCase = new SignInUseCase(azureADService);
-      const result = await signInUseCase.execute({ email: req.body.email, password: req.body.password });
+      if (req.body.tenantConnection == undefined) {
+        throw new NotFoundError("Não foi definido tenant para uso.")
+      }
 
-      return res.status(200).send(result);
+      const userRepository: UserRepository = new UserRepository(req.body.tenantConnection);
+      const azureADService: AzureADService = new AzureADService();
+      const signInUseCase: SignInUseCase = new SignInUseCase(azureADService, userRepository);
+      const result: SignInOutputDTO = await signInUseCase.execute({ email: req.body.email, password: req.body.password });
+
+      //Token de acesso é enviado para o cookie
+      res.cookie('accessToken_' + result.user.id, 'Bearer ' + result.tokens.accessToken, {
+        httpOnly: true, // Previne acesso pelo JavaScript do lado do cliente
+        secure: true,
+        sameSite: 'none',
+        path: '/',
+        maxAge: 10 * 60 * 1000, // 10 minutos (dias * horas * minutos * segundos * milisegundos )
+      });
+
+      res.cookie('refreshToken_' + result.user.id, result.tokens.refreshToken, {
+        httpOnly: true, // Previne acesso pelo JavaScript do lado do cliente
+        secure: true,
+        sameSite: 'none',
+        maxAge: 24 * 60 * 60 * 1000, // 1 dia
+      });
+
+      //Só será enviado dados do usuário
+      return res.status(200).send({ user: result.user });
     } catch (error) {
       next(error);
     }
   }
 
+  async signOut(req: Request, res: Response, next: NextFunction) {
+    try {
+
+      //Obter usuário da sessão atual
+      const sessionUserId = req.headers["usersession"];
+
+      if (sessionUserId == undefined || sessionUserId == null || isNaN(Number(sessionUserId))) {
+        throw new UnauthorizedError("usersession not defined or invalid.");
+      }
+
+      //Obter o token de acesso
+      let accessToken = req.cookies["accessToken_" + sessionUserId];
+
+      if (accessToken == undefined) {
+        throw new UnauthorizedError("accessToken not defined or invalid.");
+      }
+
+      accessToken = accessToken.split(' ')[1]; // Obtém o token após "Bearer"
+
+      let refreshToken = req.cookies["refreshToken_" + sessionUserId];
+
+      const azureADService: AzureADService = new AzureADService();
+      const signoutUseCase: SignOutUseCase = new SignOutUseCase(azureADService);
+
+      await signoutUseCase.execute({
+        accessToken,
+        refreshToken
+      });
+
+      res.clearCookie('accessToken_' + sessionUserId, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+      });
+
+      res.clearCookie('refreshToken_' + sessionUserId, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+      });
+
+      //Só será enviado dados do usuário
+      return res.status(200).send({});
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Faz a limpeza dos cookies do usuário da sessão atual
+   */
+  cleanUserCookies(req: Request, res: Response): Response {
+
+
+    return res;
+  }
+
   async refreshToken(req: Request, res: Response, next: NextFunction) {
     try {
 
-      if (req.body.tenantConnection == undefined) {
-        throw new NotFoundError("Não foi definido tenant para uso.");
+      //Obter usuário da sessão atual
+      const sessionUserId = req.headers["usersession"];
+
+      if (sessionUserId == undefined || sessionUserId == null || isNaN(Number(sessionUserId))) {
+        throw new UnauthorizedError("usersession not defined or invalid.");
       }
 
-      const userRepository: UserRepository = new UserRepository(req.body.tenantConnection);
+      //Obter o token de acesso
+      let refreshToken = req.cookies["refreshToken_" + sessionUserId];
+
+      if (refreshToken == undefined) {
+        throw new UnauthorizedError("refreshToken not defined or invalid.");
+      }
+
+      //Define o serviço de servidor de Identidade
       const identityService: IidentityService = new AzureADService();
 
-      const refreshTokenUseCase: RefreshTokenUseCase = new RefreshTokenUseCase(userRepository, identityService);
-      const response = refreshTokenUseCase.execute({
-        refreshToken: req.body.refreshToken
+      const refreshTokenUseCase: RefreshTokenUseCase = new RefreshTokenUseCase(identityService);
+      const newAccessData = await refreshTokenUseCase.execute({
+        refreshToken: refreshToken
       });
+
+      //Token de acesso é enviado
+      res.cookie('accessToken_' + sessionUserId, 'Bearer ' + newAccessData.tokens.accessToken, {
+        httpOnly: true, // Previne acesso pelo JavaScript do lado do cliente
+        secure: true,
+        sameSite: 'none', // Essa opção em 'strict' Protege contra CSRF
+        path: '/',
+        maxAge: 10 * 60 * 1000, // 10 minutos (dias * horas * minutos * segundos * milisegundos )
+      });
+
+      res.cookie('refreshToken_' + sessionUserId, newAccessData.tokens.refreshToken, {
+        httpOnly: true, // Previne acesso pelo JavaScript do lado do cliente
+        secure: true,
+        sameSite: 'none',
+        maxAge: 24 * 60 * 60 * 1000, // 1 dia
+      });
+
+      return res.status(200).send();
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async silentSingleSignOn(req: Request, res: Response, next: NextFunction) {
+    try {
+
+      const JWKsUri: string | undefined = process.env.JWKsUri;
+      const issuer: string | undefined = process.env.TOKEN_ISSUER;
+      const clientId: string | undefined = process.env.CLIENT_ID;
+
+      if (issuer == undefined || JWKsUri == undefined || clientId == undefined) {
+        throw new NotFoundError("Issuer, clientId or JWKsURI is not populated on environment variables.");
+      }
+
+      const authorizationHeader = req.headers['authorization'];
+
+      if (authorizationHeader == undefined || authorizationHeader == null || authorizationHeader == "") {
+        throw new UnauthorizedError("Access token invalid.");
+      }
+
+      const accessToken = authorizationHeader && authorizationHeader.split(' ')[1];
+
+      if (accessToken == undefined) {
+        throw new UnauthorizedError("Access token invalid.");
+      }
+
+      const validateAccessTokenUseCase: ValidateAccessTokenUseCase = new ValidateAccessTokenUseCase();
+      const response = await validateAccessTokenUseCase.execute(accessToken, { issuer: issuer, audience: clientId, jwksUri: JWKsUri });
 
       return res.status(200).send(response);
     } catch (error) {
@@ -191,11 +331,11 @@ export class AuthenticationController {
       if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
-      
+
       const azureADService: AzureADService = new AzureADService();
       const checkEmailExistUseCase: CheckEmailExistUseCase = new CheckEmailExistUseCase(azureADService);
       const emailIsValid = await checkEmailExistUseCase.execute(req.body);
-      
+
       return res.status(200).send(emailIsValid);
     } catch (error) {
       next(error);

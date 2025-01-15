@@ -16,10 +16,8 @@ setRoutes(app);
 setMiddlewaresAfterRoutes(app);
 
 /**
- * Armazena todas as instâncias de conexão com banco de dados
+ * Instancia classe que Armazena todas as instâncias de conexão com banco de dados
  */
 export const tenantConnectionService: TenantConnectionService = TenantConnectionService.instance;
-
-//TODO colocar o cache aqui também
 
 export default app;

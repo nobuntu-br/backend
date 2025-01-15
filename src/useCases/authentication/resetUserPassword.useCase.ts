@@ -1,12 +1,16 @@
 import { NotFoundError } from "../../errors/notFound.error";
-import { ResetUserPasswordDTO } from "../../models/DTO/resetUserPassword.DTO";
-import { IUser, User } from "../../models/user.model";
+import { User } from "../../models/user.model";
 import UserRepository from "../../repositories/user.repository";
 import { IidentityService } from "../../services/Iidentity.service";
 import { TokenGenerator } from "../../utils/tokenGenerator";
 
 interface JwtPayload {
   email: string
+}
+
+export type ResetUserPasswordInputDTO = {
+  password: string;
+  resetPasswordToken: string;
 }
 
 /**
@@ -20,7 +24,7 @@ export class ResetUserPasswordUseCase {
     private userRepository: UserRepository
   ) {}
 
-  async execute(input: ResetUserPasswordDTO): Promise<boolean> {
+  async execute(input: ResetUserPasswordInputDTO): Promise<boolean> {
     try {
       //TODO será obtido um JWT que será para verificar se ainda é possível realizar a alteraçào da senha do usuário
 

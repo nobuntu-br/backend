@@ -1,7 +1,14 @@
 import { IDatabasePermission } from '../../models/databasePermission.model';
-import { DatabasePermissionDTO } from '../../models/DTO/databasePermission.DTO';
 import UserRepository from '../../repositories/user.repository';
 import DatabasePermissionRepository from '../../repositories/databasePermission.repository';
+
+export type RegisterTenantPermissionInputDTO = {
+  user?: number;
+  tenant: number;
+  databaseCredential: number;
+  userUID: string;
+  isAdmin?: boolean;
+}
 
 export class RegisterTenantPermissionUseCase {
   constructor(
@@ -9,7 +16,7 @@ export class RegisterTenantPermissionUseCase {
     private userRepository: UserRepository
   ) { }
 
-  async execute(input: DatabasePermissionDTO): Promise<IDatabasePermission> {
+  async execute(input: RegisterTenantPermissionInputDTO): Promise<IDatabasePermission> {
 
     try {
 
@@ -29,7 +36,6 @@ export class RegisterTenantPermissionUseCase {
 
       return await this.databasePermissionRepository.create(
         {
-          
           isAdmin: false,
           databaseCredential: input.databaseCredential,
           tenant: input.tenant,

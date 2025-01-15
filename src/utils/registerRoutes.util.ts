@@ -9,26 +9,26 @@ const path = require('path');
  */
 export async function saveRoutes(databaseConnection: TenantConnection) {
 
-  var routesData = readRoutes();
+  let routesData = readRoutes();
+
   const functionSystemRepository: FunctionSystemRepository = new FunctionSystemRepository(databaseConnection);
 
   for (let routeIndex = 0; routeIndex < routesData.length; routeIndex++) {
     const _description = getDescription(routesData[routeIndex].fileName, routesData[routeIndex].method, routesData[routeIndex].path);
-    // const _route = routesData[routeIndex].method + "#" + routesData[routeIndex].path;
     const _route = routesData[routeIndex].path;
     const _classname = routesData[routeIndex].fileName;
     const _method = routesData[routeIndex].method[0];
 
-    let route;
+    let route = await functionSystemRepository.findOne({ route: _route, method: _method });
 
     try {
-      route = await functionSystemRepository.findOne({ route: _route, method: _method });
-    } catch (error) {
-      if (route != null) {
-        await functionSystemRepository.update(route.id!, { description: _description, route: _route, method: _method, classname: _classname });
+      if(route == null){
+        await functionSystemRepository.create({ description: _description, route: _route, method: _method, className: _classname });
       } else {
-        const newRoute = await functionSystemRepository.create({ description: _description, route: _route, method: _method, className: _classname });
+        await functionSystemRepository.update(route.id!, { description: _description, route: _route, method: _method, classname: _classname });
       }
+    } catch (error: any) {
+      throw new Error("Error on create or update functionSystem (routes) on database. Details: "+ error);
     }
 
   }

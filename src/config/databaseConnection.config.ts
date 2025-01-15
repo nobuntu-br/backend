@@ -32,7 +32,6 @@ async function connectToDatabaseWithMongoose(databaseCredential: IDatabaseCreden
 
     const connection = await mongoose.createConnection(uri).asPromise();
 
-    console.log("Conexão com banco de dados MongoDB feita!");
     return connection;
   } catch (error) {
     throw new Error("Erro to connect database using Mongoose. Detail: "+ error);
@@ -67,7 +66,6 @@ async function connectToDatabaseWithSequelize(databaseCredential: IDatabaseCrede
     }
 
     await sequelize.authenticate();
-    console.log("Connected "+ databaseCredential.type + " database.");
     return sequelize;
   } catch (error) {
     throw new Error("Error to connect database using sequelize lib. Detail: "+ error);

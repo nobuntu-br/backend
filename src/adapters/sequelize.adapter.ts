@@ -88,7 +88,7 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
     }
   }
 
-  async findMany(query: TInterface): Promise<TClass[]> {
+  async findMany(query: TInterface): Promise<TInterface[]> {
     try {
       const item = await this._model.findAll({ where: query!, order: [['createdAt', 'DESC']] });
 
@@ -96,7 +96,8 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
         return [];
       }
 
-      return this.jsonDataToResources(item);
+      // return this.jsonDataToResources(item);
+      return item;
     } catch (error) {
       throw new UnknownError("Error to find many entities to database using sequelize.");
     }
@@ -236,15 +237,22 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
   }
 
   protected jsonDataToResources(jsonData: any[]): TClass[] {
+
+    // console.log("jsonData: ", jsonData);
+
+    const formattedResults = jsonData.map((record) => record.get({ plain: true }));//onverte o objeto Sequelize em um objeto plano (plain object) que inclui os dataValues do registro principal e das entidades associadas.
+
     const resources: TClass[] = [];
-    jsonData.forEach(
-      element => resources.push(this.jsonDataToResourceFn(element.dataValues))
+    formattedResults.forEach(
+      // element => resources.push(this.jsonDataToResourceFn(element.dataValues))
+      element => resources.push(this.jsonDataToResourceFn(element))
     );
     return resources;
   }
 
   protected jsonDataToResource(jsonData: any): TClass {
-    return this.jsonDataToResourceFn(jsonData.dataValues);
+    // return this.jsonDataToResourceFn(jsonData.dataValues);
+    return this.jsonDataToResourceFn(jsonData);
   }
 
   /**
@@ -468,8 +476,32 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
     }
   }
 
-  findManyWithEagerLoading(query: TInterface): Promise<TClass[]> {
-    throw new Error("Method not implemented");
+  async findManyWithEagerLoading(query: TInterface): Promise<TClass[]> {
+    try {
+
+      const returnedValue = await this._model.findAll({ where: query!, order: [['createdAt', 'DESC']], include: [{ all: true }] });
+      // const returnedValue = await this._model.findAll({ where: { id: id }, include: [{ all: true }] });
+
+      if (returnedValue == null) {
+        return [];
+      }
+
+      // console.log("resultados não formatados: ", returnedValue);
+
+      
+
+      // console.log("resultado formatados: ", formattedResults);
+      // this.replaceForeignKeyFieldWithData(returnedValue);//TODO não precisa disso mais!
+
+      return this.jsonDataToResources(returnedValue);
+    } catch (error) {
+
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+
+      throw new UnknownError("Error to find data by id using Sequelize. Detail: " + error);
+    }
   }
 
   async findByIdWithEagerLoading(id: number): Promise<TClass | null> {

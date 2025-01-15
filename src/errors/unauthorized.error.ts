@@ -10,5 +10,6 @@ export class UnauthorizedError extends Error implements AppError {
     super(message);
     this.statusCode = 401;
     this.name = 'UnauthorizedError';
+    this.message = message;
   }
 }

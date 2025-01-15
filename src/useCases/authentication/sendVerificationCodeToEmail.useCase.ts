@@ -1,16 +1,19 @@
 import { EmailService } from '../../services/email.service';
-import { IVerificationEmail, VerificationEmail } from '../../models/verificationEmail.model';
-import { SendVerificationCodeToEmailDTO } from '../../models/DTO/sendVerificationCodeToEmail.DTO';
+import { VerificationEmail } from '../../models/verificationEmail.model';
 import { ConflictError } from '../../errors/confict.error';
 import { TooManyRequestsError } from '../../errors/tooManyRequests.error';
 import VerificationEmailRepository from '../../repositories/verificationEmail.repository';
+
+export type SendVerificationCodeToEmailInputDTO = {
+  email: string;
+}
 
 export class SendVerificationCodeToEmailUseCase {
   constructor(
     private verificationEmailRepository: VerificationEmailRepository
   ) { }
 
-  async execute(input: SendVerificationCodeToEmailDTO): Promise<boolean> {
+  async execute(input: SendVerificationCodeToEmailInputDTO): Promise<boolean> {
 
     try {
 

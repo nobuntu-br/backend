@@ -3,8 +3,13 @@ import { BaseController } from "./base.controller";
 import { UserService } from "../services/user.service";
 import { IUser, User } from "../models/user.model";
 import { NotFoundError } from "../errors/notFound.error";
-import { CheckEmailExistUseCase } from "../useCases/user/checkEmailExist.useCase";
+import { IidentityService } from "../services/Iidentity.service";
 import { AzureADService } from "../services/azureAD.service";
+import { GetUserProfilePhotoUseCase } from "../useCases/user/getUserProfilePhoto.useCase";
+import { UpdateUserProfilePhotoUseCase } from "../useCases/user/updateUserProfilePhoto.UseCase";
+import { UnauthorizedError } from "../errors/unauthorized.error";
+import { GetUserGroupsUseCase } from "../useCases/user/getUserGroups.useCase";
+
 
 export class UserController {
 
@@ -55,6 +60,7 @@ export class UserController {
       next(error);
     }
   }
+
   async update(req: Request, res: Response, next: NextFunction) {
     try {
 
@@ -125,23 +131,93 @@ export class UserController {
   /**
    * Cria o usuário dentro do banco de dados da aplicação da empresa
    */
-  async createUserForSpecificTenant(req: Request, res: Response, next: NextFunction){
+  async createUserForSpecificTenant(req: Request, res: Response, next: NextFunction) {
     try {
 
       if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
-      
+
       throw new Error("Função não finalizada");
-      
+
       // return res.status(200).send(result);
     } catch (error) {
       next(error);
     }
   }
 
-  async getUserImage(){
+  async getUserProfilePhotoImage(req: Request, res: Response, next: NextFunction) {
+    try {
+      const identityService: IidentityService = new AzureADService();
+      const getUserProfilePhotoUseCase: GetUserProfilePhotoUseCase = new GetUserProfilePhotoUseCase(identityService);
 
+      const result = await getUserProfilePhotoUseCase.execute({
+        userID: req.body.userID
+      });
+
+      return res.status(200).send(result);
+
+    } catch (error) {
+      next(error);
+    }
   }
- 
+
+  async getUserImage(req: Request, res: Response, next: NextFunction) {
+    try {
+
+      const authorizationHeader = req.headers['authorization'];
+
+      if (authorizationHeader == undefined || authorizationHeader == null || authorizationHeader == "") {
+        throw new UnauthorizedError("Access token invalid.");
+      }
+
+      const accessToken = authorizationHeader && authorizationHeader.split(' ')[1];
+
+      if (accessToken == undefined) {
+        throw new UnauthorizedError("Access token invalid.");
+      }
+
+      const identityService: IidentityService = new AzureADService();
+      const updateUserProfilePhotoUseCase: UpdateUserProfilePhotoUseCase = new UpdateUserProfilePhotoUseCase(identityService);
+
+      const result = await updateUserProfilePhotoUseCase.execute({
+        accessToken: accessToken,
+        photoBlob: req.body//TODO tem que criar um middleware com o multer e guardar a imagem na memória para poder enviar para esse caso de uso
+      });
+
+      return res.status(200).send(result);
+
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getUserGroups(req: Request, res: Response, next: NextFunction){
+    try {
+
+      const authorizationHeader = req.headers['authorization'];
+
+      if (authorizationHeader == undefined || authorizationHeader == null || authorizationHeader == "") {
+        throw new UnauthorizedError("Access token invalid.");
+      }
+
+      const accessToken = authorizationHeader && authorizationHeader.split(' ')[1];
+
+      if (accessToken == undefined) {
+        throw new UnauthorizedError("Access token invalid.");
+      }
+
+      const identityService: IidentityService = new AzureADService();
+
+      const getUserGroupsUseCase: GetUserGroupsUseCase = new GetUserGroupsUseCase(identityService);
+      const result = await getUserGroupsUseCase.execute({
+        accessToken: accessToken
+      });
+
+      return res.status(200).send(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
 }

@@ -1,9 +1,9 @@
 import FileRepository from "../repositories/file.repository";
-import { File, IFile } from "../models/file.model";
+import { File, IFileDatabaseModel } from "../models/file.model";
 import BaseService from "./base.service";
 import TenantConnection from "../models/tenantConnection.model";
 
-export class FileService extends BaseService<IFile, File> {
+export class FileService extends BaseService<IFileDatabaseModel, File> {
   private fileRepository: FileRepository;
 
   constructor(tenantConnection: TenantConnection) {

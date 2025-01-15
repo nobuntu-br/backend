@@ -3,7 +3,7 @@ import validateHeaders from './validators/index.validator';
 import getUserTenant from '../middlewares/tenant.middleware';
 import { OrderController } from '../controllers/order.controller';
 import { createNewOrderValidator, findAllOrderValidator } from './validators/order.validator';
-import { verifyAccess } from '../middlewares/auth.middleware';
+import { checkUserAccess } from '../middlewares/checkUserAccess.middleware';
 
 /**
  * Irá definir as rotas da entidade
@@ -14,9 +14,9 @@ export default function defineRoute(app: Application){
   const router: Router = Router();
   
   //Create a new
-  router.post('/', [verifyAccess, getUserTenant, ...createNewOrderValidator, validateHeaders], controller.create);
+  router.post('/', [checkUserAccess, getUserTenant, ...createNewOrderValidator, validateHeaders], controller.create);
   //Find all
-  router.get('/', [verifyAccess, getUserTenant, ...findAllOrderValidator, validateHeaders], controller.findAll);
+  router.get('/', [checkUserAccess, getUserTenant, ...findAllOrderValidator, validateHeaders], controller.findAll);
   //Find count
   router.get('/count', controller.getCount);
   //Find by id

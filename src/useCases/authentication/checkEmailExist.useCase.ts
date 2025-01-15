@@ -1,6 +1,9 @@
-import { CheckEmailExistDTO } from "../../models/DTO/checkEmailExist.DTO";
 import { IUser } from "../../models/user.model";
 import { IidentityService } from "../../services/Iidentity.service";
+
+export type CheckEmailExistInputDTO = {
+  email: string;
+}
 
 export class CheckEmailExistUseCase {
 
@@ -9,7 +12,7 @@ export class CheckEmailExistUseCase {
   ) {
   }
 
-  async execute(input: CheckEmailExistDTO): Promise<boolean> {
+  async execute(input: CheckEmailExistInputDTO): Promise<boolean> {
     
     try {
 
@@ -18,7 +21,6 @@ export class CheckEmailExistUseCase {
       return true;
 
     } catch (error) {
-      // throw new Error("Falha ao verificar a existência do email. Detalhes: "+error);
       throw error;
     }
   }

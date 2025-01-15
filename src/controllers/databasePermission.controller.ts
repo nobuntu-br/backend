@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { BaseController } from "./base.controller";
 import { RegisterTenantPermissionUseCase } from "../useCases/tenant/registerTenantPermission.useCase";
-import { DatabasePermissionDTO } from "../models/DTO/databasePermission.DTO";
 import { DatabasePermission, IDatabasePermission } from "../models/databasePermission.model";
 import { NotFoundError } from "../errors/notFound.error";
 import DatabasePermissionRepository from "../repositories/databasePermission.repository";
@@ -22,13 +21,12 @@ export class DatabasePermissionController {
       const userRepository: UserRepository = new UserRepository(req.body.tenantConnection);
       const registerTenantPermissionUseCase : RegisterTenantPermissionUseCase = new RegisterTenantPermissionUseCase(databasePermissionRepository, userRepository);
 
-      const userTenant: DatabasePermissionDTO = {
+      const registeredUserTenant : IDatabasePermission  = await registerTenantPermissionUseCase.execute({
         tenant: req.body.tenant,
         databaseCredential: req.body.databaseCredential,
         userUID: req.body.UID
-      }
+      });
 
-      const registeredUserTenant : IDatabasePermission  = await registerTenantPermissionUseCase.execute(userTenant);
       res.status(200).send(registeredUserTenant);
 
     } catch (error) {

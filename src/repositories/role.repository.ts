@@ -4,7 +4,6 @@ import { IRoleDataBaseModel, Role } from "../models/role.model";
 import TenantConnection from "../models/tenantConnection.model";
 import BaseRepository from "./base.repository";
 
-
 export default class RoleRepository extends BaseRepository<IRoleDataBaseModel, Role>{
 
   constructor(tenantConnection: TenantConnection){

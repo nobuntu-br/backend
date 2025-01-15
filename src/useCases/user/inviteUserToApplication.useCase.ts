@@ -1,11 +1,17 @@
 import { InsufficientPermissionError } from "../../errors/insufficientPermission.error";
 import { NotFoundError } from "../../errors/notFound.error";
-import { InviteUserToApplicationDTO } from "../../models/DTO/inviteUserToApplication.DTO";
 import { ITenant } from "../../models/tenant.model";
 import DatabasePermissionRepository from "../../repositories/databasePermission.repository";
 import UserRepository from "../../repositories/user.repository";
 import { EmailService } from "../../services/email.service";
 import { TokenGenerator } from "../../utils/tokenGenerator";
+
+export type InviteUserToApplicationInputDTO = {
+  invitingUserUID: string;
+  invitingUserEmail: string;//Email do usuário que está convidando alguém
+  invitedUserEmail: string;//Email do usuário que está sendo convidado
+  invitedUserTenantIds: number[];
+}
 
 export class InviteUserToApplicationUseCase {
   private applicationName: string;
@@ -32,7 +38,7 @@ export class InviteUserToApplicationUseCase {
 
   }
 
-  async execute(input: InviteUserToApplicationDTO): Promise<any> {
+  async execute(input: InviteUserToApplicationInputDTO): Promise<any> {
     //Verificar se o usuário atual tem permissão de administrador para convidar alguém
     const invitingUser = await this.userRepository.findOne({ email: input.invitingUserEmail });
 
