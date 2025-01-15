@@ -1,8 +1,6 @@
 import moment from 'moment';
 import 'moment/locale/pt-br';
-// import { PrismaClient } from '@prisma/client';
 
-// const prisma = new PrismaClient();
 
 interface IErrorResult {
     message: string;
@@ -20,7 +18,7 @@ interface IChartSeries {
     series: { name: string; value: number }[];
 }
 
-interface IFilter {
+export interface IFilter {
     typeFilter: string;
     startDate?: string;
     endDate?: string;
@@ -32,7 +30,7 @@ interface IFilter {
 /**
  * Gera de forma assíncrona dados para gráficos com base nos parâmetros fornecidos.
  * 
- * @param query - A string de consulta para buscar os dados brutos.
+ * @param data - Os dados a serem utilizados no gráfico.
  * @param type - O tipo de gráfico a ser gerado. Os valores suportados são "default" e "series".
  * @param name - O nome a ser usado nos dados do gráfico, tipicamente representando a categoria ou etiqueta dos dados.
  * @param value - O valor a ser usado nos dados do gráfico, tipicamente representando o valor dos dados para cada categoria ou etiqueta.
@@ -41,9 +39,8 @@ interface IFilter {
  * @returns Uma promessa que resolve para um objeto. Se bem-sucedido, o objeto contém os dados do gráfico gerados.
  * Se ocorrer um erro, o objeto contém uma mensagem de erro, um código de erro e uma descrição do status.
  */
-async function chartUtil(query: string, type: string, name: string, value: string, series?: string): Promise<IChartDefault[] | IChartSeries[] | IErrorResult> {
+async function chartUtil(data: any, type: string, name: string, value: string, series?: string): Promise<IChartDefault[] | IChartSeries[] | IErrorResult> {
     try {
-        let data = await queryRaw(query);
 
         switch (type) {
             case "default":
@@ -62,19 +59,19 @@ async function chartUtil(query: string, type: string, name: string, value: strin
  * Filtra os dados de um gráfico com base no tipo de filtro especificado no corpo da requisição.
  * 
  * @param bodyReq - O corpo da requisição contendo os parâmetros do filtro.
- * @param query - A consulta base para buscar os dados antes de aplicar o filtro.
+ * @param data - Os dados a serem filtrados.
  * @returns Uma promessa que resolve para um objeto. Se o filtro for aplicado com sucesso,
  * o objeto contém os dados filtrados. Se o tipo de filtro não for suportado, retorna uma mensagem de erro,
  * código de status HTTP e texto de status. Em caso de outro erro, retorna uma mensagem de erro genérica,
  * código de status HTTP e texto de status.
  */
-async function chartFilter(filter: IFilter, query: string): Promise<IChartSeries[] | IErrorResult> {
+async function chartFilter(filter: IFilter, data: any): Promise<IChartSeries[] | IErrorResult> {
     try {
         const { typeFilter } = filter;
 
         switch (typeFilter) {
             case "date":
-                return dateFilter(filter, query);
+                return dateFilter(filter, data);
             default:
                 return { message: "Tipo de gráfico não suportado.", code: 400, status: "Bad Request" };
         }
@@ -101,7 +98,8 @@ function seriesMapFormatted(data: any[], series: string, name: string, value: st
     let resData: IChartSeries[] = [];
     let seriesData: { [key: string]: { name: string; value: number }[] } = {};
 
-    data.forEach((item: any) => {
+    for(let i = 0; i < data.length; i++) {
+        let item = data[i];
         if (seriesData[item[name]]) {
             seriesData[item[name]].push({
                 name: moment(item[series]).format('ddd, DD MMM'),
@@ -121,8 +119,8 @@ function seriesMapFormatted(data: any[], series: string, name: string, value: st
                 series: seriesData[key]
             };
         }).filter(item => item !== null) as IChartSeries[];
-    });
-
+    }
+    
     return resData;
 }
 
@@ -153,32 +151,28 @@ function defaultGraphic(data: any[], name: string, value: string): IChartDefault
  * Filtra os dados de um gráfico com base em um intervalo de datas especificado no corpo da requisição.
  * 
  * @param filter - O objeto contendo os parâmetros do filtro.
- * @param query - A consulta base para buscar os dados antes de aplicar o filtro.
+ * @param data - Os dados a serem filtrados.
  * @returns Uma promessa que resolve para um objeto contendo os dados filtrados por data.
  */
-async function dateFilter(filter: IFilter, query: string): Promise<IChartSeries[] | IErrorResult> {
+async function dateFilter(filter: IFilter, data: any): Promise<IChartSeries[] | IErrorResult> {
     const { startDate, endDate, series, name, value } = filter;
 
     if (!startDate || !endDate) {
         return { message: "Data de início e fim são obrigatórias.", code: 400, status: "Bad Request" };
     }
 
-    const filterDateQuery = `WHERE ${series} BETWEEN '${startDate}' AND '${endDate}'`;
-
-    let data = await queryRaw(insertWhereClause(query, filterDateQuery));
+    data = filterDataByDate(data, startDate, endDate, series!);
 
     return seriesMapFormatted(data, series!, name!, value!);
 }
 
-async function queryRaw(query: string): Promise<any[]> {
-    try {
-        throw new Error("Método não implementado");
-        // const data = await prisma.$queryRaw(query);
-        // return data;
+async function filterDataByDate(data: any[], startDate: string, endDate: string, series: string): Promise<any[]> {
+    let filteredData = data.filter(item => {
+        let date = moment(item[series]).format('YYYY-MM-DD');
+        return moment(date).isBetween(startDate, endDate, 'days', '[]');
+    });
 
-    } catch (error) {
-        throw new Error((error as Error).message);
-    }
+    return filteredData;
 }
 
 function replacer(key: string, value: any): any {
