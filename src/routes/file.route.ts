@@ -1,5 +1,4 @@
 import { Application, Router } from 'express';
-import getUserTenant from '../middlewares/tenant.middleware';
 import validateHeaders from './validators/index.validator';
 import { FileController } from '../controllers/file.controller';
 import { checkUserAccess } from '../middlewares/checkUserAccess.middleware';
@@ -8,19 +7,19 @@ export default function defineRoute(app: Application) {
   const controller: FileController = new FileController();
   const router: Router = Router();
   // Create a new File 
-  router.post('/', [checkUserAccess, getUserTenant, validateHeaders], controller.create);
+  router.post('/', [checkUserAccess, validateHeaders], controller.create);
   // Retrieve all estrutura_orcamento 
-  router.get('/', [checkUserAccess, getUserTenant, validateHeaders], controller.findAll);
+  router.get('/', [checkUserAccess, validateHeaders], controller.findAll);
   // Retrieve cout estrutura_orcamento
-  router.get('/count', [checkUserAccess, getUserTenant], controller.getCount);
+  router.get('/count', [checkUserAccess], controller.getCount);
   // Retrieve a single File with id 
-  router.get('/:id', [checkUserAccess, getUserTenant], controller.findById);
+  router.get('/:id', [checkUserAccess], controller.findById);
   // Update a File with id 
-  router.put('/:id', [checkUserAccess, getUserTenant], controller.update);
+  router.put('/:id', [checkUserAccess], controller.update);
   // Delete a File with id 
-  router.delete('/:id', [checkUserAccess, getUserTenant], controller.delete);
+  router.delete('/:id', [checkUserAccess], controller.delete);
   // Custom get File 
-  router.post("/custom", [checkUserAccess, getUserTenant], controller.customQuery);
+  router.post("/custom", [checkUserAccess], controller.customQuery);
 
   app.use('/api/file', router);
 }; 

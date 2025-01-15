@@ -2,8 +2,8 @@ import { Application, Router } from 'express';
 import validateHeaders from './validators/index.validator';
 import { UserController } from '../controllers/user.controller';
 import { findAllUserValidator, findUserByUIDValidator } from './validators/user.validator';
-import getUserTenant, { getSecurityTenant } from '../middlewares/tenant.middleware';
 import { checkUserAccess } from '../middlewares/checkUserAccess.middleware';
+import { getSecurityTenant } from '../middlewares/tenant.middleware';
 
 /**
  * Irá definir as rotas da entidade
@@ -18,7 +18,7 @@ export default function defineRoute(app: Application) {
   router.get('/get-user-groups', controller.getUserGroups);
 
   //Criar novo usuário para salvar no banco de dados de alguma empresa
-  router.post('/client/signup', [checkUserAccess, getUserTenant], controller.createUserForSpecificTenant);
+  router.post('/client/signup', [checkUserAccess], controller.createUserForSpecificTenant);
 
   //Find all
   router.get('/', [getSecurityTenant, ...findAllUserValidator, validateHeaders], controller.findAll);

@@ -2,7 +2,7 @@ import { Application, Router } from "express";
 import { ComponentStructureController } from "../controllers/componentStructure.controller";
 import validateHeaders from "./validators/index.validator";
 import { getPageStructureValidator } from "./validators/componentStructure.validators";
-import getUserTenant from "../middlewares/tenant.middleware";
+import { checkUserAccess } from "../middlewares/checkUserAccess.middleware";
 
 /**
  * Irá definir as rotas da entidade
@@ -12,7 +12,7 @@ export default function defineRoute(app: Application) {
   const controller: ComponentStructureController = new ComponentStructureController();
   const router: Router = Router();
 
-  router.post('/', [getUserTenant, ...getPageStructureValidator, validateHeaders], controller.findOne);
+  router.post('/', [checkUserAccess, ...getPageStructureValidator, validateHeaders], controller.findOne);
 
   app.use('/api/component-structure', router);
 } 

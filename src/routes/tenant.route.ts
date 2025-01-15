@@ -2,8 +2,8 @@ import { Application, Router } from 'express';
 import { TenantController } from '../controllers/tenant.controller';
 import { createNewTenantValidator, findAllTenantValidator } from './validators/tenant.validator';
 import validateHeaders from './validators/index.validator';
-import getUserTenant, { getSecurityTenant } from '../middlewares/tenant.middleware';
 import { checkUserAccess } from '../middlewares/checkUserAccess.middleware';
+import { getSecurityTenant } from '../middlewares/tenant.middleware';
 
 /**
  * Irá definir as rotas da entidade
@@ -13,7 +13,7 @@ export default function defineRoute(app: Application) {
   const controller: TenantController = new TenantController();
   const router: Router = Router();
 
-  router.get('/database-type', [getUserTenant], controller.getDatabaseType);
+  router.get('/database-type', [checkUserAccess], controller.getDatabaseType);
   //Get tenant user is admin
   router.get('/isAdmin/uid/:userUID', [getSecurityTenant], controller.findTenantsUserIsAdmin);
   //Create a new
