@@ -8,9 +8,9 @@ export type DatabasePermissionDetailOutputDTO = {
   };
   databaseCredential: {
     id: number,
-
   };
   userUID: string;
+  userId: number;
   isAdmin?: boolean;
 }
 

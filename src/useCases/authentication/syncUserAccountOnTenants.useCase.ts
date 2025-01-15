@@ -1,0 +1,80 @@
+import { connectTenant } from "../../config/database.config";
+import { DatabaseCredential } from "../../models/databaseCredential.model";
+import { DatabasePermission } from "../../models/databasePermission.model";
+import { User } from "../../models/user.model";
+import DatabasePermissionRepository from "../../repositories/databasePermission.repository";
+import UserRepository from "../../repositories/user.repository";
+import { TenantConnectionService } from "../../services/tenantConnection.service";
+import { GetSecurityTenantConnectionUseCase } from "../tenant/getSecurityTenantConnection.useCase";
+
+/**
+ * Realizar o cadastro ou atualização dos dados do usuário em todos os bancos de dados que ele tem acesso
+ */
+export class SyncUserAccountOnTenantsUseCase {
+  constructor(){}
+
+  async execute(userUID: string, accessData: any): Promise<boolean> {
+
+    //Obter o security
+    const getSecurityTenantConnectionUseCase: GetSecurityTenantConnectionUseCase = new GetSecurityTenantConnectionUseCase();
+    const securityTenant = await getSecurityTenantConnectionUseCase.execute();
+
+    const databasePermissionRepository: DatabasePermissionRepository = new DatabasePermissionRepository(securityTenant);
+
+    //Varrer no security todos os bancos que esse usuário tem acesso
+    let databasePermissions: DatabasePermission[] = await databasePermissionRepository.findDatabaseCredentialByUserUID(userUID);
+
+    
+    for (let index = 0; index < databasePermissions.length; index++) {
+      const databaseCredential = databasePermissions[index].databaseCredential as DatabaseCredential;
+      
+      try {
+
+        //Realizar a conexão em todo tenant para atualizar o usuário neles
+        const tenantConnectionService: TenantConnectionService = TenantConnectionService.instance;
+
+        let databaseConnection = tenantConnectionService.findOneConnection(databaseCredential.id!);
+
+        if(databaseConnection == null){
+          databaseConnection = await connectTenant(databaseCredential);
+        }
+
+        const userRepository: UserRepository = new UserRepository(databaseConnection);
+
+        //Busca usuário
+        const user: User | null = await userRepository.findOne({ UID: userUID });
+
+        if (user == null) {
+          await userRepository.create(new User({
+            UID: accessData.user.UID,//UID do servidor de identidade
+            userName: accessData.user.userName,
+            firstName: accessData.user.firstName,
+            lastName: accessData.user.lastName,
+            isAdministrator: false,
+            email: accessData.user.email,
+            tenantUID: "test" //TODO é necessário esse campo?
+          }));
+        } else {
+          //Atualiza os dados de usuário que estão no servidor de identidade para o banco de dados de uso
+          await userRepository.update(
+            user.id!,
+            {
+              UID: accessData.user.UID,//UID do servidor de identidade
+              userName: accessData.user.userName,
+              firstName: accessData.user.firstName,
+              lastName: accessData.user.lastName,
+              isAdministrator: false,
+              email: accessData.user.email,
+              tenantUID: "test" //TODO é necessário esse campo?
+            }
+          );
+        }
+      } catch (error) {
+        console.log("Erro ao realizar conexào com tenant para atualizar usuário nos tenants de acesso: ", error);
+        //Se der ruim na conexão com tenant tem que ver oque faz
+        throw new Error("Error to register client on tenants. Details: "+ error);
+      }
+    }
+    return true;
+  }
+}

@@ -25,7 +25,7 @@ POST {{hostname}}/api/authentication/check-email-exist
 content-type: application/json
 
 {
-  "email":"jefersoncmnn@gmail.com"
+  "email":"diketen791@rabitex.com"
 }
 ###
 

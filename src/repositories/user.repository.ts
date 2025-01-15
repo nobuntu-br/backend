@@ -30,6 +30,24 @@ export default class UserRepository extends BaseRepository<IUserDatabaseModel, U
     }
   }
 
+  async isUserAdminById(userId: number): Promise<boolean> {
+    try {
+      const _user = await this.adapter.findOne({ id: userId });
+
+      if (_user != null && _user.isAdministrator != null) {
+        //Se o usuário é administrador
+        if (_user.isAdministrator == true) {
+          return true;
+        }
+      }
+
+      return false;
+
+    } catch (error) {
+      throw new UnknownError("Error to check if user is Admin. Detail: "+ error);
+    }
+  }
+
   async IfApplicationHasRegisteredUsers() {
     try {
       const users: User[] = await this.adapter.findAll(1, 1);

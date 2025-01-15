@@ -30,7 +30,7 @@ export default abstract class BaseRepository<TInterface, TClass> implements IBas
     return this.adapter.findOne(query);
   }
 
-  findMany(query: TInterface): Promise<TClass[]> {
+  findMany(query: TInterface): Promise<TInterface[]> {
     return this.adapter.findMany(query);
   }
 

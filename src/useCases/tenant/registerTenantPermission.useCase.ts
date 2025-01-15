@@ -36,7 +36,6 @@ export class RegisterTenantPermissionUseCase {
 
       return await this.databasePermissionRepository.create(
         {
-          
           isAdmin: false,
           databaseCredential: input.databaseCredential,
           tenant: input.tenant,

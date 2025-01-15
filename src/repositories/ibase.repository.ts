@@ -6,7 +6,7 @@ export interface IBaseRepository<TInterface, TClass> {
   create(data: TClass): Promise<TClass>;
   findAll(limitPerPage: number, offset: number): Promise<TClass[]>;
   findOne(query: TInterface): Promise<TClass | null>;
-  findMany(query: TInterface): Promise<TClass[]>;
+  findMany(query: TInterface): Promise<TInterface[]>;
   findById(id: number): Promise<TClass | null>;
   getCount(): Promise<number>;
   update(id: number, data: Object): Promise<TClass | null>;

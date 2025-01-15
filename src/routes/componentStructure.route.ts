@@ -1,6 +1,5 @@
 import { Application, Router } from "express";
 import { ComponentStructureController } from "../controllers/componentStructure.controller";
-import { verifyAccess } from "../middlewares/auth.middleware";
 import validateHeaders from "./validators/index.validator";
 import { getPageStructureValidator } from "./validators/componentStructure.validators";
 import getUserTenant from "../middlewares/tenant.middleware";

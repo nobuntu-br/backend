@@ -44,7 +44,7 @@ export default class BaseService<TInterface, TClass> implements IBaseService<TIn
     return returnedValue;
   }
 
-  findMany(query: TInterface): Promise<TClass[]> {
+  findMany(query: TInterface): Promise<TInterface[]> {
     return this.repository.findMany(query);
   }
 

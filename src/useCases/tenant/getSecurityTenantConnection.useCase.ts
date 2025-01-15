@@ -15,9 +15,9 @@ export class GetSecurityTenantConnectionUseCase {
   * @returns retornar uma instância de conexão com o banco de dados
   */
   async execute(): Promise<TenantConnection> {
-    const tenantId : number = Number(process.env.SECURITY_TENANT_DATABASE_ID);
+    const tenantCredentialId : number = Number(process.env.SECURITY_TENANT_DATABASE_ID);
 
-    if (isNaN(tenantId)) {
+    if (isNaN(tenantCredentialId)) {
       throw new Error(`Dados ausentes ao realizar a conexão com o banco security`);
     }
 
@@ -41,15 +41,15 @@ export class GetSecurityTenantConnectionUseCase {
       sslCertificate: process.env.SECURITY_TENANT_DATABASE_SSL_CERTIFICATE
     });
 
-    if (databaseCredential.checkDatabaseCredential(databaseCredential) == false || tenantId == undefined) {
+    if (databaseCredential.checkDatabaseCredential(databaseCredential) == false || tenantCredentialId == undefined) {
       throw new Error("Missing data on environment variables to connect Security Tenant.");
     }
 
+    const tenantConnectionService: TenantConnectionService = TenantConnectionService.instance;
+
     try {
 
-      const tenantConnectionService: TenantConnectionService = TenantConnectionService.instance;
-
-      let tenantConnection: TenantConnection | null = tenantConnectionService.findOneConnection(tenantId);
+      let tenantConnection: TenantConnection | null = tenantConnectionService.findOneConnection(tenantCredentialId);
 
       if (tenantConnection != null) {
         return tenantConnection;
@@ -63,7 +63,7 @@ export class GetSecurityTenantConnectionUseCase {
 
       tenantConnection.models = await this.getModelsSecurity(databaseCredential.type!, tenantConnection);
 
-      tenantConnectionService.setOnTenantConnectionPool(tenantId, tenantConnection);
+      tenantConnectionService.setOnTenantConnectionPool(tenantCredentialId, tenantConnection);
 
       console.log("Connection established with the Security database. Responsible for managing Tenants.");
       return tenantConnection;

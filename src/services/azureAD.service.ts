@@ -35,25 +35,28 @@ export class AzureADService implements IidentityService {
   private tenantID: string;
   private scope: string;
   private domainName: string;
+  private authenticationFlowDomainName: string;
 
   constructor(
   ) {
 
     if (
-      process.env.AZURE_CLIENT_ID === undefined ||
-      process.env.AZURE_CLIENT_SECRET === undefined ||
-      process.env.AZURE_TENANT_ID === undefined ||
-      process.env.AZURE_SCOPE === undefined ||
-      process.env.AZURE_DOMAIN_NAME === undefined
+      process.env.CLIENT_ID === undefined ||
+      process.env.CLIENT_SECRET === undefined ||
+      process.env.TENANT_ID === undefined ||
+      process.env.SCOPE === undefined ||
+      process.env.DOMAIN_NAME === undefined ||
+      process.env.AUTHENTICATION_FLOW_DOMAIN_NAME === undefined
     ) {
       throw new NotFoundError("Dados relacionados as requisições nos serviços da Azure não estão contidos nas variáveis ambiente");
     }
 
-    this.clientId = process.env.AZURE_CLIENT_ID;
-    this.clientSecret = process.env.AZURE_CLIENT_SECRET;
-    this.tenantID = process.env.AZURE_TENANT_ID;
-    this.scope = process.env.AZURE_SCOPE;
-    this.domainName = process.env.AZURE_DOMAIN_NAME;
+    this.clientId = process.env.CLIENT_ID;
+    this.clientSecret = process.env.CLIENT_SECRET;
+    this.tenantID = process.env.TENANT_ID;
+    this.scope = process.env.SCOPE;
+    this.domainName = process.env.DOMAIN_NAME;
+    this.authenticationFlowDomainName = process.env.AUTHENTICATION_FLOW_DOMAIN_NAME;
   }
 
   /**
@@ -125,33 +128,53 @@ export class AzureADService implements IidentityService {
     }
   }
 
-  async refreshAccessToken(refreshToken: string): Promise<string> {
-    const policies = 'b2c_1_ropc';
-
+  async refreshToken(refreshToken: string): Promise<SignInOutputDTO> {
     try {
-      const getTokenUrl = 'https://allystore.b2clogin.com/' + this.domainName + '/oauth2/v2.0/token?p=' + policies;
+      const tokenEndpoint = `https://${this.authenticationFlowDomainName}/${this.tenantID}/oauth2/v2.0/token?p=b2c_1_ropc`;
 
       const urlSearchParams = new URLSearchParams({
-        client_id: this.clientId,
-        refresh_token: refreshToken,
-        scope: this.scope,
-        grant_type: 'refresh_token'
+        'grant_type': 'refresh_token',
+        'client_id': this.clientId,
+        'refresh_token': refreshToken,
+        'scope': this.scope + ' openid offline_access'
       });
 
       // Realiza a requisição no servidor da Azure para obter o novo access token
-      const tokenResponse = await axios.post(getTokenUrl, urlSearchParams.toString(), {
+      const tokenResponse = await axios.post(tokenEndpoint, urlSearchParams.toString(), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       });
 
-      const accessToken: string = tokenResponse.data.access_token;
+      //Informações detalhadas do perfil do usuário autenticado.
+      const userData = this.parseJwt(tokenResponse.data.access_token);
 
-      return accessToken;
+      const accessData: SignInOutputDTO = {
+        user: {
+          UID: userData.sub,
+          tenantUID: "",
+          userName: userData.name,
+          firstName: userData.given_name,
+          lastName: userData.family_name,
+          email: ""
+        },
+        tokens: {
+          accessToken: tokenResponse.data.access_token,
+          refreshToken: tokenResponse.data.refresh_token,
+          tokenType: tokenResponse.data.token_type,
+          expiresIn: tokenResponse.data.expires_in,
+          expiresOn: tokenResponse.data.expires_on,
+          refreshTokenExpiresIn: tokenResponse.data.refresh_token_expires_in
+        }
+      }
+
+      return accessData;
+
     } catch (error: any) {
       if (error.response) {
         console.log(error.response.data);
       }
+
       throw new Error("Erro ao obter o accessToken do serviço Azure. Detalhes: " + error);
     }
   }
@@ -201,7 +224,9 @@ export class AzureADService implements IidentityService {
 
       const _user = {
         accountEnabled: true,
-        displayName: user.userName,
+        displayName: user.userName,//Nome completo
+        givenName: user.firstName,
+        surname: user.lastName,
         mailNickname: this.getUsernameFromEmail(user.email!),
         userPrincipalName: this.getUsernameFromEmail(user.email!) + "@" + this.domainName,//TODO tem que ser dominio do azure AD
         passwordProfile: {
@@ -240,7 +265,7 @@ export class AzureADService implements IidentityService {
 
   }
 
-  async loginUser(username: string, password: string): Promise<SignInOutputDTO> {
+  async signIn(username: string, password: string): Promise<SignInOutputDTO> {
 
     const urlSearchParams = new URLSearchParams({
       'grant_type': 'password',
@@ -253,38 +278,65 @@ export class AzureADService implements IidentityService {
 
     try {
 
-      const loginUserResponse = await axios.post('https://allystore.b2clogin.com/' + this.domainName + '/oauth2/v2.0/token?p=b2c_1_ropc', urlSearchParams.toString(), {
+      const signInResponse = await axios.post(`https://${this.authenticationFlowDomainName}/${this.domainName}/oauth2/v2.0/token?p=b2c_1_ropc`, urlSearchParams.toString(), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         },
       });
 
-      const profile = this.parseJwt(loginUserResponse.data.access_token);
+      //Informações detalhadas do perfil do usuário autenticado.
+      const userData = this.parseJwt(signInResponse.data.access_token);
 
       return {
         user: {
-          UID: profile.sub,
-          tenantUID: this.tenantID,
-          userName: profile.name,
-          firstName: profile.given_name,
-          lastName: profile.family_name,
-          email: username
+          UID: userData.sub,
+          tenantUID: "",
+          userName: userData.name,
+          firstName: userData.given_name,
+          lastName: userData.family_name,
+          email: ""
         },
         tokens: {
-          accessToken: loginUserResponse.data.access_token,
-          refreshToken: loginUserResponse.data.refresh_token,
-          tokenType: loginUserResponse.data.token_type,
-          expiresAt: loginUserResponse.data.expires_at,
+          accessToken: signInResponse.data.access_token,
+          refreshToken: signInResponse.data.refresh_token,
+          tokenType: signInResponse.data.token_type,
+          expiresIn: signInResponse.data.expires_in,
+          expiresOn: signInResponse.data.expires_on,
+          refreshTokenExpiresIn: signInResponse.data.refresh_token_expires_in
         }
       }
     } catch (error: any) {
-        console.log(error.response);
+      console.log(error.response);
 
-      if(error.response.status == 400){
+      if (error.response.status == 400) {
         throw new ValidationError("Error to access account.")
       }
 
       throw error;
+    }
+
+  }
+
+  async signOut(accessToken: string, refreshToken: string | null): Promise<boolean> {
+    const urlSearchParams = new URLSearchParams({
+      'grant_type': 'password',
+      'client_id': this.clientId,
+      'token': accessToken,
+      "refresh_token": refreshToken != null ? refreshToken : "",
+    });
+
+    try {
+      const signInResponse = await axios.post(`https://${this.authenticationFlowDomainName}/${this.domainName}/oauth2/v2.0/logout?p=b2c_1_ropc`, urlSearchParams.toString(), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+      });
+
+      return true;
+
+    } catch (error) {
+      console.log("Erro ao realizar a requisição de logout pra Azure. Details: "+ error);
+      throw new Error("Error to signout user on Azure Indentity Server. Detail: "+ error);
     }
 
   }
@@ -430,7 +482,7 @@ export class AzureADService implements IidentityService {
   }
 
   //Requer permissão User.ReadWrite.All ativo
-  async updateUserProfilePhoto(accessToken: string, photoBlob: Blob): Promise<boolean>{
+  async updateUserProfilePhoto(accessToken: string, photoBlob: Blob): Promise<boolean> {
     try {
       // Requisição para alterar imagem de perfil do usuário no servidor da Azure
       const userResponse = await axios.put(this.graphAPIUrl + "v1.0/me/photo/$value", photoBlob, {

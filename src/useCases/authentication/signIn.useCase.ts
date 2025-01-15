@@ -1,8 +1,10 @@
 import { IidentityService } from "../../services/Iidentity.service";
 import { ValidationError } from "../../errors/validation.error";
 import { UnknownError } from "../../errors/unknown.error";
-import { IUser } from "../../models/user.model";
+import { IUser, User } from "../../models/user.model";
 import { IUserAccessData } from "../../models/userAcessData.model";
+import UserRepository from "../../repositories/user.repository";
+import { SyncUserAccountOnTenantsUseCase } from "./syncUserAccountOnTenants.useCase";
 
 export type SignInInputDTO = {
   email: string;
@@ -14,38 +16,47 @@ export type SignInOutputDTO = {
   tokens: IUserAccessData
 }
 
-/*
-user: {
-          UID: profile.sub,
-          tenantUID: this.tenantID,
-          userName: profile.name,
-          firstName: profile.given_name,
-          lastName: profile.family_name,
-          email: username
-        },
-        tokens: {
-          accessToken: loginUserResponse.data.access_token,
-          refreshToken: loginUserResponse.data.refresh_token,
-          tokenType: loginUserResponse.data.token_type,
-          expiresAt: loginUserResponse.data.expires_at,
-        }
-          */
-
 export class SignInUseCase {
 
   constructor(
-    private identityService: IidentityService
+    private identityService: IidentityService,
+    private userRepository: UserRepository
   ) { }
 
   async execute(input: SignInInputDTO): Promise<SignInOutputDTO> {
     try {
-      const user = await this.identityService.loginUser(input.email, input.password);
+      const accessData = await this.identityService.signIn(input.email, input.password);
 
+      let user = await this.userRepository.findOne({ UID: accessData.user.UID });
+
+      const tenantUID = process.env.TENANT_ID;
+
+      accessData.user.email = input.email;
+
+      if(tenantUID == undefined){
+        throw new Error("TENANT_ID environment variables not populed");
+      }
+
+      if (user == null) {
+        //TODO criar o usuário no banco de dados se ele não existir?
+        user = await this.userRepository.create(new User({
+          UID: accessData.user.UID,//UID do servidor de identidade
+          userName: accessData.user.userName,
+          firstName: accessData.user.firstName,
+          lastName: accessData.user.lastName,
+          isAdministrator: false,
+          email: accessData.user.email,
+          tenantUID: tenantUID
+        }));
+      }
+
+      const syncUserAccountOnTenantsUseCase : SyncUserAccountOnTenantsUseCase = new SyncUserAccountOnTenantsUseCase();
+      await syncUserAccountOnTenantsUseCase.execute(accessData.user.UID!, accessData);
+
+      accessData.user.id = user!.id;
       //TODO verificar se o usuário está presente no grupo que dá permissão a aplicação para permitir ou não ele de realizar o acesso
-      
 
-
-      return user;
+      return accessData;
     } catch (error: any) {
       if (error instanceof ValidationError) {
         throw error;

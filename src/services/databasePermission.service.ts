@@ -1,8 +1,9 @@
-import { myCache } from "../config/database.config";
 import { DatabasePermission, IDatabasePermissionDatabaseModel } from "../models/databasePermission.model";
 import TenantConnection from "../models/tenantConnection.model";
 import DatabasePermissionRepository from "../repositories/databasePermission.repository";
+import { DatabasePermissionDetailOutputDTO } from "../useCases/tenant/getUserTenants.useCase";
 import BaseService from "./base.service";
+import { TenantConnectionService } from "./tenantConnection.service";
 
 export default class DatabasePermissionService extends BaseService<IDatabasePermissionDatabaseModel, DatabasePermission> {
   private databasePermissionRepository: DatabasePermissionRepository;
@@ -19,37 +20,14 @@ export default class DatabasePermissionService extends BaseService<IDatabasePerm
   async userHasAccessToTenant(userUID: string, tenantId: number): Promise<boolean> {
     try {
 
-      if (this.getUserAcessToTenantOnCache(userUID, tenantId) != null) {
-        return true;
-      }
+      const tenantConnectionService: TenantConnectionService = TenantConnectionService.instance;
 
-      const databasePermission = await this.getTenantsWithDefaultTenantByUserUID(userUID);
-
-      if (databasePermission == null) {
-        return false;
-      }
-
-      this.saveUserAcessToTenantOnCache(userUID, tenantId, databasePermission);
-      return true;
+      return tenantConnectionService.checkUserPermissionTenant(userUID, tenantId);
 
     } catch (error) {
       throw new Error("Erro ao buscar o usuário e os tenants " + error);
     }
 
-  }
-
-  saveUserAcessToTenantOnCache(userUID: string, tenantId: number, databasePermission: Object) {
-    try {
-      myCache.set(userUID + tenantId, databasePermission);
-    } catch (error) {
-      console.warn(error);
-      throw new Error("Erro ao salvar databasePermission no cache")
-    }
-  }
-
-  getUserAcessToTenantOnCache(userUID: string, tenantId: number): string | null {
-    //TODO se não encontrar nada do cache, retornar null
-    return myCache.get(userUID + String(tenantId));
   }
 
   //TODO  um usuário X que deve ser administrador do tenant pode alterar quais usuários tem permissão no tenant. Ao ter feito alguma alteração, tem que ser alterado no cache.
@@ -62,6 +40,13 @@ export default class DatabasePermissionService extends BaseService<IDatabasePerm
     } catch (error) {
       throw new Error("Erro ao obter userTenants com o tenant padrão");
     }
+  }
+
+  async saveDatabasePermissionsOnMemory() {
+    const usersPermissions : DatabasePermissionDetailOutputDTO[] = await this.databasePermissionRepository.getTenantsUsersHasAccess();
+    
+    const tenantConnectionService: TenantConnectionService = TenantConnectionService.instance;
+    tenantConnectionService.permissions = usersPermissions;
   }
 
 }

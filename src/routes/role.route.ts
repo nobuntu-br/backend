@@ -3,7 +3,7 @@ import { RoleController } from '../controllers/role.controller';
 import validateHeaders from './validators/index.validator';
 import { createNewRoleValidator, findAllRoleValidator } from './validators/role.validator';
 import getUserTenant from '../middlewares/tenant.middleware';
-
+import { checkUserAccess } from '../middlewares/checkUserAccess.middleware';
 /**
  * Irá definir as rotas da entidade
  * @param app Instância da aplicação express
@@ -17,7 +17,7 @@ export default function defineRoute(app: Application){
   //Find all
   router.get('/', [...findAllRoleValidator, validateHeaders], controller.findAll);
   //Find count
-  router.get('/count', controller.getCount);
+  router.get('/count', [checkUserAccess], controller.getCount);
   //Find by id
   router.get('/:id', controller.findById);
   //Update

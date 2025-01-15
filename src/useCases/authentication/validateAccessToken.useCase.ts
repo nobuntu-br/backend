@@ -5,6 +5,7 @@ import { UnauthorizedError } from "../../errors/unauthorized.error";
 interface ValidateTokenOptions {
   issuer: string; // O emissor esperado do token
   audience?: string; // A audiência esperada (opcional) (nesse caso é o ClientId)
+  jwksUri: string;
 }
 
 interface DecodedToken extends JwtPayload {
@@ -18,7 +19,7 @@ export class ValidateAccessTokenUseCase {
   async execute(token: string, options: ValidateTokenOptions): Promise<DecodedToken> {
 
     const _jwksClient = jwksClient({
-      jwksUri: options.issuer, // URL do JWK do emissor
+      jwksUri: options.jwksUri, // URL do JWK do emissor
     });
 
     if (token == null) {

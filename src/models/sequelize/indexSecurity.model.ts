@@ -35,10 +35,13 @@ export default async function setModels(tenantConnection: TenantConnection) {
 
   //Relação
   user.hasOne(databasePermission, { foreignKey: "userId" });
-  databasePermission.belongsTo(user, { foreignKey: "userId" });
+  databasePermission.belongsTo(user, { foreignKey: "userId", as: "user"});
 
   tenant.hasOne(databasePermission, { foreignKey: "tenantId" });
-  databasePermission.belongsTo(tenant, { foreignKey: "tenantId" });
+  databasePermission.belongsTo(tenant, { foreignKey: "tenantId",  as: "tenant" });
+
+  databaseCredential.hasOne(databasePermission, { foreignKey: "databaseCredentialId" });
+  databasePermission.belongsTo(databaseCredential, { foreignKey: "databaseCredentialId",  as: "databaseCredential"});
 
   user.belongsToMany(role, { through: userRole, foreignKey: "userId", otherKey: "roleId" });
   role.belongsToMany(user, { through: userRole, foreignKey: "roleId", otherKey: "userId" });

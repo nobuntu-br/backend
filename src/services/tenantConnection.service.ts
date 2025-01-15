@@ -1,10 +1,13 @@
 import TenantConnection from "../models/tenantConnection.model";
+import { DatabasePermissionDetailOutputDTO } from "../useCases/tenant/getUserTenants.useCase";
 
 export class TenantConnectionService {
   private static _instance: TenantConnectionService;
 
   private _tenantConnections: Map<string, TenantConnection> = new Map<string, TenantConnection>();
   private maxConnections = parseInt(process.env.MAX_CONNECTIONS || "10");
+
+  private _permissions : DatabasePermissionDetailOutputDTO[] = [];
 
   constructor() {
     this.tenantConnections = new Map<string, TenantConnection>();
@@ -18,6 +21,28 @@ export class TenantConnectionService {
     this._tenantConnections = tenantConnections;
   }
 
+  get permissions() : DatabasePermissionDetailOutputDTO[] {
+    return this._permissions;
+  }
+
+  set permissions(permissions: DatabasePermissionDetailOutputDTO[]) {
+    this._permissions = permissions;
+  }
+
+  //TODO usar cache no futuro
+  checkUserPermissionTenant(userUID: string | null, databaseCredentialId: number): boolean{
+    for (let index = 0; index < this.permissions.length; index++) {
+      if(this.permissions[index].userUID == userUID && this.permissions[index].tenant.id == databaseCredentialId){
+        return true;
+      }
+
+      if(this.permissions[index].userUID == null && this.permissions[index].tenant.id == databaseCredentialId){
+        return true;
+      }
+    }
+    return false;
+  }
+
   public static get instance(): TenantConnectionService {
     if (!TenantConnectionService._instance) {
       TenantConnectionService._instance = new TenantConnectionService();
@@ -26,17 +51,18 @@ export class TenantConnectionService {
     return TenantConnectionService._instance;
   }
 
-  setOnTenantConnectionPool(tenantId: number, tenantConnection: TenantConnection): TenantConnection {
+  setOnTenantConnectionPool(databaseCredentialId: number, tenantConnection: TenantConnection): TenantConnection {
+    
     try {
       if (this.hasReachedMaxConnections()) {
         this.removeOldestConnection();
       }
-
-      if (this.tenantConnections.get(String(tenantId)) != undefined) {
-        return this.tenantConnections.get(String(tenantId))!;
+      
+      if (this.tenantConnections.get(String(databaseCredentialId)) != undefined) {
+        return this.tenantConnections.get(String(databaseCredentialId))!;
       }
-
-      this.tenantConnections.set(String(tenantId), tenantConnection);
+      
+      this.tenantConnections.set(String(databaseCredentialId), tenantConnection);
 
       return tenantConnection;
     } catch (error) {
@@ -49,11 +75,14 @@ export class TenantConnectionService {
     return this.tenantConnections;
   }
 
-  findOneConnection(tenantCredentialId: number): TenantConnection | null {
-    const tenantConnection: TenantConnection | undefined = this.tenantConnections.get(tenantCredentialId.toString());
+  findOneConnection(databaseCredentialId: number): TenantConnection | null {
+
+    const tenantConnection: TenantConnection | undefined = this.tenantConnections.get(databaseCredentialId.toString());
+
     if(tenantConnection != undefined){
-      return this.tenantConnections.get(tenantCredentialId.toString())!; 
+      return tenantConnection; 
     }
+
     return null;
   }
 

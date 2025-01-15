@@ -1,17 +1,11 @@
 import { DatabaseType } from "../../adapters/createDb.adapter";
 import { connectTenant } from "../../config/database.config";
-import { NotFoundError } from "../../errors/notFound.error";
-import { UnknownError } from "../../errors/unknown.error";
-import { DatabaseCredential, IDatabaseCredential } from "../../models/databaseCredential.model";
-import { Tenant } from "../../models/tenant.model";
+import { DatabaseCredential } from "../../models/databaseCredential.model";
 import TenantConnection from "../../models/tenantConnection.model";
-import DatabaseCredentialRepository from "../../repositories/databaseCredential.repository";
-import DatabasePermissionRepository from "../../repositories/databasePermission.repository";
-import TenantRepository from "../../repositories/tenant.repository";
 import { TenantConnectionService } from "../../services/tenantConnection.service";
 import { encryptDatabasePassword } from "../../utils/crypto.util";
 import { getEnvironmentNumber } from "../../utils/environmentGetters.util";
-import { GetSecurityTenantConnectionUseCase } from "./getSecurityTenantConnection.useCase";
+import { RegisterDefaultTenantUseCase } from "./registerDefaultTenant.useCase";
 
 export class GetDefaultTenantConnectionUseCase {
   constructor() { }
@@ -42,16 +36,17 @@ export class GetDefaultTenantConnectionUseCase {
       sslPrivateKey: process.env.SECURITY_TENANT_DATABASE_SSL_PRIVATE_KEY,
       sslCertificate: process.env.SECURITY_TENANT_DATABASE_SSL_CERTIFICATE
     });
-
+    
+    const tenantConnectionService: TenantConnectionService = TenantConnectionService.instance;
+    
     try {
 
-      const tenantConnectionService: TenantConnectionService = TenantConnectionService.instance;
+      if(isNaN(Number(process.env.DEFAULT_TENANT_DATABASE_ID!)) == true){
+        throw new Error("Error to get default tenant database Id from environment variables. The value is not a number.");
+      }
 
       var tenantConnection: TenantConnection | null = tenantConnectionService.findOneConnection(Number(process.env.DEFAULT_TENANT_DATABASE_ID!));
 
-      //Se iniciou o servidor pela primeira vez, tem que registrar ele e conectar
-
-      //Se ele já tiver registrado, só conecta
       if (tenantConnection == null) {
 
         if (databaseCredential.password != undefined && databaseCredential.password != "") {
@@ -59,11 +54,13 @@ export class GetDefaultTenantConnectionUseCase {
           databaseCredential.password = encryptedDatabasePassword;
         }
 
-        const newTenantCredential = await this.saveDefaultTenantOnSecurityTenant(databaseCredential);
+        const registerDefaultTenantUseCase: RegisterDefaultTenantUseCase = new RegisterDefaultTenantUseCase();
+        const newTenantCredential = await registerDefaultTenantUseCase.execute(databaseCredential);
 
         tenantConnection = await connectTenant(
-          newTenantCredential.id!,
-          databaseCredential
+          // newTenantCredential.id!,
+          // databaseCredential
+          newTenantCredential
         );
 
         console.log("Realizado conexão com o banco de dados padrão. Responsável por ser o tenant padrão para os usuários.");
@@ -76,71 +73,4 @@ export class GetDefaultTenantConnectionUseCase {
     }
   }
 
-  //TODO separar isso em um caso de uso
-  /**
-   * Salva dados do banco de dados padrão no bando de dados do Tenant Secutiry, que é o banco de dados de controle de tenants.
-   * @param databaseCredential Dados das credenciais de acesso ao banco de dados do Tenant Padrão do projeto
-   */
-  async saveDefaultTenantOnSecurityTenant(databaseCredential: DatabaseCredential): Promise<DatabaseCredential> {
-
-    const defaultTenantName: string | undefined = process.env.DEFAULT_TENANT_DATABASE_ID;
-
-    if (defaultTenantName == undefined || defaultTenantName == null) {
-      throw new Error("Dados ausentes ao realizar o registro do tenant padrão");
-    }
-
-    const getSecurityTenantConnectionUseCase: GetSecurityTenantConnectionUseCase = new GetSecurityTenantConnectionUseCase();
-    const securityTenantConnection: TenantConnection = await getSecurityTenantConnectionUseCase.execute();
-
-    const tenantRepository: TenantRepository = new TenantRepository(securityTenantConnection);
-
-    const transaction = await tenantRepository.startTransaction();
-
-    //Cria o tenant
-    let tenant: Tenant | null;
-
-    try {
-      tenant = await tenantRepository.findOne({ name: defaultTenantName });
-      if (tenant == null) {
-        tenant = await tenantRepository.createWithTransaction({ name: defaultTenantName }, transaction);
-      }
-    } catch (error) {
-      throw new UnknownError("Unknown error on Save Default Tenant on Security Tenant function. Unknown error on create Tenant. Detail: " + error);
-    }
-
-    //Cria o databaseCredential
-    const databaseCredentialRepository: DatabaseCredentialRepository = new DatabaseCredentialRepository(securityTenantConnection);
-
-    let _databaseCredential: DatabaseCredential | null;
-
-    try {
-      _databaseCredential = await databaseCredentialRepository.findOne({ name: databaseCredential.name });
-      if (_databaseCredential == null) {
-        _databaseCredential = new DatabaseCredential(await databaseCredentialRepository.createWithTransaction(databaseCredential, transaction));
-      }
-    } catch (error) {
-      throw new UnknownError("Unknown error on Save Default Tenant on Security Tenant function. Unknown error on create Database Credential. Detail: " + error);
-    }
-
-    //Cria o databasePermission
-    const databasePermissionRepository: DatabasePermissionRepository = new DatabasePermissionRepository(securityTenantConnection);
-
-    try {
-      let databasePermission = await databasePermissionRepository.findOne({ tenantId: tenant.id, databaseCredentialId: _databaseCredential.id });
-      if (databasePermission == null) {
-        await databasePermissionRepository.createWithTransaction({
-          tenantId: tenant.id,
-          databaseCredentialId: _databaseCredential.id,
-
-        }, transaction);
-      }
-    } catch (error) {
-      throw new UnknownError("Unknown error on Save Default Tenant on Security Tenant function. Detail: " + error);
-    }
-
-    await tenantRepository.commitTransaction(transaction);
-
-    return databaseCredential;
-
-  }
 }

@@ -26,14 +26,16 @@ export class DatabasePermission extends BaseResourceModel implements IDatabasePe
   isAdmin?: boolean;
   userUID?: string;
 
-  constructor(input: IDatabasePermission){
+  constructor(data: IDatabasePermission){
     super();
-    this.id = input.id;
-    this.user = input.user;
-    this.tenant = input.tenant;
-    this.databaseCredential = input.databaseCredential;
-    this.isAdmin = input.isAdmin;
-    this.userUID = input.userUID;
+    this.id = data.id;
+    this.user = data.user;
+    this.tenant = data.tenant;
+    this.databaseCredential = data.databaseCredential;
+    this.isAdmin = data.isAdmin;
+    this.userUID = data.userUID;
+
+    
   }
 
   static fromJson(jsonData: any) : DatabasePermission {

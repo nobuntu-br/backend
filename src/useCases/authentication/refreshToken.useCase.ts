@@ -1,4 +1,5 @@
 import { IidentityService } from "../../services/Iidentity.service";
+import { SignInOutputDTO } from "./signIn.useCase";
 
 type RefreshTokenInputDTO = {
   refreshToken: string;
@@ -9,8 +10,7 @@ export class RefreshTokenUseCase {
     private identityService: IidentityService
   ) { }
 
-  async execute(input: RefreshTokenInputDTO): Promise<string> {
-
-    return await this.identityService.refreshAccessToken(input.refreshToken);
+  async execute(input: RefreshTokenInputDTO): Promise<SignInOutputDTO> {
+    return await this.identityService.refreshToken(input.refreshToken);
   }
 }

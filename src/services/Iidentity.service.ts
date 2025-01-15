@@ -4,10 +4,11 @@ import { SignInOutputDTO } from "../useCases/authentication/signIn.useCase";
 export interface IidentityService {
   getAccessToken(): Promise<string>;
   getUserGroups(userId: string): Promise<any>;
-  refreshAccessToken(refreshToken: string): Promise<string>;
+  refreshToken(refreshToken: string): Promise<SignInOutputDTO>;
   getUserByEmail(email: string): Promise<IUser>;
   createUser(user: IUser): Promise<IUser>;
-  loginUser(username: string, password: string): Promise<SignInOutputDTO>;
+  signIn(username: string, password: string): Promise<SignInOutputDTO>;
+  signOut(accessToken: string, refreshToken: string | null): Promise<any>;
   updateUser(user: IUser): Promise<IUser>;
   resetUserPassword(userUID: string, newPassword: string): Promise<string>;
   deleteUser(userID: string): Promise<string>;

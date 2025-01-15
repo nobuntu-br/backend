@@ -11,6 +11,8 @@ export default function showTime() {
   const currentTime = now.tz(timezone).format('YYYY-MM-DD HH:mm:ss');
   const currentTimeZone = now.tz(timezone).format('Z');
 
+  console.log("==============================================");
   console.log(`Horário atual: ${currentTime}`);
   console.log(`Fuso horário: ${timezone} (UTC${currentTimeZone})`);
+  console.log("==============================================");
 }
