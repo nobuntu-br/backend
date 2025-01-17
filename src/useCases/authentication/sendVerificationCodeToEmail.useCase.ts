@@ -1,8 +1,8 @@
-import { EmailService } from '../../services/email.service';
-import { VerificationEmail } from '../../models/verificationEmail.model';
+import { VerificationEmail } from '../../domain/entities/verificationEmail.model';
+import VerificationEmailRepository from '../../domain/repositories/verificationEmail.repository';
+import { EmailService } from '../../domain/services/email.service';
 import { ConflictError } from '../../errors/confict.error';
 import { TooManyRequestsError } from '../../errors/tooManyRequests.error';
-import VerificationEmailRepository from '../../repositories/verificationEmail.repository';
 
 export type SendVerificationCodeToEmailInputDTO = {
   email: string;

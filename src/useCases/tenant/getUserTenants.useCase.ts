@@ -1,5 +1,6 @@
+import { DatabasePermission } from "../../domain/entities/databasePermission.model";
+import DatabasePermissionRepository from "../../domain/repositories/databasePermission.repository";
 import { NotFoundError } from "../../errors/notFound.error";
-import UserTenantRepository from "../../repositories/databasePermission.repository";
 
 export type DatabasePermissionDetailOutputDTO = {
   tenant: {
@@ -16,13 +17,13 @@ export type DatabasePermissionDetailOutputDTO = {
 
 export class GetUserTenantsUseCase {
   constructor(
-    private userTenantRepository: UserTenantRepository,
+    private databasePermissionRepository: DatabasePermissionRepository,
   ) { }
 
   async execute(userUID: string): Promise<DatabasePermissionDetailOutputDTO[]> {
     try {
       
-      const tenants : DatabasePermissionDetailOutputDTO[] = await this.userTenantRepository.getTenantsUserHasAccess(userUID);
+      const tenants : DatabasePermissionDetailOutputDTO[] = await this.databasePermissionRepository.getTenantsUserHasAccess(userUID);
       
       if(tenants == null || tenants.length == 0){
         throw new NotFoundError("Não foram encontrados tenants que pertencem a esse usuário");

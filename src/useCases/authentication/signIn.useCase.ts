@@ -1,10 +1,10 @@
-import { IidentityService } from "../../services/Iidentity.service";
+import { IidentityService } from "../../domain/services/Iidentity.service";
 import { ValidationError } from "../../errors/validation.error";
 import { UnknownError } from "../../errors/unknown.error";
-import { IUser, User } from "../../models/user.model";
-import { IUserAccessData } from "../../models/userAcessData.model";
-import UserRepository from "../../repositories/user.repository";
 import { SyncUserAccountOnTenantsUseCase } from "./syncUserAccountOnTenants.useCase";
+import { IUser, User } from "../../domain/entities/user.model";
+import { IUserAccessData } from "../../domain/entities/userAcessData.model";
+import UserRepository from "../../domain/repositories/user.repository";
 
 export type SignInInputDTO = {
   email: string;

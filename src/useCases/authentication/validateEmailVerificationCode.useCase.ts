@@ -1,6 +1,6 @@
+import { IVerificationEmail } from "../../domain/entities/verificationEmail.model";
+import VerificationEmailRepository from "../../domain/repositories/verificationEmail.repository";
 import { NotFoundError } from "../../errors/notFound.error";
-import { IVerificationEmail } from "../../models/verificationEmail.model";
-import VerificationEmailRepository from "../../repositories/verificationEmail.repository";
 
 export type ValidateEmailVerificationCodeInputDTO = {
   verificationEmailCode: string;

@@ -1,5 +1,5 @@
-import { IidentityService } from "../../services/Iidentity.service";
-import { UserService } from "../../services/user.service";
+import { IidentityService } from "../../domain/services/Iidentity.service";
+import { UserService } from "../../domain/services/user.service";
 
 export type RegisterUserFromOtherApplicationInputDTO = {
   accessToken: string;

@@ -1,4 +1,4 @@
-import { EmailService } from '../../services/email.service';
+import { EmailService } from '../../domain/services/email.service';
 import { TokenGenerator } from '../../utils/tokenGenerator';
 
 export type SendPasswordResetLinkToEmailInputDTO = {

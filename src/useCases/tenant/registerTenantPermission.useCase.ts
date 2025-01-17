@@ -1,6 +1,6 @@
-import { IDatabasePermission } from '../../models/databasePermission.model';
-import UserRepository from '../../repositories/user.repository';
-import DatabasePermissionRepository from '../../repositories/databasePermission.repository';
+import { IDatabasePermission } from "../../domain/entities/databasePermission.model";
+import DatabasePermissionRepository from "../../domain/repositories/databasePermission.repository";
+import UserRepository from "../../domain/repositories/user.repository";
 
 export type RegisterTenantPermissionInputDTO = {
   user?: number;

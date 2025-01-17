@@ -1,11 +1,14 @@
-import { DatabaseType } from "../../adapters/createDb.adapter";
-import { connectToDatabase } from "../../config/databaseConnection.config";
-import { DatabaseCredential } from "../../models/databaseCredential.model";
-import TenantConnection from "../../models/tenantConnection.model";
-import { TenantConnectionService } from "../../services/tenantConnection.service";
+import { DatabaseType } from "../../infra/database/createDb.adapter";
+import { connectToDatabase } from "../../infra/database/databaseConnection.config";
+import { TenantConnectionService } from "../../domain/services/tenantConnection.service";
 import { getEnvironmentNumber } from "../../utils/environmentGetters.util";
-import getMongooseSecurityModels from "../../models/mongoose/indexSecurity";
-import getSequelizeSecurityModels from "../../models/sequelize/indexSecurity.model";
+import getMongooseSecurityModels from "../../infra/database/mongoose/models/indexSecurity";
+import getSequelizeSecurityModels from "../../infra/database/sequelize/models/indexSecurity.model";
+import { DatabaseInitializer } from "../../domain/repositories/databaseInitializer";
+import { SequelizeDatabaseInitializer } from "../../infra/database/sequelize/sequelizeDatabaseInitializer";
+import TenantConnection from "../../domain/entities/tenantConnection.model";
+import { DatabaseCredential } from "../../domain/entities/databaseCredential.model";
+import { MongooseDatabaseInitializer } from "../../infra/database/mongoose/mongooseDatabaseInitializer";
 
 export class GetSecurityTenantConnectionUseCase {
   constructor() { }
@@ -55,18 +58,30 @@ export class GetSecurityTenantConnectionUseCase {
         return tenantConnection;
       }
 
-      try {
-        tenantConnection = await connectToDatabase(databaseCredential, true);
-      } catch (error) {
-        throw new Error("Erro ao realizar a conexão com o banco de dados Security! Verifique se o banco de dados foi criado. Detail: " + error);
+      let databaseInitializer: DatabaseInitializer;
+
+      if(databaseCredential.type === 'mongodb'){
+        databaseInitializer = new MongooseDatabaseInitializer();
+      } else {
+        databaseInitializer = new SequelizeDatabaseInitializer();
       }
 
-      tenantConnection.models = await this.getModelsSecurity(databaseCredential.type!, tenantConnection);
+      try {
+        
+        tenantConnection = await connectToDatabase(databaseCredential, true);
+      } catch (error) {
+        // throw new Error("Erro ao realizar a conexão com o banco de dados Security! Verifique se o banco de dados foi criado. Detail: " + error);
+        //TODO o port tem que ser número, fica mais fácil
+        await databaseInitializer.createDatabaseIfNotExists(databaseCredential.name!, databaseCredential.username!, databaseCredential.password!, databaseCredential.host!, Number(databaseCredential.port), databaseCredential.type);
+        tenantConnection = await connectToDatabase(databaseCredential, true);
+      }
 
-      tenantConnectionService.setOnTenantConnectionPool(tenantCredentialId, tenantConnection);
+      tenantConnection!.models = await this.getModelsSecurity(databaseCredential.type!, tenantConnection!);
+
+      tenantConnectionService.setOnTenantConnectionPool(tenantCredentialId, tenantConnection!);
 
       console.log("Connection established with the Security database. Responsible for managing Tenants.");
-      return tenantConnection;
+      return tenantConnection!;
 
     } catch (error) {
       throw new Error(`Erro ao obter a instância da conexão com o banco de dados de controle de tenants: ${error}`);

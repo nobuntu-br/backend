@@ -1,11 +1,11 @@
-import { DatabaseType } from "../../adapters/createDb.adapter";
-import { connectTenant } from "../../config/database.config";
-import { DatabaseCredential } from "../../models/databaseCredential.model";
-import TenantConnection from "../../models/tenantConnection.model";
-import { TenantConnectionService } from "../../services/tenantConnection.service";
+import { DatabaseType } from "../../infra/database/createDb.adapter";
+import { connectTenant } from "../../infra/database/database.config";
+import { TenantConnectionService } from "../../domain/services/tenantConnection.service";
 import { encryptDatabasePassword } from "../../utils/crypto.util";
 import { getEnvironmentNumber } from "../../utils/environmentGetters.util";
 import { RegisterDefaultTenantUseCase } from "./registerDefaultTenant.useCase";
+import { DatabaseCredential } from "../../domain/entities/databaseCredential.model";
+import TenantConnection from "../../domain/entities/tenantConnection.model";
 
 export class GetDefaultTenantConnectionUseCase {
   constructor() { }
@@ -14,7 +14,7 @@ export class GetDefaultTenantConnectionUseCase {
   * Obter a instância de conexão com o banco de dados.
   * @returns retornar uma instância de conexão com o banco de dados
   */
-  async execute(): Promise<TenantConnection | Error> {
+  async execute(): Promise<TenantConnection | null> {
     const tenantId = process.env.SECURITY_TENANT_DATABASE_ID;
 
     const databaseCredential: DatabaseCredential = new DatabaseCredential({

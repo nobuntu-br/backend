@@ -1,5 +1,5 @@
-import TenantConnection from "../models/tenantConnection.model";
-import FunctionSystemRepository from "../repositories/functionSystem.repository";
+import TenantConnection from "../domain/entities/tenantConnection.model";
+import FunctionSystemRepository from "../domain/repositories/functionSystem.repository";
 
 const fs = require('fs-extra');
 const path = require('path');
@@ -44,7 +44,7 @@ export async function saveRoutes(databaseConnection: TenantConnection) {
  * @returns Retorna a descrição da rota
  */
 function getDescription(className: string, method: string, routePath: string) {
-  var fullPath = path.join(__dirname, `../routes/${className}.route.ts`);
+  var fullPath = path.join(__dirname, `../infra/http/routes/${className}.route.ts`);
   const content = fs.readFileSync(fullPath, 'utf8');
 
   const RouteDescriptionRegex = /\/\/Description: *([^\n]+)/g;
@@ -101,7 +101,7 @@ function getDefaultDescription(className: string, method: string, path: string) 
 function readRoutes() {
   var routes: any[] = [];
   // Diretório onde estão localizados os arquivos de rota
-  const dir = path.join(__dirname, '../routes');
+  const dir = path.join(__dirname, '../infra/http/routes/');
   //Faz a leitura do diretório que contém as rotas
   const files = fs.readdirSync(dir);
 

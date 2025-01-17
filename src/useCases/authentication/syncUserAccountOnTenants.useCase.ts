@@ -1,10 +1,10 @@
-import { connectTenant } from "../../config/database.config";
-import { DatabaseCredential } from "../../models/databaseCredential.model";
-import { DatabasePermission } from "../../models/databasePermission.model";
-import { User } from "../../models/user.model";
-import DatabasePermissionRepository from "../../repositories/databasePermission.repository";
-import UserRepository from "../../repositories/user.repository";
-import { TenantConnectionService } from "../../services/tenantConnection.service";
+import { connectTenant } from "../../infra/database/database.config";
+import { DatabaseCredential } from "../../domain/entities/databaseCredential.model";
+import { DatabasePermission } from "../../domain/entities/databasePermission.model";
+import { User } from "../../domain/entities/user.model";
+import DatabasePermissionRepository from "../../domain/repositories/databasePermission.repository";
+import UserRepository from "../../domain/repositories/user.repository";
+import { TenantConnectionService } from "../../domain/services/tenantConnection.service";
 import { GetSecurityTenantConnectionUseCase } from "../tenant/getSecurityTenantConnection.useCase";
 
 /**

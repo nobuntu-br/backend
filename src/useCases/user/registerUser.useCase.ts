@@ -1,9 +1,9 @@
 import { NotFoundError } from "../../errors/notFound.error";
-import { IUser, User } from "../../models/user.model";
-import UserRepository from "../../repositories/user.repository";
-import { IidentityService } from "../../services/Iidentity.service";
-import { VerificationEmailService } from "../../services/verificationEmail.service";
+import { IidentityService } from "../../domain/services/Iidentity.service";
 import { TokenGenerator } from "../../utils/tokenGenerator";
+import { IUser, User } from "../../domain/entities/user.model";
+import UserRepository from "../../domain/repositories/user.repository";
+import VerificationEmailRepository from "../../domain/repositories/verificationEmail.repository";
 
 export type signupInputDTO = {
   userName: string;
@@ -18,7 +18,7 @@ export class RegisterUserUseCase {
 
   constructor(
     private userRepository: UserRepository,
-    private verificationEmailService: VerificationEmailService,
+    private verificationEmailRepository: VerificationEmailRepository,
     private identityService: IidentityService,
     private tokenGenerator: TokenGenerator
   ) { }
@@ -41,7 +41,7 @@ export class RegisterUserUseCase {
       }
 
       //Verificar se dados do usuário são válidos novamente (verificar se o registro de confirmação de email foi validado)
-      if (await this.verificationEmailService.ifEmailWasValidated(input.email) == false) {
+      if (await this.verificationEmailRepository.ifEmailWasValidated(input.email) == false) {
         throw new NotFoundError("Verificação de email não realizada!");
       }
 
