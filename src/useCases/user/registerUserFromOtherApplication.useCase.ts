@@ -1,5 +1,4 @@
 import { IidentityService } from "../../domain/services/Iidentity.service";
-import { UserService } from "../../domain/services/user.service";
 
 export type RegisterUserFromOtherApplicationInputDTO = {
   accessToken: string;
@@ -8,7 +7,6 @@ export type RegisterUserFromOtherApplicationInputDTO = {
 export class RegisterUserFromOtherApplicationUseCase {
 
   constructor(
-    private userService: UserService,
     private identityService: IidentityService
   ) {}
 
