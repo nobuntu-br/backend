@@ -309,9 +309,10 @@ export default class DatabasePermissionRepository extends BaseRepository<IDataba
   }
 
 
-  async findDatabaseCredentialByUserUID(userUID: string): Promise<any> {
+  async findDatabaseCredentialByUserUID(userUID: string): Promise<DatabasePermission[]> {
     try {
       if (this.adapter.databaseType == 'mongodb') {
+        throw new Error("Not implemented function.");
         // return await this.findTenantsUserIsAdminMongooseImplementation(userUID);
       } else {
         return await this.findDatabaseCredentialByUserUIDSequelizeImplementation(userUID);
@@ -322,7 +323,7 @@ export default class DatabasePermissionRepository extends BaseRepository<IDataba
   }
 
   async findDatabaseCredentialByUserUIDSequelizeImplementation(userUID: string): Promise<DatabasePermission[]> {
-    let databasePermissions = await this.adapter.findManyWithEagerLoading({userUID: null!});
+    let databasePermissions = await this.adapter.findManyWithEagerLoading({userUID: userUID});
 
     return databasePermissions;
   }

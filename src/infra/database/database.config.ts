@@ -76,8 +76,6 @@ export async function connectTenant(databaseCredential: DatabaseCredential): Pro
     //TODO Descriptogradar as chaves SSL
     
     let tenantConnection: TenantConnection;
-    // const databaseURI: string = buildURI(databaseCredential);
-    
     const databaseType: string = databaseCredential.type;
 
     tenantConnection = await connectToDatabase(databaseCredential, false);
