@@ -1,4 +1,4 @@
-import { IidentityService } from "../../services/Iidentity.service";
+import { IidentityService } from "../../domain/services/Iidentity.service";
 
 export type UpdateUserProfilePhotoInputDTO = {
   accessToken: string;

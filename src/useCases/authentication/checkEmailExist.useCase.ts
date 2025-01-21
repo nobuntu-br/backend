@@ -1,5 +1,5 @@
-import { IUser } from "../../models/user.model";
-import { IidentityService } from "../../services/Iidentity.service";
+import { IUser } from "../../domain/entities/user.model";
+import { IidentityService } from "../../domain/services/Iidentity.service";
 
 export type CheckEmailExistInputDTO = {
   email: string;

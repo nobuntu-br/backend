@@ -1,6 +1,6 @@
+import { ComponentStructure } from "../../domain/entities/componentStructure.model";
+import ComponentStructureRoleRepository from "../../domain/repositories/componentStructureRole.repository";
 import { NotFoundError } from "../../errors/notFound.error";
-import { ComponentStructure } from "../../models/componentStructure.model";
-import ComponentStructureRoleRepository from "../../repositories/componentStructureRole.repository";
 
 export type GetPageStructureInputDTO = {
   userUID: string;

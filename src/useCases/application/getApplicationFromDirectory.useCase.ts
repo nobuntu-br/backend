@@ -1,5 +1,5 @@
 import axios from "axios";
-import { IidentityService } from "../../services/Iidentity.service";
+import { IidentityService } from "../../domain/services/Iidentity.service";
 
 export class GetApplicationFromDirectoryUseCase {
   constructor(private identityService: IidentityService) { }

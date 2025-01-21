@@ -1,9 +1,9 @@
 import { encryptDatabasePassword } from '../../utils/crypto.util';
-import DatabasePermissionRepository from '../../repositories/databasePermission.repository';
-import DatabaseCredentialRepository from '../../repositories/databaseCredential.repository';
-import UserRepository from '../../repositories/user.repository';
-import { DatabaseCredential } from '../../models/databaseCredential.model';
-import { DatabaseType } from "../../adapters/createDb.adapter";
+import { DatabaseType } from "../../infra/database/createDb.adapter";
+import DatabaseCredentialRepository from '../../domain/repositories/databaseCredential.repository';
+import { DatabaseCredential } from '../../domain/entities/databaseCredential.model';
+import DatabasePermissionRepository from '../../domain/repositories/databasePermission.repository';
+import UserRepository from '../../domain/repositories/user.repository';
 
 type RegisterDatabaseCredentialInputDTO = {
   name?: string;

@@ -2,7 +2,7 @@ import app from './app';
 import showTime from './utils/showTime.util';
 import { GetDefaultTenantConnectionUseCase } from './useCases/tenant/getDefaultTenantConnection.useCase';
 import { GetSecurityTenantConnectionUseCase } from './useCases/tenant/getSecurityTenantConnection.useCase';
-import DatabasePermissionService from './services/databasePermission.service';
+import DatabasePermissionService from './domain/services/databasePermission.service';
 
 const PORT = process.env.PORT || 8080;
 

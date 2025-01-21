@@ -1,10 +1,10 @@
+import { DatabaseCredential } from "../../domain/entities/databaseCredential.model";
+import { Tenant } from "../../domain/entities/tenant.model";
+import TenantConnection from "../../domain/entities/tenantConnection.model";
+import DatabaseCredentialRepository from "../../domain/repositories/databaseCredential.repository";
+import DatabasePermissionRepository from "../../domain/repositories/databasePermission.repository";
+import TenantRepository from "../../domain/repositories/tenant.repository";
 import { UnknownError } from "../../errors/unknown.error";
-import { DatabaseCredential } from "../../models/databaseCredential.model";
-import { Tenant } from "../../models/tenant.model";
-import TenantConnection from "../../models/tenantConnection.model";
-import DatabaseCredentialRepository from "../../repositories/databaseCredential.repository";
-import DatabasePermissionRepository from "../../repositories/databasePermission.repository";
-import TenantRepository from "../../repositories/tenant.repository";
 import { GetSecurityTenantConnectionUseCase } from "./getSecurityTenantConnection.useCase";
 
 export class RegisterDefaultTenantUseCase {
