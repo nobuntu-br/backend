@@ -33,13 +33,13 @@ export class SignInUseCase {
 
       accessData.user.email = input.email;
 
-      if(tenantUID == undefined){
+      if (tenantUID == undefined) {
         throw new Error("TENANT_ID environment variables not populed");
       }
 
+
       if (user == null) {
-        //TODO criar o usuário no banco de dados se ele não existir?
-        user = await this.userRepository.create(new User({
+        await this.userRepository.create(new User({
           UID: accessData.user.UID,//UID do servidor de identidade
           userName: accessData.user.userName,
           firstName: accessData.user.firstName,
@@ -48,8 +48,20 @@ export class SignInUseCase {
           email: accessData.user.email,
           tenantUID: tenantUID
         }));
+      } else {
+        await this.userRepository.update(
+          user.id!,
+          {
+            UID: accessData.user.UID,//UID do servidor de identidade
+            userName: accessData.user.userName,
+            firstName: accessData.user.firstName,
+            lastName: accessData.user.lastName,
+            isAdministrator: false,
+            email: accessData.user.email,
+            tenantUID: tenantUID
+          }
+        );
       }
-
       const syncUserAccountOnTenantsUseCase : SyncUserAccountOnTenantsUseCase = new SyncUserAccountOnTenantsUseCase();
       await syncUserAccountOnTenantsUseCase.execute(accessData.user.UID!, accessData);
 

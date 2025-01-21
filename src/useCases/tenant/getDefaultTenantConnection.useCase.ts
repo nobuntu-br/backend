@@ -45,22 +45,18 @@ export class GetDefaultTenantConnectionUseCase {
         throw new Error("Error to get default tenant database Id from environment variables. The value is not a number.");
       }
 
-      var tenantConnection: TenantConnection | null = tenantConnectionService.findOneConnection(Number(process.env.DEFAULT_TENANT_DATABASE_ID!));
+      let tenantConnection: TenantConnection | null = tenantConnectionService.findOneConnection(Number(process.env.DEFAULT_TENANT_DATABASE_ID!));
 
       if (tenantConnection == null) {
 
-        if (databaseCredential.password != undefined && databaseCredential.password != "") {
-          const encryptedDatabasePassword = encryptDatabasePassword(databaseCredential.password);
-          databaseCredential.password = encryptedDatabasePassword;
-        }
-
         const registerDefaultTenantUseCase: RegisterDefaultTenantUseCase = new RegisterDefaultTenantUseCase();
-        const newTenantCredential = await registerDefaultTenantUseCase.execute(databaseCredential);
 
+        databaseCredential.password = "";
+        const newTenantCredential : DatabaseCredential = await registerDefaultTenantUseCase.execute(databaseCredential);
+
+        databaseCredential.id = Number(process.env.DEFAULT_TENANT_DATABASE_ID!);
         tenantConnection = await connectTenant(
-          // newTenantCredential.id!,
-          // databaseCredential
-          newTenantCredential
+          databaseCredential
         );
 
         console.log("Realizado conexão com o banco de dados padrão. Responsável por ser o tenant padrão para os usuários.");
