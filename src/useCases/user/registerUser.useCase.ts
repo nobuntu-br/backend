@@ -26,7 +26,7 @@ export class RegisterUserUseCase {
   async execute(input: signupInputDTO): Promise<IUser> {
     try {
 
-      if (input.invitedTenantsToken != null) {
+      if (input.invitedTenantsToken != null && input.invitedTenantsToken != undefined && input.invitedTenantsToken != "") {
         //TODO tem que verificar se contém o JWT que informa se o usuário será cadastrado em um tenant diretamente
         const data = this.tokenGenerator.verifyToken(input.invitedTenantsToken);
       }

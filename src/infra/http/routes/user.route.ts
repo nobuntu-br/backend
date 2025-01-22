@@ -13,7 +13,7 @@ export default function defineRoute(app: Application) {
   const controller: UserController = new UserController();
   const router: Router = Router();
 
-  router.get('/get-user-image/:id', controller.getUserImage);
+  router.get('/get-user-profile-photo/:id', controller.getUserProfilePhoto);
 
   router.get('/get-user-groups', controller.getUserGroups);
 

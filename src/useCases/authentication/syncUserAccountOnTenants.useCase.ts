@@ -37,7 +37,7 @@ export class SyncUserAccountOnTenantsUseCase {
         let databaseConnection = tenantConnectionService.findOneConnection(databaseCredential.id!);
 
         if (databaseConnection == null) {
-          databaseConnection = await connectTenant(databaseCredential);
+          databaseConnection = await connectTenant(databaseCredential, true);
         }
 
         await this.updateUser(databaseConnection, accessData, userUID);

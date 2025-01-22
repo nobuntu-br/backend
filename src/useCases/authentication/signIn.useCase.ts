@@ -29,6 +29,8 @@ export class SignInUseCase {
 
       let user = await this.userRepository.findOne({ UID: accessData.user.UID });
 
+      console.log("user encontrado no banco de dados: ", user);
+
       const tenantUID = process.env.TENANT_ID;
 
       accessData.user.email = input.email;

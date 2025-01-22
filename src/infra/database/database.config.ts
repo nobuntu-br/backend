@@ -39,7 +39,7 @@ export async function getTenantConnection(databaseCredentialId: number, userUID:
         throw new Error("Erro to try find database credential to connect Tenant.");
       }
       
-      await connectTenant(databaseCredential);
+      await connectTenant(databaseCredential, true);
 
     }
 
@@ -56,7 +56,7 @@ export async function getTenantConnection(databaseCredentialId: number, userUID:
  * @param databaseCredential Dados de credenciais para realizar a conexão do banco de dados
  * @returns
  */
-export async function connectTenant(databaseCredential: DatabaseCredential): Promise<TenantConnection> {
+export async function connectTenant(databaseCredential: DatabaseCredential, decryptEnabled: boolean): Promise<TenantConnection> {
 
   //TODO verificar se o tenant já não tem conexão realizada
 
@@ -68,12 +68,14 @@ export async function connectTenant(databaseCredential: DatabaseCredential): Pro
   
 
   try {
-    //Descriptgrafar a senha do tenant
-    if(databaseCredential.password != undefined && databaseCredential.password != ""){
-      databaseCredential.password = decryptDatabasePassword(databaseCredential.password)!;
-    }
+    if (decryptEnabled == true) {
+      //Descriptgrafar a senha do tenant
+      if (databaseCredential.password != undefined && databaseCredential.password != "") {
+        databaseCredential.password = decryptDatabasePassword(databaseCredential.password)!;
+      }
 
-    //TODO Descriptogradar as chaves SSL
+      //TODO Descriptogradar as chaves SSL
+    }
     
     let tenantConnection: TenantConnection;
     const databaseType: string = databaseCredential.type;

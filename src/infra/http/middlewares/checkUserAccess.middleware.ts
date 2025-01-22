@@ -99,7 +99,7 @@ async function isUserHaveAccessToRoute(userId: number, method: string, url: stri
     return true;
   }
 
-  //TODO no futuro implementar com uso de cache
+  //TODO no futuro implementar com uso de cache em um banco separado (Redis)
   const functionSystemRoleRepository: FunctionSystemRoleRepository = new FunctionSystemRoleRepository(databaseConnection);
   const isUserHaveAccessToRoute: boolean | null = await functionSystemRoleRepository.isUserHaveAccessToRouteByUserId(userId, method, url);
 

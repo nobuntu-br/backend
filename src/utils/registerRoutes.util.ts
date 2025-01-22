@@ -2,7 +2,7 @@ import TenantConnection from "../domain/entities/tenantConnection.model";
 import FunctionSystemRepository from "../domain/repositories/functionSystem.repository";
 
 const fs = require('fs-extra');
-const path = require('path');
+const path = require('node:path');
 
 /**
  * Registra todas as rotas dessa API no banco de dados.

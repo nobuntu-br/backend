@@ -146,7 +146,7 @@ export class UserController {
     }
   }
 
-  async getUserProfilePhotoImage(req: Request, res: Response, next: NextFunction) {
+  async getUserProfilePhoto(req: Request, res: Response, next: NextFunction) {
     try {
       const identityService: IidentityService = new AzureADService();
       const getUserProfilePhotoUseCase: GetUserProfilePhotoUseCase = new GetUserProfilePhotoUseCase(identityService);

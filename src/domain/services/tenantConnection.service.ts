@@ -31,6 +31,7 @@ export class TenantConnectionService {
 
   //TODO usar cache no futuro
   checkUserPermissionTenant(userUID: string | null, databaseCredentialId: number): boolean{
+
     for (let index = 0; index < this.permissions.length; index++) {
       if(this.permissions[index].userUID == userUID && this.permissions[index].tenant.id == databaseCredentialId){
         return true;

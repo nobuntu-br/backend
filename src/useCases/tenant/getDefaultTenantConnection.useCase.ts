@@ -51,12 +51,12 @@ export class GetDefaultTenantConnectionUseCase {
 
         const registerDefaultTenantUseCase: RegisterDefaultTenantUseCase = new RegisterDefaultTenantUseCase();
 
-        databaseCredential.password = "";
         const newTenantCredential : DatabaseCredential = await registerDefaultTenantUseCase.execute(databaseCredential);
 
         databaseCredential.id = Number(process.env.DEFAULT_TENANT_DATABASE_ID!);
         tenantConnection = await connectTenant(
-          databaseCredential
+          databaseCredential,
+          false
         );
 
         console.log("Realizado conexão com o banco de dados padrão. Responsável por ser o tenant padrão para os usuários.");

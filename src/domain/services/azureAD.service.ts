@@ -102,9 +102,6 @@ export class AzureADService implements IidentityService {
         }
       });
 
-      console.log("get user groups");
-      console.log(userResponse.data);
-
       //É retornado pela Azure um Array com todos os grupos que o usuário faz parte
       if (userResponse.data.value.length > 0 && userResponse.data.value[0] != null) {
         var userGroups: IAzureUserGroup[] = [];
@@ -457,18 +454,19 @@ export class AzureADService implements IidentityService {
     }
   }
 
-  async getUserProfilePhoto(userID: string): Promise<GetUserProfilePhotoOutputDTO> {
+  async getUserProfilePhoto(userUID: string): Promise<GetUserProfilePhotoOutputDTO> {
     try {
       const accessToken: string = await this.getAccessToken();
 
       // Requisição para obter imagem de perfil do usuário no servidor da Azure
-      const userResponse = await axios.get(this.graphAPIUrl + "v1.0/users/" + userID + "/photo", {
+      const userResponse = await axios.get(this.graphAPIUrl + "v1.0/users/" + userUID + "/photo/", {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json'
         }
       });
 
+      //TODO terminar essa parte para enviar o blob para o frontend
       console.dir(userResponse.data, { depth: null });
 
       return { imageUrl: "ddd" };
@@ -476,7 +474,7 @@ export class AzureADService implements IidentityService {
       throw new NotFoundError("Nenhum usuário encontrado");
     } catch (error: any) {
       console.dir(error.response.data, { depth: null });
-      throw error;
+      throw new NotFoundError("Profile photo not found.");
     }
   }
 

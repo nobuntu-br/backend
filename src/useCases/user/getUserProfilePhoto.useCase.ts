@@ -15,7 +15,11 @@ export class GetUserProfilePhotoUseCase {
   ) {}
 
   async execute(input: GetUserProfilePhotoInputDTO): Promise<GetUserProfilePhotoOutputDTO> {
-    return await this.identityService.getUserProfilePhoto(input.userID);
+    try {
+      return await this.identityService.getUserProfilePhoto(input.userID);
+    } catch (error) {
+      throw error;
+    }
   }
 
 }

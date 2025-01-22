@@ -17,6 +17,7 @@ export default class FunctionSystemRoleRepository extends BaseRepository<IFuncti
 
     const userRoleRepository: UserRoleRepository = new UserRoleRepository(this.tenantConnection);
 
+    //Obtem as roles do usuário
     let roles = await userRoleRepository.findMany({userId: userId});
 
     let roleIds = roles.map(role => role.roleId!);
@@ -38,7 +39,7 @@ export default class FunctionSystemRoleRepository extends BaseRepository<IFuncti
     method = method.toLowerCase();
 
     if (!Array.isArray(roleIds) || roleIds.length === 0) {
-      return null;
+      return false;
     }
 
     const routeUserHaveAccess = await this.adapter.model.findAll({
@@ -74,7 +75,7 @@ export default class FunctionSystemRoleRepository extends BaseRepository<IFuncti
     method = method.toLowerCase();
 
     if (!Array.isArray(roleIds) || roleIds.length === 0) {
-      return null;
+      return false;
     }
 
     let checkUserHaveAccessToRouteByUserId = [
@@ -164,59 +165,16 @@ export default class FunctionSystemRoleRepository extends BaseRepository<IFuncti
         },
       },
     ];
-    /*
-    var isPublicRouteQuery: any;
-    isPublicRouteQuery = [
-
-      //Encotrar documento com nome "guest"
-      // { $match: { name: "guest" } },
-      
-
-      {
-        $lookup: {
-          from: "functionssystemroles",
-          localField: "FunctionSystemRoles",
-          foreignField: "_id",
-          as: "FunctionSystemRoles",
-        },
-      },
-
-      { $unwind: "$FunctionSystemRoles" },
-
-      {
-        $match: {
-          "FunctionSystemRoles.authorized": true,
-        },
-      },
-      {
-        $lookup: {
-          from: "functionssystems",
-          localField: "FunctionSystemRoles.FunctionSystem",
-          foreignField: "_id",
-          as: "FunctionSystem",
-        },
-      },
-
-      { $unwind: "$FunctionSystem" },
-
-      {
-        
-      },
-
-      {
-        $project: {
-          name: 1,
-          NomeDaRole: "$Roles.name",
-          isAuthorized: "$FunctionSystemRoles.authorized",
-          FunctionSystemRoute: "$FunctionSystem.route",
-        },
-      },
-    ];
-    */
+   
     // const role = await dbAdapter.findUsingQuery(isPublicRouteQuery);
     const role = await this.findUsingCustomQuery(isPublicRouteQuery);
-    if (role != null) {
-      return true;
+
+    if(Array.isArray(role) == true){
+      if(role.length > 0){
+        return true;
+      } else {
+        return false;
+      }
     }
 
     return false;
