@@ -18,7 +18,7 @@ export default class FunctionSystemRoleRepository extends BaseRepository<IFuncti
     const userRoleRepository: UserRoleRepository = new UserRoleRepository(this.tenantConnection);
 
     //Obtem as roles do usuário
-    let roles = await userRoleRepository.findMany({userId: userId});
+    let roles = await userRoleRepository.findMany({ userId: userId });
 
     let roleIds = roles.map(role => role.roleId!);
 
@@ -42,15 +42,16 @@ export default class FunctionSystemRoleRepository extends BaseRepository<IFuncti
       return false;
     }
 
-    const routeUserHaveAccess = await this.adapter.model.findAll({
+    const routeUserHaveAccess = await this._tenantConnection.models!.get("Role").findAll({
       where: {
-        roleId: {
+        id: {
           [Op.in]: roleIds,
         }
       },
       include: [
         {
           model: this._tenantConnection.models!.get("FunctionSystem"),
+          as: "functionSystem",
           required: true,
           where: {
             method: method,
@@ -59,13 +60,11 @@ export default class FunctionSystemRoleRepository extends BaseRepository<IFuncti
         },
       ],
     });
-    
-    console.log("Retorno da pesquisa se o usuário tem permissão na rota com sequelize: ", routeUserHaveAccess);
 
-    if(routeUserHaveAccess.length > 0){
+    if (routeUserHaveAccess.length > 0) {
       return true;
     }
-    
+
     return false;
   }
 
@@ -114,7 +113,7 @@ export default class FunctionSystemRoleRepository extends BaseRepository<IFuncti
       }
     ];
 
-    const role : IFunctionSystemRoleDatabaseModel[] = await this._tenantConnection.models!.get("FunctionSystemRole").aggregate(checkUserHaveAccessToRouteByUserId);
+    const role: IFunctionSystemRoleDatabaseModel[] = await this._tenantConnection.models!.get("FunctionSystemRole").aggregate(checkUserHaveAccessToRouteByUserId);
 
     if (role.length > 0) {
       return true;
@@ -136,7 +135,7 @@ export default class FunctionSystemRoleRepository extends BaseRepository<IFuncti
   }
 
   async isPublicRouteMongooseImplementation(method: string, route: string): Promise<boolean> {
-    
+
     //De functionSystem vai para role
     let isPublicRouteQuery = [
       {
@@ -165,12 +164,12 @@ export default class FunctionSystemRoleRepository extends BaseRepository<IFuncti
         },
       },
     ];
-   
+
     // const role = await dbAdapter.findUsingQuery(isPublicRouteQuery);
     const role = await this.findUsingCustomQuery(isPublicRouteQuery);
 
-    if(Array.isArray(role) == true){
-      if(role.length > 0){
+    if (Array.isArray(role) == true) {
+      if (role.length > 0) {
         return true;
       } else {
         return false;
@@ -181,7 +180,7 @@ export default class FunctionSystemRoleRepository extends BaseRepository<IFuncti
   }
 
   async isPublicRouteSequelizeImplementation(method: string, route: string) {
-    const userTenants = await this._tenantConnection.models!.get("FunctionSystem").findAll({
+    const isPublicRoute = await this._tenantConnection.models!.get("FunctionSystem").findAll({
       where: {
         route: route,
         method: method
@@ -189,6 +188,7 @@ export default class FunctionSystemRoleRepository extends BaseRepository<IFuncti
       include: [
         {
           model: this._tenantConnection.models!.get("Role"),
+          as: "role",
           required: true,
           where: {
             name: "guest",
@@ -197,7 +197,9 @@ export default class FunctionSystemRoleRepository extends BaseRepository<IFuncti
       ],
     });
 
-    if (userTenants.length <= 0) {
+    console.log("retorno ao verificar se a rota é publica: ", isPublicRoute)
+
+    if (isPublicRoute.length <= 0) {
       return false;
     }
 

@@ -33,8 +33,8 @@ export default async function setModels(tenantConnection: TenantConnection) {
   user.belongsToMany(role, {through: userRole, foreignKey: "userId", otherKey: "roleId"});
   role.belongsToMany(user, {through: userRole, foreignKey: "roleId", otherKey: "userId"});
 
-  role.belongsToMany(functionSystem, {through: functionSystemRole, foreignKey: "roleId", otherKey: "functionSystemId"});
-  functionSystem.belongsToMany(role, {through: functionSystemRole, foreignKey: "functionSystemId", otherKey: "roleId"});
+  role.belongsToMany(functionSystem, {through: functionSystemRole, foreignKey: "roleId", otherKey: "functionSystemId", as: "functionSystem",});
+  functionSystem.belongsToMany(role, {through: functionSystemRole, foreignKey: "functionSystemId", otherKey: "roleId", as: "role"});
 
   //Relação de muitos para muitos entre ComponentStructure e Role
   componentStructure.belongsToMany(role, {through: componentStructureRole, foreignKey: "componentStructureId", otherKey: "roleId"});
