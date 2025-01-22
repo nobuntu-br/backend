@@ -107,7 +107,7 @@ async function isUserHaveAccessToRoute(userId: number, method: string, url: stri
     return false;
   }
 
-  return true;
+  return isUserHaveAccessToRoute;
 }
 
 /**
