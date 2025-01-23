@@ -197,8 +197,6 @@ export default class FunctionSystemRoleRepository extends BaseRepository<IFuncti
       ],
     });
 
-    console.log("retorno ao verificar se a rota é publica: ", isPublicRoute)
-
     if (isPublicRoute.length <= 0) {
       return false;
     }

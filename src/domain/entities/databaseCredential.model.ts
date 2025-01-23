@@ -28,8 +28,8 @@ export interface IDatabaseCredential extends BaseResourceModel{
   type?: DatabaseType;
   username?: string;
   password?: string;
-  host?: string;
-  port?: string;
+  host: string;
+  port: string;
   srvEnabled?: boolean; // Indica se usa protocolo SRV (mongodb)
   options?: string;
   storagePath?: string;
@@ -50,8 +50,8 @@ export class DatabaseCredential extends BaseResourceModel implements IDatabaseCr
   type: DatabaseType;
   username?: string;
   password?: string;
-  host?: string;
-  port?: string;
+  host: string;
+  port: string;
   srvEnabled: boolean;
   options?: string;
   storagePath?: string;
@@ -81,8 +81,8 @@ export class DatabaseCredential extends BaseResourceModel implements IDatabaseCr
 
     this.username = data?.username || "";
     this.password = data?.password || "";
-    this.host = data?.host || "";
-    this.port = data?.port || "";
+    this.host = data.host;
+    this.port = data.port;
 
     if(data.srvEnabled == undefined || data.srvEnabled == null){
       throw new Error("srvEnabled field are not populated.");
@@ -92,7 +92,7 @@ export class DatabaseCredential extends BaseResourceModel implements IDatabaseCr
     this.storagePath = data?.storagePath || "";
     this.sslEnabled = data.sslEnabled || false;
     this.poolSize = data.poolSize;
-    this.timeOutTime = data?.timeOutTime;
+    this.timeOutTime = data.timeOutTime;
     
     if(data.version == undefined){
       this.version = 0;
@@ -127,21 +127,3 @@ export class DatabaseCredential extends BaseResourceModel implements IDatabaseCr
   }
 
 }
-
-
-// // Função para verificar se todos os campos necessários estão preenchidos
-// export function validateDatabaseCredential(credential: IDatabaseCredential): boolean {
-//   // Verifica se todos os campos necessários são definidos e não são vazios
-//   return (
-//     credential.databaseType !== undefined &&
-//     credential.databaseName !== undefined &&
-//     credential.databaseUsername !== undefined &&
-//     credential.databasePassword !== undefined &&
-//     credential.databaseHost !== undefined &&
-//     credential.databaseType !== "" &&
-//     credential.databaseName !== "" &&
-//     credential.databaseUsername !== "" &&
-//     credential.databasePassword !== "" &&
-//     credential.databaseHost !== ""
-//   );
-// }

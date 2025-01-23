@@ -5,6 +5,7 @@ import { SyncUserAccountOnTenantsUseCase } from "./syncUserAccountOnTenants.useC
 import { IUser, User } from "../../domain/entities/user.model";
 import { IUserAccessData } from "../../domain/entities/userAcessData.model";
 import UserRepository from "../../domain/repositories/user.repository";
+import { checkEmailIsValid } from "../../utils/verifiers.util";
 
 export type SignInInputDTO = {
   email: string;
@@ -25,6 +26,11 @@ export class SignInUseCase {
 
   async execute(input: SignInInputDTO): Promise<SignInOutputDTO> {
     try {
+
+      if (checkEmailIsValid(input.email) == false) {
+        throw new Error("Incorrect email format.");
+      };
+
       const accessData = await this.identityService.signIn(input.email, input.password);
 
       let user = await this.userRepository.findOne({ UID: accessData.user.UID });
@@ -64,7 +70,7 @@ export class SignInUseCase {
           }
         );
       }
-      const syncUserAccountOnTenantsUseCase : SyncUserAccountOnTenantsUseCase = new SyncUserAccountOnTenantsUseCase();
+      const syncUserAccountOnTenantsUseCase: SyncUserAccountOnTenantsUseCase = new SyncUserAccountOnTenantsUseCase();
       await syncUserAccountOnTenantsUseCase.execute(accessData.user.UID!, accessData);
 
       accessData.user.id = user!.id;

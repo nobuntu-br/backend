@@ -1,11 +1,14 @@
 import { DatabaseType } from "../../infra/database/createDb.adapter";
 import { connectTenant } from "../../infra/database/database.config";
 import { TenantConnectionService } from "../../domain/services/tenantConnection.service";
-import { encryptDatabasePassword } from "../../utils/crypto.util";
 import { getEnvironmentNumber } from "../../utils/environmentGetters.util";
 import { RegisterDefaultTenantUseCase } from "./registerDefaultTenant.useCase";
 import { DatabaseCredential } from "../../domain/entities/databaseCredential.model";
 import TenantConnection from "../../domain/entities/tenantConnection.model";
+import { DatabaseInitializer } from "../../domain/repositories/databaseInitializer";
+import { MongooseDatabaseInitializer } from "../../infra/database/mongoose/mongooseDatabaseInitializer";
+import { SequelizeDatabaseInitializer } from "../../infra/database/sequelize/sequelizeDatabaseInitializer";
+import { checkEnvironmentVariableIsEmpty } from "../../utils/verifiers.util";
 
 export class GetDefaultTenantConnectionUseCase {
   constructor() { }
@@ -15,15 +18,22 @@ export class GetDefaultTenantConnectionUseCase {
   * @returns retornar uma instância de conexão com o banco de dados
   */
   async execute(): Promise<TenantConnection | null> {
-    const tenantId = process.env.SECURITY_TENANT_DATABASE_ID;
+    let databaseCredential: DatabaseCredential;
 
-    const databaseCredential: DatabaseCredential = new DatabaseCredential({
+    if (checkEnvironmentVariableIsEmpty(process.env.DEFAULT_TENANT_DATABASE_HOST!) == true ||
+      checkEnvironmentVariableIsEmpty(process.env.DEFAULT_TENANT_DATABASE_PORT!) == true
+    ) {
+      console.log("This project don't have default tenant.");
+      return null;
+    }
+
+    databaseCredential = new DatabaseCredential({
       name: process.env.DEFAULT_TENANT_DATABASE_NAME,
       type: process.env.DEFAULT_TENANT_DATABASE_TYPE as DatabaseType,
       username: process.env.DEFAULT_TENANT_DATABASE_USERNAME,
       password: process.env.DEFAULT_TENANT_DATABASE_PASSWORD,
-      host: process.env.DEFAULT_TENANT_DATABASE_HOST,
-      port: process.env.DEFAULT_TENANT_DATABASE_PORT,
+      host: process.env.DEFAULT_TENANT_DATABASE_HOST!,
+      port: process.env.DEFAULT_TENANT_DATABASE_PORT!,
       srvEnabled: process.env.DEFAULT_TENANT_DATABASE_SRV_ENABLED === "true" ? true : false,
       options: process.env.DEFAULT_TENANT_DATABASE_OPTIONS,
       storagePath: process.env.DEFAULT_TENANT_DATABASE_STORAGE_PATH,
@@ -36,37 +46,50 @@ export class GetDefaultTenantConnectionUseCase {
       sslPrivateKey: process.env.SECURITY_TENANT_DATABASE_SSL_PRIVATE_KEY,
       sslCertificate: process.env.SECURITY_TENANT_DATABASE_SSL_CERTIFICATE
     });
-    
+
     const tenantConnectionService: TenantConnectionService = TenantConnectionService.instance;
-    
-    try {
 
-      if(isNaN(Number(process.env.DEFAULT_TENANT_DATABASE_ID!)) == true){
-        throw new Error("Error to get default tenant database Id from environment variables. The value is not a number.");
-      }
+    let tenantConnection: TenantConnection | null = tenantConnectionService.findOneConnection(1);
 
-      let tenantConnection: TenantConnection | null = tenantConnectionService.findOneConnection(Number(process.env.DEFAULT_TENANT_DATABASE_ID!));
-
-      if (tenantConnection == null) {
-
-        const registerDefaultTenantUseCase: RegisterDefaultTenantUseCase = new RegisterDefaultTenantUseCase();
-
-        const newTenantCredential : DatabaseCredential = await registerDefaultTenantUseCase.execute(databaseCredential);
-
-        databaseCredential.id = Number(process.env.DEFAULT_TENANT_DATABASE_ID!);
-        tenantConnection = await connectTenant(
-          databaseCredential,
-          false
-        );
-
-        console.log("Realizado conexão com o banco de dados padrão. Responsável por ser o tenant padrão para os usuários.");
-
-      }
-
+    if (tenantConnection != null) {
       return tenantConnection;
-    } catch (error) {
-      throw new Error("Get default tenant connection error. Detail: " + error);
     }
+
+    const registerDefaultTenantUseCase: RegisterDefaultTenantUseCase = new RegisterDefaultTenantUseCase();
+
+    try {
+      const newTenantCredential: DatabaseCredential = await registerDefaultTenantUseCase.execute(databaseCredential);
+    } catch (error) {
+      throw new Error("Error to register default tenant on Security database. Detail: " + error);
+    }
+
+    databaseCredential.id = 1;
+
+    try {
+      tenantConnection = await connectTenant(
+        databaseCredential,
+        false
+      );
+    } catch (error) {
+
+      let databaseInitializer: DatabaseInitializer;
+
+      if (databaseCredential.type === 'mongodb') {
+        databaseInitializer = new MongooseDatabaseInitializer();
+      } else {
+        databaseInitializer = new SequelizeDatabaseInitializer();
+      }
+
+      await databaseInitializer.createDatabaseIfNotExists(databaseCredential.name!, databaseCredential.username!, databaseCredential.password!, databaseCredential.host!, Number(databaseCredential.port), databaseCredential.type);
+      tenantConnection = await connectTenant(
+        databaseCredential,
+        false
+      );
+    }
+
+    console.log("Realizado conexão com o banco de dados padrão. Responsável por ser o tenant padrão para os usuários.");
+
+    return tenantConnection;
   }
 
 }

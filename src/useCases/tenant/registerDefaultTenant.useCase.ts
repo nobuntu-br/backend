@@ -8,22 +8,14 @@ import { UnknownError } from "../../errors/unknown.error";
 import { GetSecurityTenantConnectionUseCase } from "./getSecurityTenantConnection.useCase";
 
 export class RegisterDefaultTenantUseCase {
-  constructor(
-
-  ) {
-    
-  }
+  constructor() {}
 
   /**
    * Salva dados do banco de dados padrão no bando de dados do Tenant Secutiry, que é o banco de dados de controle de tenants.
    * @param databaseCredential Dados das credenciais de acesso ao banco de dados do Tenant Padrão do projeto
    */
   async execute(databaseCredential: DatabaseCredential): Promise<DatabaseCredential> {
-    const defaultTenantName: string | undefined = process.env.DEFAULT_TENANT_DATABASE_ID;
-
-    if (defaultTenantName == undefined || defaultTenantName == null) {
-      throw new Error("Dados ausentes ao realizar o registro do tenant padrão");
-    }
+    const defaultTenantName: string = "default";
 
     const getSecurityTenantConnectionUseCase: GetSecurityTenantConnectionUseCase = new GetSecurityTenantConnectionUseCase();
     const securityTenantConnection: TenantConnection = await getSecurityTenantConnectionUseCase.execute();

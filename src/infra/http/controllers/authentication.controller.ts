@@ -136,15 +136,6 @@ export class AuthenticationController {
     }
   }
 
-  /**
-   * Faz a limpeza dos cookies do usuário da sessão atual
-   */
-  cleanUserCookies(req: Request, res: Response): Response {
-
-
-    return res;
-  }
-
   async refreshToken(req: Request, res: Response, next: NextFunction) {
     try {
 

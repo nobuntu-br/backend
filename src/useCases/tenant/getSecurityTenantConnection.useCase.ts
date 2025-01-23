@@ -18,19 +18,15 @@ export class GetSecurityTenantConnectionUseCase {
   * @returns retornar uma instância de conexão com o banco de dados
   */
   async execute(): Promise<TenantConnection> {
-    const tenantCredentialId : number = Number(process.env.SECURITY_TENANT_DATABASE_ID);
-
-    if (isNaN(tenantCredentialId)) {
-      throw new Error(`Dados ausentes ao realizar a conexão com o banco security`);
-    }
+    const tenantCredentialId : number = 0;
 
     const databaseCredential: DatabaseCredential = new DatabaseCredential({
       name: process.env.SECURITY_TENANT_DATABASE_NAME,
       type: process.env.SECURITY_TENANT_DATABASE_TYPE as DatabaseType,
       username: process.env.SECURITY_TENANT_DATABASE_USERNAME,
       password: process.env.SECURITY_TENANT_DATABASE_PASSWORD,
-      host: process.env.SECURITY_TENANT_DATABASE_HOST,
-      port: process.env.SECURITY_TENANT_DATABASE_PORT,
+      host: process.env.SECURITY_TENANT_DATABASE_HOST!,
+      port: process.env.SECURITY_TENANT_DATABASE_PORT!,
       srvEnabled: process.env.SECURITY_TENANT_DATABASE_SRV_ENABLED === "true" ? true : false,
       options: process.env.SECURITY_TENANT_DATABASE_OPTIONS,
       storagePath: process.env.SECURITY_TENANT_DATABASE_STORAGE_PATH,
@@ -84,7 +80,7 @@ export class GetSecurityTenantConnectionUseCase {
       return tenantConnection!;
 
     } catch (error) {
-      throw new Error(`Erro ao obter a instância da conexão com o banco de dados de controle de tenants: ${error}`);
+      throw new Error("Error to get Security database connection. Details: "+ error);
     }
   }
 

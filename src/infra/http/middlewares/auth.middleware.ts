@@ -1,31 +1,21 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
-import axios from "axios";
 import { UnauthorizedError } from "../../../errors/unauthorized.error";
-import { GetSecurityTenantConnectionUseCase } from "../../../useCases/tenant/getSecurityTenantConnection.useCase";
 import { errorHandler } from "./errorHandler.middleware";
 import { ValidateAccessTokenUseCase } from "../../../useCases/authentication/validateAccessToken.useCase";
-const jwkToPem = require("jwk-to-pem");
-
-async function getJWKS(jwksUri: string): Promise<any[]> {
-  try {
-    const response = await axios.get(jwksUri);
-    return response.data.keys;
-  } catch (error) {
-    console.error("Erro ao obter as chaves JWKS:", error);
-    return [];
-  }
-}
+import { checkEnvironmentVariableIsEmpty } from "../../../utils/verifiers.util";
 
 /**
  * Verifica se o usuário foi cadastrado de fato no servidor de identidade
  */
 export async function verifyAccess(req: Request, res: Response, next: NextFunction): Promise<void> {
+
   const clientId = process.env.CLIENT_ID;
   const issuer = process.env.TOKEN_ISSUER;
   const jwksUri = process.env.JWKsUri;
 
-  if (clientId == undefined || issuer == undefined || jwksUri == undefined) {
+  if (checkEnvironmentVariableIsEmpty(clientId!) == true ||
+    checkEnvironmentVariableIsEmpty(issuer!) == true ||
+    checkEnvironmentVariableIsEmpty(jwksUri!) == true) {
     throw new Error("Populate Azure environment variables.");
   }
 
@@ -48,8 +38,8 @@ export async function verifyAccess(req: Request, res: Response, next: NextFuncti
     accessToken = accessToken.split(' ')[1]; // Obtém o token após "Bearer"
     const validateAccessTokenUseCase: ValidateAccessTokenUseCase = new ValidateAccessTokenUseCase();
     await validateAccessTokenUseCase.execute(accessToken, {
-      issuer: issuer,
-      jwksUri: jwksUri,
+      issuer: issuer!,
+      jwksUri: jwksUri!,
       audience: clientId
     });
 

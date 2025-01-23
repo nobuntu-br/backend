@@ -1,31 +1,13 @@
 import { encryptDatabasePassword } from '../../utils/crypto.util';
-import { DatabaseType } from "../../infra/database/createDb.adapter";
 import DatabaseCredentialRepository from '../../domain/repositories/databaseCredential.repository';
-import { DatabaseCredential } from '../../domain/entities/databaseCredential.model';
+import { DatabaseCredential, IDatabaseCredential } from '../../domain/entities/databaseCredential.model';
 import DatabasePermissionRepository from '../../domain/repositories/databasePermission.repository';
 import UserRepository from '../../domain/repositories/user.repository';
 
 type RegisterDatabaseCredentialInputDTO = {
-  name?: string;
-  type: DatabaseType;
-  username?: string;
-  password?: string;
-  host?: string;
-  port?: string;
-  srvEnabled: boolean; // Indica se usa protocolo SRV (mongodb)
-  options?: string;
-  storagePath?: string;
-  sslEnabled: boolean;
-  poolSize?: number;
-  timeOutTime?: number;
-
-  //SSL data
-  sslCertificateAuthority?: string; //Serve para verificar que o certificado apresentado pelo servidor ou cliente é confiável e foi emitido por uma CA válida.
-  sslPrivateKey?: string; //Usada para descriptografar mensagens recebidas e assinar mensagens enviadas. Deve ser mantido em segredo.
-  sslCertificate?: string; //Informações públicas, como o domínio, entidade responsável e a CertificateAuthority que o emitiu.
-
-  tenant?: number;
-  userUID?: string;
+  databaseCredential: IDatabaseCredential;
+  tenantId: number;
+  userUID: string;
 }
 
 export class RegisterDatabaseCredentialUseCase {
@@ -54,21 +36,21 @@ export class RegisterDatabaseCredentialUseCase {
 
 
       //Criptografa a senha do tenant
-      const encriptedDatabasePassword : string | null = encryptDatabasePassword(input.password!);
+      const encriptedDatabasePassword : string | null = encryptDatabasePassword(input.databaseCredential.password!);
       if(encriptedDatabasePassword == null){
         throw new Error("Não foi possível encriptografar senha das novas credenciais de tenant");
       }
 
-      input.password = encriptedDatabasePassword;
+      input.databaseCredential.password = encriptedDatabasePassword;
 
       //Registra as credenciais do tenant
-      const newTenantCredential = await this.databaseCredentialRepository.create(new DatabaseCredential(input));
+      const newTenantCredential = await this.databaseCredentialRepository.create(new DatabaseCredential(input.databaseCredential));
       // await this.tenantCredentialService.create(input);
 
       //Registra o User Tenant
       await this.databasePermissionRepository.create({
         databaseCredential: newTenantCredential.id,
-        tenant: input.tenant,
+        tenant: input.tenantId,
         isAdmin: true,
         user: user!.id,
         userUID: input.userUID,

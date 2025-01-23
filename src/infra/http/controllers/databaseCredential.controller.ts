@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { BaseController } from "./base.controller";
 import { NotFoundError } from "../../../errors/notFound.error";
 import { RegisterDatabaseCredentialUseCase } from "../../../useCases/tenant/registerDatabaseCredential.useCase";
-import { IDatabaseCredential, DatabaseCredential } from "../../../domain/entities/databaseCredential.model";
+import { IDatabaseCredentialDatabaseModel, DatabaseCredential } from "../../../domain/entities/databaseCredential.model";
 import DatabaseCredentialRepository from "../../../domain/repositories/databaseCredential.repository";
 import UserTenantRepository from "../../../domain/repositories/databasePermission.repository";
 import UserRepository from "../../../domain/repositories/user.repository";
@@ -26,22 +26,26 @@ export class DatabaseCredentialController {
       const registerDatabaseCredentialUseCase: RegisterDatabaseCredentialUseCase = new RegisterDatabaseCredentialUseCase(tenantCredentialRepository, userTenantRepository, userRepository);
 
       const data = await registerDatabaseCredentialUseCase.execute({
-        name: req.body.databaseName,
-        type: req.body.databaseType,
-        username: req.body.databaseUsername,
-        password: req.body.databasePassword,
-        host: req.body.databaseHost,
-        port: req.body.databasePort,
-        srvEnabled: req.body.srvEnabled,
-        options: req.body.options,
-        storagePath: req.body.storagePath,
-        sslEnabled: req.body.sslEnabled,
-        poolSize: req.body.poolSize,
-        timeOutTime: req.body.timeOutTime,
-        //SSL data
-        sslCertificateAuthority: req.body.sslCertificateAuthority,
-        sslPrivateKey: req.body.sslPrivateKey,
-        sslCertificate: req.body.sslCertificate
+        databaseCredential: new DatabaseCredential({
+          name: req.body.databaseName,
+          type: req.body.databaseType,
+          username: req.body.databaseUsername,
+          password: req.body.databasePassword,
+          host: req.body.databaseHost,
+          port: req.body.databasePort,
+          srvEnabled: req.body.srvEnabled,
+          options: req.body.options,
+          storagePath: req.body.storagePath,
+          sslEnabled: req.body.sslEnabled,
+          poolSize: req.body.poolSize,
+          timeOutTime: req.body.timeOutTime,
+          //SSL data
+          sslCertificateAuthority: req.body.sslCertificateAuthority,
+          sslPrivateKey: req.body.sslPrivateKey,
+          sslCertificate: req.body.sslCertificate
+        }),
+        tenantId: req.body.tenantId,
+        userUID: req.body.userUID
       });
 
       return res.status(200).send(data);
@@ -64,7 +68,7 @@ export class DatabaseCredentialController {
       const databaseCredentialRepository: DatabaseCredentialRepository = new DatabaseCredentialRepository(req.body.tenantConnection as TenantConnection); 
 
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<IDatabaseCredential, DatabaseCredential> = new BaseController(databaseCredentialRepository, "DatabaseCredential");
+      const baseController: BaseController<IDatabaseCredentialDatabaseModel, DatabaseCredential> = new BaseController(databaseCredentialRepository, "DatabaseCredential");
 
       baseController.findAll(req, res, next);
     } catch (error) {
@@ -83,7 +87,7 @@ export class DatabaseCredentialController {
       const databaseCredentialRepository: DatabaseCredentialRepository = new DatabaseCredentialRepository(req.body.tenantConnection as TenantConnection); 
 
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<IDatabaseCredential, DatabaseCredential> = new BaseController(databaseCredentialRepository, "DatabaseCredential");
+      const baseController: BaseController<IDatabaseCredentialDatabaseModel, DatabaseCredential> = new BaseController(databaseCredentialRepository, "DatabaseCredential");
 
       baseController.findById(req, res, next);
     } catch (error) {
@@ -101,7 +105,7 @@ export class DatabaseCredentialController {
       const databaseCredentialRepository: DatabaseCredentialRepository = new DatabaseCredentialRepository(req.body.tenantConnection as TenantConnection); 
 
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<IDatabaseCredential, DatabaseCredential> = new BaseController(databaseCredentialRepository, "DatabaseCredential");
+      const baseController: BaseController<IDatabaseCredentialDatabaseModel, DatabaseCredential> = new BaseController(databaseCredentialRepository, "DatabaseCredential");
 
       baseController.getCount(req, res, next);
     } catch (error) {
@@ -119,7 +123,7 @@ export class DatabaseCredentialController {
       const databaseCredentialRepository: DatabaseCredentialRepository = new DatabaseCredentialRepository(req.body.tenantConnection as TenantConnection); 
 
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<IDatabaseCredential, DatabaseCredential> = new BaseController(databaseCredentialRepository, "DatabaseCredential");
+      const baseController: BaseController<IDatabaseCredentialDatabaseModel, DatabaseCredential> = new BaseController(databaseCredentialRepository, "DatabaseCredential");
 
       baseController.update(req, res, next);
     } catch (error) {
@@ -137,7 +141,7 @@ export class DatabaseCredentialController {
       const databaseCredentialRepository: DatabaseCredentialRepository = new DatabaseCredentialRepository(req.body.tenantConnection as TenantConnection); 
 
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<IDatabaseCredential, DatabaseCredential> = new BaseController(databaseCredentialRepository, "DatabaseCredential");
+      const baseController: BaseController<IDatabaseCredentialDatabaseModel, DatabaseCredential> = new BaseController(databaseCredentialRepository, "DatabaseCredential");
 
       baseController.delete(req, res, next);
     } catch (error) {
@@ -155,7 +159,7 @@ export class DatabaseCredentialController {
       const databaseCredentialRepository: DatabaseCredentialRepository = new DatabaseCredentialRepository(req.body.tenantConnection as TenantConnection); 
 
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<IDatabaseCredential, DatabaseCredential> = new BaseController(databaseCredentialRepository, "DatabaseCredential");
+      const baseController: BaseController<IDatabaseCredentialDatabaseModel, DatabaseCredential> = new BaseController(databaseCredentialRepository, "DatabaseCredential");
 
       baseController.deleteAll(req, res, next);
     } catch (error) {
