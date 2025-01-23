@@ -44,7 +44,7 @@ export class SignInUseCase {
       }
 
       if (user == null) {
-        await this.userRepository.create(new User({
+        user = await this.userRepository.create(new User({
           UID: accessData.user.UID,//UID do servidor de identidade
           userName: accessData.user.userName,
           firstName: accessData.user.firstName,
@@ -70,7 +70,7 @@ export class SignInUseCase {
       const syncUserAccountOnTenantsUseCase: SyncUserAccountOnTenantsUseCase = new SyncUserAccountOnTenantsUseCase();
       const value = await syncUserAccountOnTenantsUseCase.execute(accessData.user.UID!, accessData);
 
-      accessData.user.id = user!.id;
+      accessData.user.id = user.id;
       //TODO verificar se o usuário está presente no grupo que dá permissão a aplicação para permitir ou não ele de realizar o acesso
 
       return accessData;
