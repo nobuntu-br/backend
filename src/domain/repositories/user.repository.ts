@@ -47,13 +47,14 @@ export default class UserRepository extends BaseRepository<IUserDatabaseModel, U
     }
   }
 
-  async IfApplicationHasRegisteredUsers() {
+  async isUserRegistered(): Promise<boolean> {
     try {
       const users: User[] = await this.adapter.findAll(1, 1);
 
-      if (users.length == 0) {
+      if (users.length > 0) {
         return true;
       }
+      
       return false;
 
     } catch (error) {

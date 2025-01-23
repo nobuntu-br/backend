@@ -49,7 +49,7 @@ export class RegisterUserUseCase {
 
       var userWillBeAdministrator: boolean = false;
       //Verificar se é o primeiro usuário da aplicação, para assim definir ele como admin
-      if (await this.userRepository.IfApplicationHasRegisteredUsers() == false) {
+      if (await this.userRepository.isUserRegistered() == false) {
         userWillBeAdministrator = true;
       }
 

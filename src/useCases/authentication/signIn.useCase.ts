@@ -35,8 +35,6 @@ export class SignInUseCase {
 
       let user = await this.userRepository.findOne({ UID: accessData.user.UID });
 
-      console.log("user encontrado no banco de dados: ", user);
-
       const tenantUID = process.env.TENANT_ID;
 
       accessData.user.email = input.email;
@@ -44,7 +42,6 @@ export class SignInUseCase {
       if (tenantUID == undefined) {
         throw new Error("TENANT_ID environment variables not populed");
       }
-
 
       if (user == null) {
         await this.userRepository.create(new User({
@@ -71,7 +68,7 @@ export class SignInUseCase {
         );
       }
       const syncUserAccountOnTenantsUseCase: SyncUserAccountOnTenantsUseCase = new SyncUserAccountOnTenantsUseCase();
-      await syncUserAccountOnTenantsUseCase.execute(accessData.user.UID!, accessData);
+      const value = await syncUserAccountOnTenantsUseCase.execute(accessData.user.UID!, accessData);
 
       accessData.user.id = user!.id;
       //TODO verificar se o usuário está presente no grupo que dá permissão a aplicação para permitir ou não ele de realizar o acesso

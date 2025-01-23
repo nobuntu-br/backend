@@ -68,32 +68,41 @@ export class SyncUserAccountOnTenantsUseCase {
     const userRepository: UserRepository = new UserRepository(tenantConnection);
 
     //Busca usuário
-    const user: User | null = await userRepository.findOne({ UID: userUID });
+    let user: User | null = await userRepository.findOne({ UID: userUID });
+
+    //TODO verificar se a aplicação tem outro usuário
+    const isUserRegistered = await userRepository.isUserRegistered();
+
+    let _isAdministrator: boolean = false;
+
+    if(isUserRegistered == false){
+      _isAdministrator = true;
+    }
 
     if (user == null) {
-      await userRepository.create(new User({
+      user = await userRepository.create(new User({
         UID: accessData.user.UID,//UID do servidor de identidade
         userName: accessData.user.userName,
         firstName: accessData.user.firstName,
         lastName: accessData.user.lastName,
-        isAdministrator: false,
+        isAdministrator: _isAdministrator,
         email: accessData.user.email,
         tenantUID: "test" //TODO é necessário esse campo?
       }));
     } else {
       //Atualiza os dados de usuário que estão no servidor de identidade para o banco de dados de uso
-      await userRepository.update(
+      user = await userRepository.update(
         user.id!,
         {
           UID: accessData.user.UID,//UID do servidor de identidade
           userName: accessData.user.userName,
           firstName: accessData.user.firstName,
           lastName: accessData.user.lastName,
-          isAdministrator: false,
           email: accessData.user.email,
           tenantUID: "test" //TODO é necessário esse campo?
         }
       );
     }
+
   }
 }
