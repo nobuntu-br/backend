@@ -1,30 +1,39 @@
 import { ComponentStructure } from "../../domain/entities/componentStructure.model";
-import ComponentStructureRoleRepository from "../../domain/repositories/componentStructureRole.repository";
+import ComponentStructureRepository from "../../domain/repositories/componentStructure.repository";
+import UserRepository from "../../domain/repositories/user.repository";
 import { NotFoundError } from "../../errors/notFound.error";
 
 export type GetPageStructureInputDTO = {
-  userUID: string;
-  pageName: string;
+  userId: number;
+  componentName: string;
 }
 
 export class GetPageStructureUseCase {
   constructor(
-    private componentStructureRoleRepository: ComponentStructureRoleRepository,
+    private componentStructureRepository: ComponentStructureRepository,
+    private userRepository: UserRepository
   ) { }
 
-  async execute(input: GetPageStructureInputDTO ): Promise<ComponentStructure> {
-    
-    const pageStructure: ComponentStructure = await this.componentStructureRoleRepository.getPageStructure(input.userUID, input.pageName);  
-    //verificar a role do usuário
+  async execute(input: GetPageStructureInputDTO): Promise<ComponentStructure> {
 
-    if(pageStructure == null){
-      throw new NotFoundError("Page structure not found");
+    try {
+      let pageStructure: ComponentStructure | null = null;
+
+      const isUserAdmin = await this.userRepository.isUserAdminById(input.userId);
+
+      if (isUserAdmin != null || isUserAdmin == true) {
+        pageStructure = await this.componentStructureRepository.findOne({ componentName: input.componentName });
+      } else {
+        pageStructure = await this.componentStructureRepository.getPageStructure(input.userId, input.componentName);
+      }
+
+      if (pageStructure != null) {
+        return pageStructure;
+      }
+      
+      throw new NotFoundError("Page structure not found.");
+    } catch (error) {
+      throw error;
     }
-
-    return pageStructure;
-
-    //verificar qual role tá ligada ao component
-
-    // return await this.componentStructureRepository.findOne({id: componentStructureId, componentName: input.pageName});
   }
 }

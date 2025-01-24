@@ -34,7 +34,7 @@ export async function getTenantConnection(databaseCredentialId: number, userUID:
       //Realizar a conexão do tenant do usuário
       const databaseCredentialRepository: DatabaseCredentialRepository = new DatabaseCredentialRepository(defaultTenantConnection);
       const databaseCredential : DatabaseCredential | null = await databaseCredentialRepository.findById(databaseCredentialId);
-
+      //Se for o tenant default ele vai tentar realizar a conexão com os dados do banco de dados, aí é foda
       if (databaseCredential == null) {
         throw new Error("Erro to try find database credential to connect Tenant.");
       }

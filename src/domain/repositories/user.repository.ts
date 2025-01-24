@@ -4,6 +4,7 @@ import { UnknownError } from "../../errors/unknown.error";
 import TenantConnection from "../entities/tenantConnection.model";
 import { IUserDatabaseModel, User } from "../entities/user.model";
 import BaseRepository from "./base.repository";
+import { Role } from "../entities/role.model";
 
 export default class UserRepository extends BaseRepository<IUserDatabaseModel, User> {
 
@@ -25,13 +26,13 @@ export default class UserRepository extends BaseRepository<IUserDatabaseModel, U
       return false;
 
     } catch (error) {
-      throw new UnknownError("Error to check if user is Admin. Detail: "+ error);
+      throw new UnknownError("Error to check if user is Admin. Detail: " + error);
     }
   }
 
   async isUserAdminById(userId: number): Promise<boolean> {
     try {
-      const _user = await this.adapter.findOne({ id: userId });
+      const _user = await this.adapter.findById(userId);
 
       if (_user != null && _user.isAdministrator != null) {
         //Se o usuário é administrador
@@ -43,24 +44,23 @@ export default class UserRepository extends BaseRepository<IUserDatabaseModel, U
       return false;
 
     } catch (error) {
-      throw new UnknownError("Error to check if user is Admin. Detail: "+ error);
+      throw new UnknownError("Error to check if user is Admin. Detail: " + error);
     }
   }
 
   async isUserRegistered(): Promise<boolean> {
     try {
-      const users: User[] = await this.adapter.findAll(1, 1);
+      const usersCount: number = await this.adapter.getCount();
 
-      if (users.length > 0) {
+      if (usersCount > 0) {
         return true;
       }
-      
+
       return false;
 
     } catch (error) {
-      throw new UnknownError("Error to check if application has registered Users. Detail: "+ error);
+      throw new UnknownError("Error to check if application has registered Users. Detail: " + error);
     }
   }
-
 
 }

@@ -302,12 +302,11 @@ export class AzureADService implements IidentityService {
         }
       }
     } catch (error: any) {
-      console.log(error.response);
-
-      if (error.response.status == 400) {
+      
+      if (error.response.status == "400") {
         throw new ValidationError("Error to access account.")
       }
-
+      console.log(error.response);
       throw error;
     }
 
@@ -331,7 +330,6 @@ export class AzureADService implements IidentityService {
       return true;
 
     } catch (error) {
-      console.log("Erro ao realizar a requisição de logout pra Azure. Details: "+ error);
       throw new Error("Error to signout user on Azure Indentity Server. Detail: "+ error);
     }
 

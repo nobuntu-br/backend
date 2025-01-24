@@ -1,7 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { NotFoundError } from "../../../errors/notFound.error";
 import { GetPageStructureUseCase } from "../../../useCases/componentStructure/getPageStructure.useCase";
-import ComponentStructureRoleRepository from "../../../domain/repositories/componentStructureRole.repository";
+import ComponentStructureRepository from "../../../domain/repositories/componentStructure.repository";
+import UserRepository from "../../../domain/repositories/user.repository";
+import RoleRepository from "../../../domain/repositories/role.repository";
 
 export class ComponentStructureController {
 
@@ -11,14 +13,15 @@ export class ComponentStructureController {
         throw new NotFoundError("Não foi definido tenant para uso.");
       }
 
-      const { pageName, userUID } = req.body;
+      const { componentName, userId } = req.body;
 
-      const componentStructureRoleRepository: ComponentStructureRoleRepository = new ComponentStructureRoleRepository(req.body.tenantConnection);
-      const getPageStructureUseCase: GetPageStructureUseCase = new GetPageStructureUseCase(componentStructureRoleRepository);
+      const componentStructureRepository: ComponentStructureRepository = new ComponentStructureRepository(req.body.tenantConnection);
+      const userRepository: UserRepository = new UserRepository(req.body.tenantConnection);
+      const getPageStructureUseCase: GetPageStructureUseCase = new GetPageStructureUseCase(componentStructureRepository, userRepository);
 
-      const response = getPageStructureUseCase.execute({
-        pageName: pageName,
-        userUID: userUID
+      const response = await getPageStructureUseCase.execute({
+        componentName: componentName,
+        userId: userId
       });
 
       return res.status(200).send(response);

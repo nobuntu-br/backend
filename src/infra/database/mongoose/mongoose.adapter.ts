@@ -55,6 +55,8 @@ export class MongooseAdapter<TInterface, TClass> implements IDatabaseAdapter<TIn
 
   async findOne(query: TInterface): Promise<TClass | null> {
 
+    //TODO verificar na query se tem um "id" para tornar um "_id";
+
     try {
       const returnedValue = await this.model.findOne( query! );
 
@@ -74,6 +76,9 @@ export class MongooseAdapter<TInterface, TClass> implements IDatabaseAdapter<TIn
   }
 
   async findMany(query: TInterface): Promise<TInterface[]> {
+
+    //TODO verificar na query se tem um "id" para tornar um "_id";
+
     try {
       const returnedValue = await this.model.find( query! );
 

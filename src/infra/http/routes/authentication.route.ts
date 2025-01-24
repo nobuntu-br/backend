@@ -4,6 +4,7 @@ import validateHeaders from '../validators/index.validator';
 import { getSecurityTenant } from '../middlewares/tenant.middleware';
 import { resetPasswordValidator, sendPasswordResetLintToEmailValidator } from '../validators/authentication.validator';
 import { checkEmailExistValidator, createNewUserValidator, inviteUserValidator, sendVerificationEmailCodeValidator, signinValidator, validateVerificationEmailCodeValidator } from '../validators/user.validator';
+import { signInRateLimiter } from '../middlewares/signinRateLimiter.middleware';
 
 /**
  * Irá definir as rotas da entidade
@@ -15,7 +16,7 @@ export default function defineRoute(app: Application) {
 
   router.post('/signup', [getSecurityTenant, ...createNewUserValidator, validateHeaders], controller.signUp);
 
-  router.post('/signin', [getSecurityTenant, ...signinValidator, validateHeaders], controller.signIn);
+  router.post('/signin', [getSecurityTenant, signInRateLimiter, ...signinValidator, validateHeaders], controller.signIn);
 
   router.post('/signout', controller.signOut);
 
