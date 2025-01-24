@@ -44,12 +44,11 @@ export class ValidateAccessTokenUseCase {
 
     // Verifica e decodifica o token
     const verifiedToken = jwt.verify(token, publicKey, {
+      clockTolerance: 5,
       issuer: options.issuer, //Compara se o Emissor do token é o correto
       audience: options.audience,
       algorithms: [algorithm] //Algoritmo de assinatura do JWT
     }) as DecodedToken;
-
-    this.checkIsValidOnTime(verifiedToken);
 
     return verifiedToken;
   }
@@ -63,17 +62,5 @@ export class ValidateAccessTokenUseCase {
       });
     });
   };
-
-  checkIsValidOnTime(verifiedToken: DecodedToken){
-    const currentTime = Math.floor(Date.now() / 1000);
-
-    if (verifiedToken.exp && verifiedToken.exp < currentTime) {
-      throw new Error("Token has expired");
-    }
-
-    if (verifiedToken.iat && verifiedToken.iat > currentTime) {
-      throw new Error("Token issued in the future");
-    }
-  }
 
 }
