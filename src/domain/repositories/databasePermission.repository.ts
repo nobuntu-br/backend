@@ -172,7 +172,6 @@ export default class DatabasePermissionRepository extends BaseRepository<IDataba
           _userTenants.push(_userTenant);
         });
 
-        console.log("getTenantsUsersHasAccess with mongoose: ", _userTenants);
 
         return _userTenants;
 

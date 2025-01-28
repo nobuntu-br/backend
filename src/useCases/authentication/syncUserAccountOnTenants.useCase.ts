@@ -43,7 +43,6 @@ export class SyncUserAccountOnTenantsUseCase {
         await this.updateUser(databaseConnection, accessData, userUID);
 
       } catch (error) {
-        console.log("Erro ao realizar conexào com tenant para atualizar usuário nos tenants de acesso: ", error);
         //Se der ruim na conexão com tenant tem que ver oque faz
         throw new Error("Error to register client on tenants. Details: " + error);
       }

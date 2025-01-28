@@ -72,7 +72,7 @@ export async function checkUserAccess(req: Request, res: Response, next: NextFun
     const _isUserHaveAccessToRoute = await isUserHaveAccessToRoute(Number(sessionUserId), req.method, req.originalUrl, tenantConnection);
 
     if (_isUserHaveAccessToRoute == null || _isUserHaveAccessToRoute == false) {
-      return errorHandler(new InsufficientPermissionError("Usuário não tem permissã para rota."), req, res, next);
+      return errorHandler(new InsufficientPermissionError("Usuário não tem permissão para rota."), req, res, next);
     }
 
     req.body.tenantConnection = tenantConnection;

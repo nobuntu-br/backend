@@ -73,7 +73,6 @@ export class RegisterUserUseCase {
       return newUser;
 
     } catch (error) {
-      console.log("Erro ao realizar o cadastro do usuário. Detalhes: ", error);
       throw error;
     }
   }

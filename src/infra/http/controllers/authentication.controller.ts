@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { RefreshTokenUseCase } from "../../../useCases/authentication/refreshToken.useCase";
+import { RefreshTokenOutputDTO, RefreshTokenUseCase } from "../../../useCases/authentication/refreshToken.useCase";
 import { NotFoundError } from "../../../errors/notFound.error";
 import { IidentityService } from "../../../domain/services/Iidentity.service";
 import { AzureADService } from "../../../domain/services/azureAD.service";
@@ -82,7 +82,7 @@ export class AuthenticationController {
       });
 
       //Só será enviado dados do usuário
-      return res.status(200).send({ user: result.user });
+      return res.status(200).send(result.user);
     } catch (error) {
       next(error);
     }
@@ -139,45 +139,64 @@ export class AuthenticationController {
   async refreshToken(req: Request, res: Response, next: NextFunction) {
     try {
 
-      //Obter usuário da sessão atual
-      const sessionUserId = req.headers["usersession"];
+      //Obter os tokens
+      let cookies = req.cookies;
 
-      if (sessionUserId == undefined || sessionUserId == null || isNaN(Number(sessionUserId))) {
-        throw new UnauthorizedError("usersession not defined or invalid.");
-      }
-
-      //Obter o token de acesso
-      let refreshToken = req.cookies["refreshToken_" + sessionUserId];
-
-      if (refreshToken == undefined) {
+      if (cookies == undefined) {
         throw new UnauthorizedError("refreshToken not defined or invalid.");
       }
+
+      // console.log(cookies);
+
+      let refreshTokens: Map<string, string> = new Map<string, string>();
+
+      for (const [key, refreshToken] of Object.entries(cookies)) {
+        if (key.startsWith("refreshToken_")) {
+          // Extrai o texto após "_"
+          const userSessionId = key.split("refreshToken_")[1];
+
+          if(isNaN(Number(refreshToken)) == true){
+            refreshTokens.set(userSessionId, refreshToken as string);
+          }
+        }
+      }
+
+      // console.log("valores do map de refreshtokens: ", refreshTokens);
 
       //Define o serviço de servidor de Identidade
       const identityService: IidentityService = new AzureADService();
 
-      const refreshTokenUseCase: RefreshTokenUseCase = new RefreshTokenUseCase(identityService);
-      const newAccessData = await refreshTokenUseCase.execute({
-        refreshToken: refreshToken
-      });
+      let newAccessData : RefreshTokenOutputDTO[] = [];
 
-      //Token de acesso é enviado
-      res.cookie('accessToken_' + sessionUserId, 'Bearer ' + newAccessData.tokens.accessToken, {
-        httpOnly: true, // Previne acesso pelo JavaScript do lado do cliente
-        secure: true,
-        sameSite: 'none', // Essa opção em 'strict' Protege contra CSRF
-        path: '/',
-        maxAge: 10 * 60 * 1000, // 10 minutos (dias * horas * minutos * segundos * milisegundos )
-      });
+      for (const [userSessionId, refreshToken] of refreshTokens) {
 
-      res.cookie('refreshToken_' + sessionUserId, newAccessData.tokens.refreshToken, {
-        httpOnly: true, // Previne acesso pelo JavaScript do lado do cliente
-        secure: true,
-        sameSite: 'none',
-        maxAge: 24 * 60 * 60 * 1000, // 1 dia
-      });
+        const refreshTokenUseCase: RefreshTokenUseCase = new RefreshTokenUseCase(identityService);
+        let refreshTokenResponse = await refreshTokenUseCase.execute({
+          refreshToken: refreshToken
+        });
 
-      return res.status(200).send();
+        //Token de acesso é enviado
+        res.cookie('accessToken_' + userSessionId, 'Bearer ' + refreshTokenResponse.tokens.accessToken, {
+          httpOnly: true, // Previne acesso pelo JavaScript do lado do cliente
+          secure: true,
+          sameSite: 'none', // Essa opção em 'strict' Protege contra CSRF
+          path: '/',
+          maxAge: 10 * 60 * 1000, // 10 minutos (dias * horas * minutos * segundos * milisegundos )
+        });
+
+        res.cookie('refreshToken_' + userSessionId, refreshTokenResponse.tokens.refreshToken, {
+          httpOnly: true, // Previne acesso pelo JavaScript do lado do cliente
+          secure: true,
+          sameSite: 'none',
+          maxAge: 24 * 60 * 60 * 1000, // 1 dia
+        });
+
+        refreshTokenResponse.user.id = Number(userSessionId);
+        
+        newAccessData.push(refreshTokenResponse);
+      }
+
+      return res.status(200).send(newAccessData.map(_newAccessData => _newAccessData.user));
     } catch (error) {
       next(error);
     }

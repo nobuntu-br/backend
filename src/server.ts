@@ -4,7 +4,7 @@ import { GetDefaultTenantConnectionUseCase } from './useCases/tenant/getDefaultT
 import { GetSecurityTenantConnectionUseCase } from './useCases/tenant/getSecurityTenantConnection.useCase';
 import DatabasePermissionService from './domain/services/databasePermission.service';
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT_SERVER || 8080;
 
 app.listen(PORT, async () => {
   //Realiza conexão no banco de dados de segurança

@@ -53,6 +53,7 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
     }
   }
 
+  //TODO arrumar isso
   async findAll(limitPerPage: number, offset: number): Promise<TClass[]> {
     try {
 

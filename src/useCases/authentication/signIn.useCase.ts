@@ -6,6 +6,8 @@ import { IUser, User } from "../../domain/entities/user.model";
 import { IUserAccessData } from "../../domain/entities/userAcessData.model";
 import UserRepository from "../../domain/repositories/user.repository";
 import { checkEmailIsValid } from "../../utils/verifiers.util";
+import { TooManyRequestsError } from "../../errors/tooManyRequests.error";
+import { loginAttempts } from "../../infra/http/middlewares/signinRateLimiter.middleware";
 
 export type SignInInputDTO = {
   email: string;
@@ -76,6 +78,18 @@ export class SignInUseCase {
       return accessData;
     } catch (error: any) {
       if (error instanceof ValidationError) {
+
+        const user = loginAttempts[input.email];
+
+        if(user != undefined){
+          user.attempts += 1;
+
+          if (user.attempts >= 5) {
+            user.blockUntil = Date.now() + 15 * 60 * 1000; // Bloqueia por 15 minutos
+            throw new TooManyRequestsError("Too many signIn attempts. Please try accessing later.");
+          }
+        }
+
         throw error;
       } else {
         throw new UnknownError("Error to signin. Detalhes: " + error);

@@ -30,15 +30,15 @@ export default async function setModels(tenantConnection: TenantConnection) {
   const verificationEmail = verificationEmailModel(sequelizeConnection);
 
   //Relação de muitos pra muitos de User para Role
-  user.belongsToMany(role, {through: userRole, foreignKey: "userId", otherKey: "roleId"});
-  role.belongsToMany(user, {through: userRole, foreignKey: "roleId", otherKey: "userId"});
+  user.belongsToMany(role, {through: userRole, foreignKey: "userId", otherKey: "roleId", as: "role"});
+  role.belongsToMany(user, {through: userRole, foreignKey: "roleId", otherKey: "userId", as: "user"});
 
   role.belongsToMany(functionSystem, {through: functionSystemRole, foreignKey: "roleId", otherKey: "functionSystemId", as: "functionSystem",});
   functionSystem.belongsToMany(role, {through: functionSystemRole, foreignKey: "functionSystemId", otherKey: "roleId", as: "role"});
 
   //Relação de muitos para muitos entre ComponentStructure e Role
-  componentStructure.belongsToMany(role, {through: componentStructureRole, foreignKey: "componentStructureId", otherKey: "roleId"});
-  role.belongsToMany(componentStructure, {through: componentStructureRole, foreignKey: "roleId", otherKey: "componentStructureId"});
+  componentStructure.belongsToMany(role, {through: componentStructureRole, foreignKey: "componentStructureId", otherKey: "roleId", as: "role"});
+  role.belongsToMany(componentStructure, {through: componentStructureRole, foreignKey: "roleId", otherKey: "componentStructureId", as: "componentStructure"});
 
   //TODO precisará ser gerado várias linhas como essa abaixo, com o model diferente
   await sequelizeConnection.sync();
