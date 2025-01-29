@@ -4,7 +4,7 @@ import validateHeaders from '../validators/index.validator';
 import { getSecurityTenant } from '../middlewares/tenant.middleware';
 import { resetPasswordValidator, sendPasswordResetLintToEmailValidator } from '../validators/authentication.validator';
 import { checkEmailExistValidator, createNewUserValidator, inviteUserValidator, sendVerificationEmailCodeValidator, signinValidator, validateVerificationEmailCodeValidator } from '../validators/user.validator';
-import { signInRateLimiter } from '../middlewares/signinRateLimiter.middleware';
+import { signInRateLimiter } from '../middlewares/signInRateLimiter.middleware';
 
 /**
  * Irá definir as rotas da entidade

@@ -7,7 +7,7 @@ import { IUserAccessData } from "../../domain/entities/userAcessData.model";
 import UserRepository from "../../domain/repositories/user.repository";
 import { checkEmailIsValid } from "../../utils/verifiers.util";
 import { TooManyRequestsError } from "../../errors/tooManyRequests.error";
-import { loginAttempts } from "../../infra/http/middlewares/signinRateLimiter.middleware";
+import { loginAttempts } from "../../infra/http/middlewares/signInRateLimiter.middleware";
 
 export type SignInInputDTO = {
   email: string;
