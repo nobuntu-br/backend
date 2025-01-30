@@ -8,7 +8,7 @@ export function setMiddlewaresBeforeRoutes(app: Application){
 
   var corsOptions : CorsOptions = {
     // origin: "*",
-    origin: 'https://localhost:4200', // URL do frontend
+    origin: process.env.FRONTEND_PATH, // URL do frontend
     credentials: true, // Permite envio de cookies
   };
   
