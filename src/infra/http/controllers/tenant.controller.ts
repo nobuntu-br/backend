@@ -7,6 +7,9 @@ import { ITenant, Tenant } from "../../../domain/entities/tenant.model";
 import DatabasePermissionRepository from "../../../domain/repositories/databasePermission.repository";
 import TenantConnection from "../../../domain/entities/tenantConnection.model";
 import TenantRepository from "../../../domain/repositories/tenant.repository";
+import { InviteUserToTenantUseCase } from "../../../useCases/tenant/inviteUserToTenant.userCase";
+import { EmailService } from "../../../domain/services/email.service";
+import { RemoveUserAccessToTenantUseCase } from "../../../useCases/tenant/removeUserAccessToTenant.useCase";
 
 export class TenantController {
 
@@ -18,7 +21,7 @@ export class TenantController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
-      
+
       const tenantRepository: TenantRepository = new TenantRepository(req.body.tenantConnection as TenantConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<ITenant, Tenant> = new BaseController(tenantRepository, "Tenant");
@@ -37,7 +40,7 @@ export class TenantController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
-      
+
       const tenantRepository: TenantRepository = new TenantRepository(req.body.tenantConnection as TenantConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<ITenant, Tenant> = new BaseController(tenantRepository, "Tenant");
@@ -56,7 +59,7 @@ export class TenantController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
-      
+
       const tenantRepository: TenantRepository = new TenantRepository(req.body.tenantConnection as TenantConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<ITenant, Tenant> = new BaseController(tenantRepository, "Tenant");
@@ -75,7 +78,7 @@ export class TenantController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
-      
+
       const tenantRepository: TenantRepository = new TenantRepository(req.body.tenantConnection as TenantConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<ITenant, Tenant> = new BaseController(tenantRepository, "Tenant");
@@ -94,7 +97,7 @@ export class TenantController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
-      
+
       const tenantRepository: TenantRepository = new TenantRepository(req.body.tenantConnection as TenantConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<ITenant, Tenant> = new BaseController(tenantRepository, "Tenant");
@@ -144,7 +147,7 @@ export class TenantController {
 
   async findByUserUID(req: Request, res: Response) {
     try {
-      
+
       if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
@@ -171,14 +174,15 @@ export class TenantController {
       if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
-      
+
       const databasePermissionRepository: DatabasePermissionRepository = new DatabasePermissionRepository(req.body.tenantConnection as TenantConnection);
 
       const tenantsUserIsAdmin: Tenant[] = await databasePermissionRepository.findTenantsUserIsAdmin(req.params.userUID);
 
-      if (tenantsUserIsAdmin == null) {
+      if (tenantsUserIsAdmin.length == 0) {
         throw new NotFoundError("Não foram encontrados tenants que esse usuário é administrador");
       }
+
       return res.status(200).send(tenantsUserIsAdmin);
     } catch (error) {
       next(error);
@@ -190,7 +194,7 @@ export class TenantController {
       if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
-      
+
       const tenantConnection = req.body.tenantConnection as TenantConnection;
       const databaseType: DatabaseType = tenantConnection.databaseType;
 
@@ -199,5 +203,48 @@ export class TenantController {
       next(error);
     }
   }
+
+  async inviteUserToTenant(req: Request, res: Response, next: NextFunction): Promise<any> {
+    try {
+
+      const frontEndURI = process.env.FRONTEND_PATH;
+
+      if(!frontEndURI){
+        throw new NotFoundError("Variaveis ambiente não configuradas.");
+      }
+
+      const emailService: EmailService = new EmailService();
+      const inviteUserToTenantUseCase: InviteUserToTenantUseCase = new InviteUserToTenantUseCase(emailService, frontEndURI);
+      const response = await inviteUserToTenantUseCase.execute({
+        databaseCredentialId: req.body.databaseCredentialId,
+        invitedUserEmail: req.body.invitedUserEmail,
+        invitingUserUID: req.body.invitingUserUID,
+        tenantId: req.body.tenantId
+      });
+
+      return res.status(200).send(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async removeUserAccessToTenant(req: Request, res: Response, next: NextFunction): Promise<any> {
+    try {
+
+      const removeUserAccessToTenantUseCase: RemoveUserAccessToTenantUseCase = new RemoveUserAccessToTenantUseCase();
+      
+      const response = await removeUserAccessToTenantUseCase.execute({
+        removingAccessUserUID: req.body.removingAccessUserUID,
+        removedAccessUserId: req.body.removedAccessUserId,
+        tenantId: req.body.tenantId,
+        databaseCredentialId: req.body.databaseCredentialId
+      });
+
+      return res.status(200).send(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
 
 }

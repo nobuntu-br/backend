@@ -18,7 +18,7 @@ export default abstract class BaseRepository<TInterface, TClass> implements IBas
     return this._tenantConnection;
   }
   
-  create(data: TClass): Promise<TClass> {
+  create(data: TInterface): Promise<TClass> {
     return this.adapter.create(data);
   }
 

@@ -3,7 +3,7 @@ import { ModelStatic, Transaction } from "sequelize";
 import { FilterValue } from "../../utils/mongoose/customQuery.util";
 
 export interface IBaseRepository<TInterface, TClass> {
-  create(data: TClass): Promise<TClass>;
+  create(data: TInterface): Promise<TClass>;
   findAll(limitPerPage: number, offset: number): Promise<TClass[]>;
   findOne(query: TInterface): Promise<TClass | null>;
   findMany(query: TInterface): Promise<TInterface[]>;

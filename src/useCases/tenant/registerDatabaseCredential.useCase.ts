@@ -49,10 +49,10 @@ export class RegisterDatabaseCredentialUseCase {
 
       //Registra o User Tenant
       await this.databasePermissionRepository.create({
-        databaseCredential: newTenantCredential.id,
-        tenant: input.tenantId,
+        databaseCredentialId: newTenantCredential.id,
+        tenantId: input.tenantId,
         isAdmin: true,
-        user: user!.id,
+        userId: user!.id,
         userUID: input.userUID,
       });
 

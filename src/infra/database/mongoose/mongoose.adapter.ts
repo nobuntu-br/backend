@@ -31,7 +31,7 @@ export class MongooseAdapter<TInterface, TClass> implements IDatabaseAdapter<TIn
     return this._databaseConnection;
   }
 
-  async create(data: TClass): Promise<TClass> {
+  async create(data: TInterface): Promise<TClass> {
     try {
       const item = new this._model(data);
       const newItem = await item.save();

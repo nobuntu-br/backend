@@ -1,6 +1,6 @@
 import { Application, Router } from 'express';
 import { TenantController } from '../controllers/tenant.controller';
-import { createNewTenantValidator, findAllTenantValidator } from '../validators/tenant.validator';
+import { createNewTenantValidator, findAllTenantValidator, inviteUserToTenant, removeUserAccessToTenant } from '../validators/tenant.validator';
 import validateHeaders from '../validators/index.validator';
 import { checkUserAccess } from '../middlewares/checkUserAccess.middleware';
 import { getSecurityTenant } from '../middlewares/tenant.middleware';
@@ -13,6 +13,10 @@ import { verifyAccess } from '../middlewares/auth.middleware';
 export default function defineRoute(app: Application) {
   const controller: TenantController = new TenantController();
   const router: Router = Router();
+
+  router.post('/invite-user-to-tenant', [checkUserAccess, ...inviteUserToTenant, validateHeaders], controller.inviteUserToTenant);
+
+  router.post('/remove-user-access-to-tenant', [checkUserAccess, ...removeUserAccessToTenant, validateHeaders], controller.removeUserAccessToTenant);
 
   router.get('/database-type', [checkUserAccess], controller.getDatabaseType);
   //Get tenant user is admin

@@ -5,7 +5,7 @@ export interface IBaseService<TInterface, TClass> {
   readonly repository: any;
   readonly databaseType: string;
 
-  create(data: TClass): Promise<TClass>;
+  create(data: TInterface): Promise<TClass>;
   findAll(limitPerPage: number, offset: number): Promise<TClass[] | null>;
   findOne(query: TInterface): Promise<TClass>;
   findMany(query: TInterface): Promise<TInterface[]>;

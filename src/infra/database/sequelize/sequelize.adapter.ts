@@ -33,7 +33,7 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
     return this._databaseConnection;
   }
 
-  async create(data: TClass): Promise<TClass> {
+  async create(data: TInterface): Promise<TClass> {
     try {
       const newItem = await this._model.create(data!);
       return this.jsonDataToResource(newItem);
@@ -398,7 +398,7 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
       }
 
       //A opção de retornar o registro editado da função update só funciona pra msql e postgres, então na dúvida eu prefiro pesquisar novamente o registro pra não dar problemas (sei que duas buscas não é o ideial mas, o ambiente é complexo).
-      const returnedValue = await this._model.findOne({ where: { id: id } });
+      const returnedValue = await this._model.findOne({ where: { id: id }, transaction: transaction});
 
       return this.jsonDataToResource(returnedValue);
     } catch (error) {

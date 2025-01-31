@@ -40,9 +40,12 @@ export class RegisterDefaultTenantUseCase {
     let _databaseCredential: DatabaseCredential | null;
 
     try {
-      _databaseCredential = await databaseCredentialRepository.findOne({ name: databaseCredential.name });
+      // _databaseCredential = await databaseCredentialRepository.findOne({ name: databaseCredential.name });
+      _databaseCredential = await databaseCredentialRepository.findOne({ id: 1 });
       if (_databaseCredential == null) {
         _databaseCredential = new DatabaseCredential(await databaseCredentialRepository.createWithTransaction(databaseCredential, transaction));
+      } else {
+        _databaseCredential = new DatabaseCredential(await databaseCredentialRepository.updateWithTransaction(1, databaseCredential, transaction));
       }
     } catch (error) {
       throw new UnknownError("Unknown error on Save Default Tenant on Security Tenant function. Unknown error on create Database Credential. Detail: " + error);

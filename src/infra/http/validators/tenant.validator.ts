@@ -12,6 +12,20 @@ export const findAllTenantValidator = [
   query('limit').optional().isNumeric().withMessage('Only digits allowed in title limit')
 ]
 
-export const findUserByUIDValidator =[
+export const findUserByUIDValidator = [
   param('UID').notEmpty().withMessage('UID is required')
+]
+
+export const inviteUserToTenant = [
+  check('databaseCredentialId').notEmpty().withMessage('databaseCredentialId is required'),
+  check('invitedUserEmail').notEmpty().withMessage('invitedUserEmail is required'),
+  check('invitingUserUID').notEmpty().withMessage('invitingUserUID is required'),
+  check('tenantId').notEmpty().withMessage('tenantId is required')
+]
+
+export const removeUserAccessToTenant = [
+  check('databaseCredentialId').notEmpty().withMessage('databaseCredentialId is required'),
+  check('removedAccessUserId').notEmpty().withMessage('removedAccessUserId is required'),
+  check('removingAccessUserUID').notEmpty().withMessage('removingAccessUserUID is required'),
+  check('tenantId').notEmpty().withMessage('tenantId is required')
 ]

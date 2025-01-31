@@ -11,7 +11,7 @@ export interface IDatabaseAdapter<TInterface, TClass> {
   readonly databaseConnection: Connection | Sequelize;
 
   //Lazy loading
-  create(data: TClass): Promise<TClass>;
+  create(data: TInterface): Promise<TClass>;
   findAll(limitPerPage: number, offset: number): Promise<TClass[]>;
   findOne(query: TInterface): Promise<TClass | null>;
   findMany(query: TInterface): Promise<TInterface[]>;

@@ -26,7 +26,7 @@ export default class BaseService<TInterface, TClass> implements IBaseService<TIn
     return this._repository;
   }
 
-  create(data: TClass): Promise<TClass> {
+  create(data: TInterface): Promise<TClass> {
     return this.repository.create(data);
   }
 

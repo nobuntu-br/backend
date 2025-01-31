@@ -29,6 +29,10 @@ export class TenantConnectionService {
     this._permissions = permissions;
   }
 
+  addPermission(permission: DatabasePermissionDetailOutputDTO){
+    this._permissions.push(permission);
+  }
+
   //TODO usar cache no futuro
   checkUserPermissionTenant(userUID: string | null, databaseCredentialId: number): boolean{
 
@@ -38,11 +42,11 @@ export class TenantConnectionService {
     // console.log(this.permissions);
 
     for (let index = 0; index < this.permissions.length; index++) {
-      if(this.permissions[index].userUID == userUID && this.permissions[index].tenant.id == databaseCredentialId){
+      if(this.permissions[index].userUID == userUID && this.permissions[index].databaseCredential.id == databaseCredentialId){
         return true;
       }
 
-      if(this.permissions[index].userUID == null && this.permissions[index].tenant.id == databaseCredentialId){
+      if(this.permissions[index].userUID == null && this.permissions[index].databaseCredential.id == databaseCredentialId){
         return true;
       }
     }
