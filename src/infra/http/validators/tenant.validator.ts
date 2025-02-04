@@ -19,7 +19,7 @@ export const findUserByUIDValidator = [
 export const inviteUserToTenant = [
   check('databaseCredentialId').notEmpty().withMessage('databaseCredentialId is required'),
   check('invitedUserEmail').notEmpty().withMessage('invitedUserEmail is required'),
-  check('invitingUserUID').notEmpty().withMessage('invitingUserUID is required'),
+  check('invitingUserEmail').notEmpty().withMessage('invitingUserEmail is required').isEmail().withMessage("invitingUserEmail not email format"),
   check('tenantId').notEmpty().withMessage('tenantId is required')
 ]
 

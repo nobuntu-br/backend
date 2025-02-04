@@ -10,6 +10,8 @@ import TenantRepository from "../../../domain/repositories/tenant.repository";
 import { InviteUserToTenantUseCase } from "../../../useCases/tenant/inviteUserToTenant.userCase";
 import { EmailService } from "../../../domain/services/email.service";
 import { RemoveUserAccessToTenantUseCase } from "../../../useCases/tenant/removeUserAccessToTenant.useCase";
+import { AzureADService } from "../../../domain/services/azureAD.service";
+import { TokenGenerator } from "../../../utils/tokenGenerator";
 
 export class TenantController {
 
@@ -180,7 +182,7 @@ export class TenantController {
       const tenantsUserIsAdmin: Tenant[] = await databasePermissionRepository.findTenantsUserIsAdmin(req.params.userUID);
 
       if (tenantsUserIsAdmin.length == 0) {
-        throw new NotFoundError("Não foram encontrados tenants que esse usuário é administrador");
+        throw new NotFoundError("No tenants were found where this user is an administrator.");
       }
 
       return res.status(200).send(tenantsUserIsAdmin);
@@ -214,11 +216,13 @@ export class TenantController {
       }
 
       const emailService: EmailService = new EmailService();
-      const inviteUserToTenantUseCase: InviteUserToTenantUseCase = new InviteUserToTenantUseCase(emailService, frontEndURI);
+      const azureADService: AzureADService = new AzureADService();
+      const tokenGenerator: TokenGenerator = new TokenGenerator();
+      const inviteUserToTenantUseCase: InviteUserToTenantUseCase = new InviteUserToTenantUseCase(emailService, azureADService, tokenGenerator, frontEndURI);
       const response = await inviteUserToTenantUseCase.execute({
         databaseCredentialId: req.body.databaseCredentialId,
         invitedUserEmail: req.body.invitedUserEmail,
-        invitingUserUID: req.body.invitingUserUID,
+        invitingUserEmail: req.body.invitingUserEmail,
         tenantId: req.body.tenantId
       });
 

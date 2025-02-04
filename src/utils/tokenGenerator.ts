@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { NotFoundError } from '../errors/notFound.error';
 
 export class TokenGenerator {
-  private readonly secret: string;
+  private secret: string;
 
   constructor() {
     const secret = process.env.JWTSECRET;
@@ -28,10 +28,9 @@ export class TokenGenerator {
   verifyToken(token: string): object {
     try {
       //TODO deverá ser verificado no banco de dados se o token está revogado ou não.
-      
       return jwt.verify(token, this.secret) as object;
-    } catch {
-      return new Error("Error to verify JWT");
+    } catch (error){
+      return new Error("Error to verify JWT. Detail: "+ error);
     }
   }
 

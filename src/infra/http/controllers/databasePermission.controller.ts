@@ -4,7 +4,6 @@ import { RegisterTenantPermissionUseCase } from "../../../useCases/tenant/regist
 import { NotFoundError } from "../../../errors/notFound.error";
 import { IDatabasePermission, DatabasePermission } from "../../../domain/entities/databasePermission.model";
 import DatabasePermissionRepository from "../../../domain/repositories/databasePermission.repository";
-import UserRepository from "../../../domain/repositories/user.repository";
 import TenantConnection from "../../../domain/entities/tenantConnection.model";
 
 export class DatabasePermissionController {
@@ -12,18 +11,12 @@ export class DatabasePermissionController {
   async create(req: Request, res: Response, next: NextFunction) {
     try {
 
-      if (req.body.tenantConnection == undefined) {
-        throw new NotFoundError("Não foi definido tenant para uso.")
-      }
-
-      const databasePermissionRepository: DatabasePermissionRepository = new DatabasePermissionRepository(req.body.tenantConnection);
-      const userRepository: UserRepository = new UserRepository(req.body.tenantConnection);
-      const registerTenantPermissionUseCase : RegisterTenantPermissionUseCase = new RegisterTenantPermissionUseCase(databasePermissionRepository, userRepository);
+      const registerTenantPermissionUseCase : RegisterTenantPermissionUseCase = new RegisterTenantPermissionUseCase();
 
       const registeredUserTenant : IDatabasePermission  = await registerTenantPermissionUseCase.execute({
-        tenant: req.body.tenant,
-        databaseCredential: req.body.databaseCredential,
-        userUID: req.body.UID
+        tenantId: req.body.tenantId,
+        databaseCredentialId: req.body.databaseCredentialId,
+        userId: req.body.userId
       });
 
       res.status(200).send(registeredUserTenant);

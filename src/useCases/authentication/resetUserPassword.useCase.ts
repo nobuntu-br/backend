@@ -20,26 +20,17 @@ export class ResetUserPasswordUseCase {
 
   constructor(
     private identityService: IidentityService,
-    private tokenGenerator: TokenGenerator,
-    private userRepository: UserRepository
+    private tokenGenerator: TokenGenerator
   ) {}
 
   async execute(input: ResetUserPasswordInputDTO): Promise<boolean> {
     try {
-      //TODO será obtido um JWT que será para verificar se ainda é possível realizar a alteraçào da senha do usuário
 
-      
-      //Validar JWT e pegar o payload
+      //Validar JWT e pegar o payload (dados contidos dentro do JWT)
       const payload = this.tokenGenerator.verifyToken(input.resetPasswordToken) as JwtPayload;
 
-      let user: User | null = await this.userRepository.findOne({email: payload.email});
-      
-      if(user == null){
-        throw new NotFoundError("Error to reset password. User not found.");
-      }
-
       try {
-        await this.identityService.resetUserPassword(user.UID!, input.password);
+        await this.identityService.resetUserPassword(payload.email, input.password);
       } catch (error) {
         throw error;
       }

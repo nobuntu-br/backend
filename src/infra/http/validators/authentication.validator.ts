@@ -5,6 +5,6 @@ export const sendPasswordResetLintToEmailValidator = [
 ];
 
 export const resetPasswordValidator = [
-  check('email').isEmail().withMessage('email is required'),
+  check('password').notEmpty().withMessage('password is required'),
   check('resetPasswordToken').notEmpty().withMessage('resetPasswordToken is required'),
 ];

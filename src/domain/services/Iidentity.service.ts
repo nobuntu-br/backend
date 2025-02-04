@@ -11,7 +11,7 @@ export interface IidentityService {
   signIn(username: string, password: string): Promise<SignInOutputDTO>;
   signOut(accessToken: string, refreshToken: string | null): Promise<any>;
   updateUser(user: IUser): Promise<IUser>;
-  resetUserPassword(userUID: string, newPassword: string): Promise<string>;
+  resetUserPassword(userUID: string, newPassword: string): Promise<IUser>;
   deleteUser(userID: string): Promise<string>;
   getUserProfilePhoto(userID: string): any;
   updateUserProfilePhoto(accessToken: string, photoBlob: Blob): Promise<boolean>;

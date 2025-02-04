@@ -302,7 +302,7 @@ export class AzureADService implements IidentityService {
         }
       }
     } catch (error: any) {
-      
+
       if (error.response.status == "400") {
         throw new ValidationError("Error to access account.")
       }
@@ -330,7 +330,7 @@ export class AzureADService implements IidentityService {
       return true;
 
     } catch (error) {
-      throw new Error("Error to signout user on Azure Indentity Server. Detail: "+ error);
+      throw new Error("Error to signout user on Azure Indentity Server. Detail: " + error);
     }
 
   }
@@ -361,33 +361,89 @@ export class AzureADService implements IidentityService {
     throw new Error("Método não implementado");
   }
 
-  async resetUserPassword(userUID: string, newPassword: string): Promise<string> {
+  async resetUserPassword(email: string, newPassword: string): Promise<IUser> {
+
+    const accessToken: string = await this.getAccessToken();
+    let userResponse;
 
     try {
-      const accessToken: string = await this.getAccessToken();
-
-      const body = {
-        "passwordProfile": {
-          "forceChangePasswordNextSignIn": false,
-          "password": newPassword
+      // Endpoint da Microsoft Graph API para buscar o usuário pelo e-mail
+      userResponse = await axios.get(
+        `https://graph.microsoft.com/v1.0/users?$filter=mail eq '${email}'`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
         }
-      }
-
-      // Altera senha do usuário
-      const updateUserPasswordResponse = await axios.patch(this.graphAPIUrl + `v1.0/users/` + userUID, body, {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        },
-      });
-
-      return userUID;
-
-    } catch (error: any) {
-      console.dir(error.response.data, { depth: null });
-      throw new Error("Erro ao alterar senha do usuário na Azure. Detalhes: " + error);
+      );
+    } catch (error) {
+      throw new Error("Error to find user on identity server. Details: " + error);
     }
 
+    // Verifica se encontrou o usuário
+    if (!userResponse.data || userResponse.data.value.length === 0) {
+      throw new NotFoundError("User not found to change password.");
+    }
+
+    const userId = userResponse.data.value[0].id; // Obtém o ID do usuário
+
+    try {
+      // Requisição para alterar a senha do usuário
+      await axios.patch(
+        `https://graph.microsoft.com/v1.0/users/${userId}`,
+        {
+          passwordProfile: {
+            forceChangePasswordNextSignIn: true,
+            password: newPassword,
+          },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    } catch (error: any) {
+      console.dir(error.response.data, { depth: null });
+      throw new Error("Error to change user password on identity server. Details: " + error);
+    }
+
+    return {
+      email: email,
+      firstName: userResponse.data.value[0].givenName,
+      lastName: userResponse.data.value[0].surname,
+      UID: userResponse.data.value[0].id,
+      userName: userResponse.data.value[0].displayName,
+      tenantUID: this.tenantID
+    }
+    /*
+        try {
+          const accessToken: string = await this.getAccessToken();
+    
+          const body = {
+            "passwordProfile": {
+              "forceChangePasswordNextSignIn": false,
+              "password": newPassword
+            }
+          }
+    
+          // Altera senha do usuário
+          const updateUserPasswordResponse = await axios.patch(this.graphAPIUrl + `v1.0/users/` + userUID, body, {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'application/json'
+            },
+          });
+    
+          return userUID;
+    
+        } catch (error: any) {
+          console.dir(error.response.data, { depth: null });
+          throw new Error("Erro ao alterar senha do usuário na Azure. Detalhes: " + error);
+        }
+    */
   }
 
   async deleteUser(userID: string): Promise<string> {

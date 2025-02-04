@@ -196,6 +196,10 @@ export class AuthenticationController {
         newAccessData.push(refreshTokenResponse);
       }
 
+      if(newAccessData.length == 0){
+        throw new UnauthorizedError("Error to refresh token");
+      }
+
       return res.status(200).send(newAccessData.map(_newAccessData => _newAccessData.user));
     } catch (error) {
       next(error);
@@ -242,7 +246,8 @@ export class AuthenticationController {
       }
 
       const verificationEmailRepository: VerificationEmailRepository = new VerificationEmailRepository(req.body.tenantConnection);
-      const sendVerificationCodeUseCase: SendVerificationCodeToEmailUseCase = new SendVerificationCodeToEmailUseCase(verificationEmailRepository);
+      const azureADService: AzureADService = new AzureADService();
+      const sendVerificationCodeUseCase: SendVerificationCodeToEmailUseCase = new SendVerificationCodeToEmailUseCase(verificationEmailRepository, azureADService);
       const result = await sendVerificationCodeUseCase.execute(req.body);
 
       return res.status(200).send(result);
@@ -277,8 +282,8 @@ export class AuthenticationController {
       //Definir o servico de email que será usado
       const emailService: EmailService = new EmailService();
       const tokenGenerator: TokenGenerator = new TokenGenerator();
-
-      const sendPasswordResetLinkToEmailUseCase: SendPasswordResetLinkToEmailUseCase = new SendPasswordResetLinkToEmailUseCase(emailService, tokenGenerator);
+      const azureADService: AzureADService = new AzureADService();
+      const sendPasswordResetLinkToEmailUseCase: SendPasswordResetLinkToEmailUseCase = new SendPasswordResetLinkToEmailUseCase(azureADService, emailService, tokenGenerator);
       const result = await sendPasswordResetLinkToEmailUseCase.execute({
         email: req.body.email
       });
@@ -298,9 +303,8 @@ export class AuthenticationController {
 
       const azureADService: AzureADService = new AzureADService();
       const tokenGenerator: TokenGenerator = new TokenGenerator();
-      const userRepository: UserRepository = new UserRepository(req.body.tenantConnection);
-      const resetUserPasswordUseCase: ResetUserPasswordUseCase = new ResetUserPasswordUseCase(azureADService, tokenGenerator, userRepository);
-      const result = await resetUserPasswordUseCase.execute({ password: req.body.password, resetPasswordToken: req.body.changePasswordToken });
+      const resetUserPasswordUseCase: ResetUserPasswordUseCase = new ResetUserPasswordUseCase(azureADService, tokenGenerator);
+      const result = await resetUserPasswordUseCase.execute({ password: req.body.password, resetPasswordToken: req.body.resetPasswordToken });
 
       return res.status(200).send(result);
     } catch (error) {

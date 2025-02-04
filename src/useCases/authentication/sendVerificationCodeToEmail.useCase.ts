@@ -1,8 +1,12 @@
+import { IUser } from '../../domain/entities/user.model';
 import { VerificationEmail } from '../../domain/entities/verificationEmail.model';
 import VerificationEmailRepository from '../../domain/repositories/verificationEmail.repository';
 import { EmailService } from '../../domain/services/email.service';
+import { IidentityService } from '../../domain/services/Iidentity.service';
 import { ConflictError } from '../../errors/confict.error';
 import { TooManyRequestsError } from '../../errors/tooManyRequests.error';
+import { ValidationError } from '../../errors/validation.error';
+import { checkEmailIsValid } from '../../utils/verifiers.util';
 
 export type SendVerificationCodeToEmailInputDTO = {
   email: string;
@@ -10,10 +14,27 @@ export type SendVerificationCodeToEmailInputDTO = {
 
 export class SendVerificationCodeToEmailUseCase {
   constructor(
-    private verificationEmailRepository: VerificationEmailRepository
+    private verificationEmailRepository: VerificationEmailRepository,
+    private identityService: IidentityService
   ) { }
 
   async execute(input: SendVerificationCodeToEmailInputDTO): Promise<boolean> {
+
+    if (checkEmailIsValid(input.email) == false) {
+      throw new ValidationError("Email is invalid.");
+    };
+
+    let user: IUser | null = null;
+
+    try {
+      user = await this.identityService.getUserByEmail(input.email);
+    } catch (error) {
+      
+    }
+
+    if (user != null) {
+      throw new ValidationError("User already exists.");
+    }
 
     try {
 
@@ -26,12 +47,12 @@ export class SendVerificationCodeToEmailUseCase {
           await this.verificationEmailRepository.delete(verificationEmail.id!);
         } else {
 
-          if(verificationEmail.isVerified == true){
+          if (verificationEmail.isVerified == true) {
             throw new ConflictError("Código já enviado para esse email");
           } else {
             throw new TooManyRequestsError("O e-mail de verificação já foi enviado recentemente. Aguarde antes de solicitar novamente");
           }
-          
+
         }
       }
 
