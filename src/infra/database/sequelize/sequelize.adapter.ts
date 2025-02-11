@@ -63,6 +63,7 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
         order: [['createdAt', 'DESC']], // Ordenar por data de criação, por exemplo
       });
 
+      console.log(this.jsonDataToResources(items));
       return this.jsonDataToResources(items);
 
     } catch (error) {

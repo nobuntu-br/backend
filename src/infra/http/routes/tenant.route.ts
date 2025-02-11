@@ -24,7 +24,7 @@ export default function defineRoute(app: Application) {
   //Create a new
   router.post('/', [getSecurityTenant, ...createNewTenantValidator, validateHeaders], controller.create);
   //Find all
-  router.get('/', [checkUserAccess, getSecurityTenant, ...findAllTenantValidator, validateHeaders], controller.findAll);
+  router.get('/', [ getSecurityTenant, ...findAllTenantValidator, validateHeaders], controller.findAll);
   //Find count
   router.get('/count', [getSecurityTenant, validateHeaders], controller.getCount);
   //Find Tenant by UserUID

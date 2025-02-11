@@ -4,7 +4,6 @@ import { IDatabaseAdapter } from "../../infra/database/IDatabase.adapter";
 import { UnknownError } from "../../errors/unknown.error";
 import { DatabasePermissionDetailOutputDTO } from "../../useCases/tenant/getUserTenants.useCase";
 import { IDatabasePermissionDatabaseModel, DatabasePermission } from "../entities/databasePermission.model";
-import { Tenant } from "../entities/tenant.model";
 import TenantConnection from "../entities/tenantConnection.model";
 import BaseRepository from "./base.repository";
 
@@ -226,88 +225,6 @@ export default class DatabasePermissionRepository extends BaseRepository<IDataba
     }
   }
 
-  /**
-   * Retorna os tenants que o usuário é administrador
-   * @param {*} userUID identificador universal do usuário
-   */
-  async findTenantsUserIsAdmin(userUID: string): Promise<Tenant[]> {
-    try {
-      if (this.adapter.databaseType == 'mongodb') {
-        return await this.findTenantsUserIsAdminMongooseImplementation(userUID);
-      } else {
-        return await this.findTenantsUserIsAdminSequelizeImplementation(userUID);
-      }
-    } catch (error) {
-      throw new UnknownError("Error to find tenants this user is admin. Detail: " + error);
-    }
-  }
-
-  async findTenantsUserIsAdminMongooseImplementation(userUID: string): Promise<Tenant[]> {
-    let findTenantsUserIsAdminQuery = [
-      //Encotrar documento com nome "guest"
-      {
-        $match: {
-          userUID: userUID,
-          isAdmin: true
-        }
-      },
-
-      {
-        $lookup: {
-          from: "Tenant",
-          localField: "tenantId",
-          foreignField: "_id",
-          as: "Tenant",
-        },
-      },
-
-      // { $unwind: "$Tenant" },
-
-    ];
-
-    const tenantsUserIsAdmin = await this.findUsingCustomQuery(findTenantsUserIsAdminQuery);
-
-    let tenants: Tenant[] = [];
-
-    tenantsUserIsAdmin.forEach((tenant: Tenant) => {
-      tenants.push({
-        id: tenant.id,
-        name: tenant.name
-      });
-    });
-
-    return tenants;
-  }
-
-  async findTenantsUserIsAdminSequelizeImplementation(userUID: string): Promise<Tenant[]> {
-    const tenantsUserIsAdmin = await this._tenantConnection.models!.get("DatabasePermission").findAll({
-      where: {
-        userUID: userUID,
-        isAdmin: true
-      },
-      include: [
-        {
-          as:"tenant",
-          model: this._tenantConnection.models!.get("Tenant"),
-          required: true,
-        },
-      ],
-    });
-
-    let tenants: Tenant[] = [];
-
-    tenantsUserIsAdmin.forEach((tenant: Tenant) => {
-      tenants.push({
-        id: tenant.id,
-        name: tenant.name
-      });
-    });
-
-    return tenants;
-
-  }
-
-
   async findDatabaseCredentialByUserUID(userUID: string): Promise<DatabasePermission[]> {
     try {
       if (this.adapter.databaseType == 'mongodb') {
@@ -330,4 +247,13 @@ export default class DatabasePermissionRepository extends BaseRepository<IDataba
   //TODO  um usuário X que deve ser administrador do tenant pode alterar quais usuários tem permissão no tenant. Ao ter feito alguma alteração, tem que ser alterado no cache.
   //TODO fazer a função que verifica se o usuário é admin do tenant para poder alterar a permissão dos outros ao tenant
   //TODO permitir o usuário passar o cargo de admin pra outra pessoa
+
+  //TODO
+
+  async getDatabaseCredentialByTenantId(tenantId: number){
+    //Cada databaseCredential é associado a um tenant, entào tem que ir com base no Id do tenant e Id do dono do tenant
+    const data : IDatabasePermissionDatabaseModel[] = await this.adapter.findMany({tenantId: tenantId});
+
+    
+  }
 }

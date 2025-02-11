@@ -2,12 +2,12 @@ import { InsufficientPermissionError } from "../../errors/insufficientPermission
 import { NotFoundError } from "../../errors/notFound.error";
 import { EmailService } from "../../domain/services/email.service";
 import { TokenGenerator } from "../../utils/tokenGenerator";
-import { ITenant } from "../../domain/entities/tenant.model";
-import DatabasePermissionRepository from "../../domain/repositories/databasePermission.repository";
+import { ITenantDatabaseModel } from "../../domain/entities/tenant.model";
 import UserRepository from "../../domain/repositories/user.repository";
+import TenantRepository from "../../domain/repositories/tenant.repository";
 
 export type InviteUserToApplicationInputDTO = {
-  invitingUserUID: string;
+  invitingUserId: number;
   invitingUserEmail: string;//Email do usuário que está convidando alguém
   invitedUserEmail: string;//Email do usuário que está sendo convidado
   invitedUserTenantIds: number[];
@@ -22,7 +22,7 @@ export class InviteUserToApplicationUseCase {
     private emailService: EmailService,
     private userRepository: UserRepository,
     private tokenGenerator: TokenGenerator,
-    private databasePermissionRepository: DatabasePermissionRepository
+    private tenantRepository: TenantRepository
   ) {
 
     if (process.env.APPLICATION_NAME == undefined || process.env.APPLICATION_NAME == '' ||
@@ -53,10 +53,11 @@ export class InviteUserToApplicationUseCase {
       throw new InsufficientPermissionError("User don't have permission for this action");
     }
 
-    //Verificar se todos os tenants que serão dado o acesso ao novo usuário existem mesmo;
-    var tenants: ITenant[];
+    //Verificar se o tenant que será dado o acesso ao novo usuário existem mesmo;
+    var tenants: ITenantDatabaseModel[];
     try {
-      tenants = await this.databasePermissionRepository.findTenantsUserIsAdmin(input.invitingUserUID);
+      // tenants = await this.databasePermissionRepository.findTenantsUserIsAdmin(input.invitingUserUID);
+      tenants = await this.tenantRepository.findMany({ownerUserId: input.invitingUserId})
     } catch (error) {
       throw new NotFoundError("Inviting UserUID is invalid");
     }
@@ -89,7 +90,7 @@ export class InviteUserToApplicationUseCase {
     return { "message": "invited send to " + input.invitedUserEmail };
   }
 
-  private isValidTenantIds(invitedTenantIds: number[], tenants: ITenant[]): boolean {
+  private isValidTenantIds(invitedTenantIds: number[], tenants: ITenantDatabaseModel[]): boolean {
     const _tenantsIds = tenants.map(tenant => tenant.id);
     return invitedTenantIds.every(value => _tenantsIds.includes(value));
   }

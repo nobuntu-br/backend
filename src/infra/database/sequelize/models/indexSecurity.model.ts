@@ -50,7 +50,8 @@ export default async function setModels(tenantConnection: TenantConnection) {
   role.belongsToMany(functionSystem, { through: functionSystemRole, foreignKey: "roleId", otherKey: "functionSystemId" });
   functionSystem.belongsToMany(role, { through: functionSystemRole, foreignKey: "functionSystemId", otherKey: "roleId" });
 
-
+  user.hasOne(tenant, { foreignKey: "userId" });
+  tenant.belongsTo(user, { foreignKey: "userId", as: "user"});
   //Cria as tabelas no banco de dados
   await sequelizeConnection.sync();
 

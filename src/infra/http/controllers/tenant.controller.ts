@@ -3,7 +3,7 @@ import { BaseController } from "./base.controller";
 import { GetUserTenantsUseCase } from "../../../useCases/tenant/getUserTenants.useCase";
 import { NotFoundError } from "../../../errors/notFound.error";
 import { DatabaseType } from "../../database/createDb.adapter";
-import { ITenant, Tenant } from "../../../domain/entities/tenant.model";
+import { ITenant, ITenantDatabaseModel, Tenant } from "../../../domain/entities/tenant.model";
 import DatabasePermissionRepository from "../../../domain/repositories/databasePermission.repository";
 import TenantConnection from "../../../domain/entities/tenantConnection.model";
 import TenantRepository from "../../../domain/repositories/tenant.repository";
@@ -26,7 +26,7 @@ export class TenantController {
 
       const tenantRepository: TenantRepository = new TenantRepository(req.body.tenantConnection as TenantConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<ITenant, Tenant> = new BaseController(tenantRepository, "Tenant");
+      const baseController: BaseController<ITenantDatabaseModel, Tenant> = new BaseController(tenantRepository, "Tenant");
 
       baseController.create(req, res, next);
     } catch (error) {
@@ -45,7 +45,7 @@ export class TenantController {
 
       const tenantRepository: TenantRepository = new TenantRepository(req.body.tenantConnection as TenantConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<ITenant, Tenant> = new BaseController(tenantRepository, "Tenant");
+      const baseController: BaseController<ITenantDatabaseModel, Tenant> = new BaseController(tenantRepository, "Tenant");
 
       baseController.findAll(req, res, next);
     } catch (error) {
@@ -64,7 +64,7 @@ export class TenantController {
 
       const tenantRepository: TenantRepository = new TenantRepository(req.body.tenantConnection as TenantConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<ITenant, Tenant> = new BaseController(tenantRepository, "Tenant");
+      const baseController: BaseController<ITenantDatabaseModel, Tenant> = new BaseController(tenantRepository, "Tenant");
 
       baseController.findById(req, res, next);
     } catch (error) {
@@ -83,7 +83,7 @@ export class TenantController {
 
       const tenantRepository: TenantRepository = new TenantRepository(req.body.tenantConnection as TenantConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<ITenant, Tenant> = new BaseController(tenantRepository, "Tenant");
+      const baseController: BaseController<ITenantDatabaseModel, Tenant> = new BaseController(tenantRepository, "Tenant");
 
       baseController.getCount(req, res, next);
     } catch (error) {
@@ -102,7 +102,7 @@ export class TenantController {
 
       const tenantRepository: TenantRepository = new TenantRepository(req.body.tenantConnection as TenantConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<ITenant, Tenant> = new BaseController(tenantRepository, "Tenant");
+      const baseController: BaseController<ITenantDatabaseModel, Tenant> = new BaseController(tenantRepository, "Tenant");
 
       baseController.update(req, res, next);
     } catch (error) {
@@ -120,7 +120,7 @@ export class TenantController {
 
       const tenantRepository: TenantRepository = new TenantRepository(req.body.tenantConnection as TenantConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<ITenant, Tenant> = new BaseController(tenantRepository, "Tenant");
+      const baseController: BaseController<ITenantDatabaseModel, Tenant> = new BaseController(tenantRepository, "Tenant");
 
       baseController.delete(req, res, next);
     } catch (error) {
@@ -138,7 +138,7 @@ export class TenantController {
 
       const tenantRepository: TenantRepository = new TenantRepository(req.body.tenantConnection as TenantConnection);
       //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<ITenant, Tenant> = new BaseController(tenantRepository, "Tenant");
+      const baseController: BaseController<ITenantDatabaseModel, Tenant> = new BaseController(tenantRepository, "Tenant");
 
       baseController.deleteAll(req, res, next);
     } catch (error) {
@@ -177,9 +177,11 @@ export class TenantController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
-      const databasePermissionRepository: DatabasePermissionRepository = new DatabasePermissionRepository(req.body.tenantConnection as TenantConnection);
+      // const databasePermissionRepository: DatabasePermissionRepository = new DatabasePermissionRepository(req.body.tenantConnection as TenantConnection);
+      const tenantRepository: TenantRepository = new TenantRepository(req.body.tenantConnection as TenantConnection);
 
-      const tenantsUserIsAdmin: Tenant[] = await databasePermissionRepository.findTenantsUserIsAdmin(req.params.userUID);
+      // const tenantsUserIsAdmin: Tenant[] = await te.findTenantsUserIsAdmin(req.params.userUID);
+      const tenantsUserIsAdmin: ITenantDatabaseModel[] = await tenantRepository.findMany({ownerUserId: Number(req.params.userId)});
 
       if (tenantsUserIsAdmin.length == 0) {
         throw new NotFoundError("No tenants were found where this user is an administrator.");

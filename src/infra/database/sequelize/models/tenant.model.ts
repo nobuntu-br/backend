@@ -6,6 +6,13 @@ export default function defineModel(sequelize: Sequelize) {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    ownerUserId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Users',
+        key: 'id',
+      },
+    },
   });
 
   schema.prototype.toJSON = function() {

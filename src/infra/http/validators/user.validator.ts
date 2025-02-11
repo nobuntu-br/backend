@@ -46,6 +46,6 @@ export const signinValidator = [
 export const inviteUserValidator = [
   check('invitingUserEmail').notEmpty().withMessage('invitingUserEmail is required').isEmail().withMessage('invitingUserEmail is wrong format'),
   check('invitedUserEmail').notEmpty().withMessage('invitedUserEmail is required').isEmail().withMessage('invitedUserEmail is wrong format'),
-  check('invitingUserUID').notEmpty().withMessage('invitingUserEmail is required'),
-  check('invitedUserTenantIds').notEmpty().withMessage('invitingUserEmail is required'),
+  check('invitingUserId').notEmpty().withMessage('invitingUserId is required'),
+  check('invitedUserTenantIds').notEmpty().withMessage('nvitedUserTenantIds is required'),
 ]

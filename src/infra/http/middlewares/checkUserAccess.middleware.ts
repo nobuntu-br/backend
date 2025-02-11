@@ -8,6 +8,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import TenantConnection from "../../../domain/entities/tenantConnection.model";
 import FunctionSystemRoleRepository from "../../../domain/repositories/functionSystemRole.repository";
 import UserRepository from "../../../domain/repositories/user.repository";
+import RoleRepository from "../../../domain/repositories/role.repository";
 
 /**
  * Middleware criado para:
@@ -95,6 +96,8 @@ export async function checkUserAccess(req: Request, res: Response, next: NextFun
  */
 async function isUserHaveAccessToRoute(userId: number, method: string, url: string, databaseConnection: TenantConnection): Promise<boolean | null> {
 
+  console.log("se a rota é pública: ", await isPublicRoute(method, url, databaseConnection));
+
   if (await isUserAdmin(userId, databaseConnection) == true || await isPublicRoute(method, url, databaseConnection) == true) {
     return true;
   }
@@ -131,6 +134,8 @@ async function isUserAdmin(userId: number, databaseConnection: TenantConnection)
  */
 async function isPublicRoute(method: string, url: string, databaseConnection: TenantConnection): Promise<boolean | null> {
   //TODO se for pra fazer isso, tem que ser com cache
-  const functionSystemRoleRepository: FunctionSystemRoleRepository = new FunctionSystemRoleRepository(databaseConnection);
-  return await functionSystemRoleRepository.isPublicRoute(method, url);
+  // const functionSystemRoleRepository: FunctionSystemRoleRepository = new FunctionSystemRoleRepository(databaseConnection);
+  // return await functionSystemRoleRepository.ad.isPublicRoute(method, url);
+  const roleRepository: RoleRepository = new RoleRepository(databaseConnection);
+  return await roleRepository.advancedSearches.isPublicRoute(method, url);
 }

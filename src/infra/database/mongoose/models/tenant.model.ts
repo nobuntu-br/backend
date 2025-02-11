@@ -13,6 +13,10 @@ export default function defineModel(mongooseConnection: Connection) {
         type: String,
         required: true
       },
+      ownerUserId: {
+        type: Number, ref: 'User',
+        required: true,
+      }
     },
     { timestamps: true }
   );

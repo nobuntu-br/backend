@@ -22,7 +22,7 @@ export default function defineRoute(app: Application) {
 
   router.get('/refresh-token', controller.refreshToken);
 
-  router.get('/silent-single-sign-on', controller.silentSingleSignOn);
+  router.get('/single-sign-on', [getSecurityTenant], controller.singleSignOn);
 
   /**
    * Envia código de verificação para email

@@ -63,11 +63,8 @@ export class DatabaseCredentialController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
-      // //O Service será criado com base no tipo de banco de dados e o model usado
-      // const databaseCredentialRepository: DatabaseCredentialRepository = new DatabaseCredentialRepository(req.body.tenantConnection as TenantConnection); 
       const databaseCredentialRepository: DatabaseCredentialRepository = new DatabaseCredentialRepository(req.body.tenantConnection as TenantConnection); 
 
-      //Base Controller é uma classe que já tem implementado todas as funções de CRUD
       const baseController: BaseController<IDatabaseCredentialDatabaseModel, DatabaseCredential> = new BaseController(databaseCredentialRepository, "DatabaseCredential");
 
       baseController.findAll(req, res, next);
@@ -90,6 +87,24 @@ export class DatabaseCredentialController {
       const baseController: BaseController<IDatabaseCredentialDatabaseModel, DatabaseCredential> = new BaseController(databaseCredentialRepository, "DatabaseCredential");
 
       baseController.findById(req, res, next);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async findByTenantId(req: Request, res: Response, next: NextFunction) {
+    try {
+      if (req.body.tenantConnection == undefined) {
+        throw new NotFoundError("Não foi definido tenant para uso.")
+      }
+
+      const databaseCredentialRepository: DatabaseCredentialRepository = new DatabaseCredentialRepository(req.body.tenantConnection as TenantConnection); 
+
+      //Quem pode pegar esse dado? só o gerenciador desse tenant (o dono do tenant)
+
+      const data = await databaseCredentialRepository.advancedSearches.getDatabaseCredentialByTenantId(req.body.tenantId, req.body.userId);
+
+      return res.status(200).send(data);
     } catch (error) {
       next(error);
     }

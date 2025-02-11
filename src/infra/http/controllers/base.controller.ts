@@ -44,7 +44,7 @@ export class BaseController<TInterface, TClass> implements IBaseController {
 
       const startIndex = (page - 1) * limitItems;
 
-      const data = await this.repository.findAll(limitItems, startIndex);
+      const data = await this.repository.findAllWithAagerLoading(limitItems, startIndex);
       return res.status(200).send(data);
     } catch (err) {
       return res.status(500).send({ message: err || "Algum erro desconhecido ocorreu ao buscar "+this.entityName+"." });

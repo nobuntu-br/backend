@@ -19,6 +19,8 @@ import { SignOutUseCase } from "../../../useCases/authentication/signOut.useCase
 import DatabasePermissionRepository from "../../../domain/repositories/databasePermission.repository";
 import UserRepository from "../../../domain/repositories/user.repository";
 import VerificationEmailRepository from "../../../domain/repositories/verificationEmail.repository";
+import TenantRepository from "../../../domain/repositories/tenant.repository";
+import { SingleSignOnUseCase } from "../../../useCases/authentication/singleSignOn.useCase";
 
 export class AuthenticationController {
 
@@ -56,6 +58,8 @@ export class AuthenticationController {
   async signIn(req: Request, res: Response, next: NextFunction) {
     try {
 
+      let acceptedCookieDomains = process.env.ACCEPTED_COOKIE_DOMAINS == undefined ? "" : process.env.ACCEPTED_COOKIE_DOMAINS;
+
       if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
@@ -68,9 +72,10 @@ export class AuthenticationController {
       //Token de acesso é enviado para o cookie
       res.cookie('accessToken_' + result.user.id, 'Bearer ' + result.tokens.accessToken, {
         httpOnly: true, // Previne acesso pelo JavaScript do lado do cliente
-        secure: true,
+        secure: true, // garante que o cookie só seja enviado por HTTPS
         sameSite: 'none',
         path: '/',
+        domain: acceptedCookieDomains,
         maxAge: 10 * 60 * 1000, // 10 minutos (dias * horas * minutos * segundos * milisegundos )
       });
 
@@ -78,6 +83,7 @@ export class AuthenticationController {
         httpOnly: true, // Previne acesso pelo JavaScript do lado do cliente
         secure: true,
         sameSite: 'none',
+        domain: acceptedCookieDomains,
         maxAge: 24 * 60 * 60 * 1000, // 1 dia
       });
 
@@ -163,14 +169,17 @@ export class AuthenticationController {
 
       // console.log("valores do map de refreshtokens: ", refreshTokens);
 
+      let acceptedCookieDomains = process.env.ACCEPTED_COOKIE_DOMAINS == undefined ? "" : process.env.ACCEPTED_COOKIE_DOMAINS;
+
       //Define o serviço de servidor de Identidade
       const identityService: IidentityService = new AzureADService();
 
       let newAccessData : RefreshTokenOutputDTO[] = [];
 
+      const refreshTokenUseCase: RefreshTokenUseCase = new RefreshTokenUseCase(identityService);
+
       for (const [userSessionId, refreshToken] of refreshTokens) {
 
-        const refreshTokenUseCase: RefreshTokenUseCase = new RefreshTokenUseCase(identityService);
         let refreshTokenResponse = await refreshTokenUseCase.execute({
           refreshToken: refreshToken
         });
@@ -181,6 +190,7 @@ export class AuthenticationController {
           secure: true,
           sameSite: 'none', // Essa opção em 'strict' Protege contra CSRF
           path: '/',
+          domain: acceptedCookieDomains,
           maxAge: 10 * 60 * 1000, // 10 minutos (dias * horas * minutos * segundos * milisegundos )
         });
 
@@ -188,6 +198,7 @@ export class AuthenticationController {
           httpOnly: true, // Previne acesso pelo JavaScript do lado do cliente
           secure: true,
           sameSite: 'none',
+          domain: acceptedCookieDomains,
           maxAge: 24 * 60 * 60 * 1000, // 1 dia
         });
 
@@ -206,33 +217,78 @@ export class AuthenticationController {
     }
   }
 
-  async silentSingleSignOn(req: Request, res: Response, next: NextFunction) {
+  async singleSignOn(req: Request, res: Response, next: NextFunction) {
+
     try {
 
-      const JWKsUri: string | undefined = process.env.JWKsUri;
-      const issuer: string | undefined = process.env.TOKEN_ISSUER;
-      const clientId: string | undefined = process.env.CLIENT_ID;
-
-      if (issuer == undefined || JWKsUri == undefined || clientId == undefined) {
-        throw new NotFoundError("Issuer, clientId or JWKsURI is not populated on environment variables.");
+      if (req.body.tenantConnection == undefined) {
+        throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
-      const authorizationHeader = req.headers['authorization'];
+      //Obter os tokens
+      let cookies = req.cookies;
 
-      if (authorizationHeader == undefined || authorizationHeader == null || authorizationHeader == "") {
-        throw new UnauthorizedError("Access token invalid.");
+      if (cookies == undefined) {
+        throw new UnauthorizedError("refreshToken not defined or invalid.");
       }
 
-      const accessToken = authorizationHeader && authorizationHeader.split(' ')[1];
+      let refreshTokens: Map<string, string> = new Map<string, string>();
 
-      if (accessToken == undefined) {
-        throw new UnauthorizedError("Access token invalid.");
+      for (const [key, refreshToken] of Object.entries(cookies)) {
+        if (key.startsWith("refreshToken_")) {
+          // Extrai o texto após "_"
+          const userSessionId = key.split("refreshToken_")[1];
+
+          if(isNaN(Number(refreshToken)) == true){
+            refreshTokens.set(userSessionId, refreshToken as string);
+          }
+        }
       }
 
-      const validateAccessTokenUseCase: ValidateAccessTokenUseCase = new ValidateAccessTokenUseCase();
-      const response = await validateAccessTokenUseCase.execute(accessToken, { issuer: issuer, audience: clientId, jwksUri: JWKsUri });
+      let acceptedCookieDomains = process.env.ACCEPTED_COOKIE_DOMAINS == undefined ? "" : process.env.ACCEPTED_COOKIE_DOMAINS;
 
-      return res.status(200).send(response);
+      //Define o serviço de servidor de Identidade
+      const identityService: IidentityService = new AzureADService();
+
+      let newAccessData : RefreshTokenOutputDTO[] = [];
+      
+      const userRepository: UserRepository = new UserRepository(req.body.tenantConnection);
+      const singleSignOnUseCase: SingleSignOnUseCase = new SingleSignOnUseCase(identityService, userRepository);
+
+      for (const [userSessionId, refreshToken] of refreshTokens) {
+
+        let refreshTokenResponse = await singleSignOnUseCase.execute({
+          refreshToken: refreshToken
+        });
+
+        //Token de acesso é enviado
+        res.cookie('accessToken_' + userSessionId, 'Bearer ' + refreshTokenResponse.tokens.accessToken, {
+          httpOnly: true, // Previne acesso pelo JavaScript do lado do cliente
+          secure: true,
+          sameSite: 'none', // Essa opção em 'strict' Protege contra CSRF
+          path: '/',
+          domain: acceptedCookieDomains,
+          maxAge: 10 * 60 * 1000, // 10 minutos (dias * horas * minutos * segundos * milisegundos )
+        });
+
+        res.cookie('refreshToken_' + userSessionId, refreshTokenResponse.tokens.refreshToken, {
+          httpOnly: true, // Previne acesso pelo JavaScript do lado do cliente
+          secure: true,
+          sameSite: 'none',
+          domain: acceptedCookieDomains,
+          maxAge: 24 * 60 * 60 * 1000, // 1 dia
+        });
+
+        refreshTokenResponse.user.id = Number(userSessionId);
+        
+        newAccessData.push(refreshTokenResponse);
+      }
+
+      if(newAccessData.length == 0){
+        throw new UnauthorizedError("Error to refresh token");
+      }
+
+      return res.status(200).send(newAccessData.map(_newAccessData => _newAccessData.user));
     } catch (error) {
       next(error);
     }
@@ -322,15 +378,15 @@ export class AuthenticationController {
       const emailService: EmailService = new EmailService();
       //Serviço de geração de token
       const tokenGenerator = new TokenGenerator();
-      const databasePermissionRepository: DatabasePermissionRepository = new DatabasePermissionRepository(req.body.tenantConnection);
+      const tenantRepository = new TenantRepository(req.body.tenantConnection);
 
-      const inviteUserToApplicationUseCase: InviteUserToApplicationUseCase = new InviteUserToApplicationUseCase(emailService, userRepository, tokenGenerator, databasePermissionRepository);
+      const inviteUserToApplicationUseCase: InviteUserToApplicationUseCase = new InviteUserToApplicationUseCase(emailService, userRepository, tokenGenerator, tenantRepository);
 
       const response = await inviteUserToApplicationUseCase.execute({
         invitedUserEmail: req.body.invitedUserEmail,
         invitedUserTenantIds: req.body.invitedUserTenantIds,
         invitingUserEmail: req.body.invitingUserEmail,
-        invitingUserUID: req.body.invitingUserUID
+        invitingUserId: req.body.invitingUserId
       });
 
       return res.status(200).send(response);

@@ -68,8 +68,7 @@ export class SyncUserAccountOnTenantsUseCase {
 
     //Busca usuário
     let user: User | null = await userRepository.findOne({ UID: userUID });
-
-    //TODO verificar se a aplicação tem outro usuário
+    //verificar se a aplicação tem outro usuário
     const isUserRegistered = await userRepository.isUserRegistered();
 
     let _isAdministrator: boolean = false;
@@ -80,12 +79,12 @@ export class SyncUserAccountOnTenantsUseCase {
 
     if (user == null) {
       user = await userRepository.create(new User({
-        UID: accessData.user.UID,//UID do servidor de identidade
-        userName: accessData.user.userName,
-        firstName: accessData.user.firstName,
-        lastName: accessData.user.lastName,
+        UID: accessData.UID,//UID do servidor de identidade
+        userName: accessData.userName,
+        firstName: accessData.firstName,
+        lastName: accessData.lastName,
         isAdministrator: _isAdministrator,
-        email: accessData.user.email,
+        email: accessData.email,
         tenantUID: "test" //TODO é necessário esse campo?
       }));
     } else {
@@ -93,11 +92,11 @@ export class SyncUserAccountOnTenantsUseCase {
       user = await userRepository.update(
         user.id!,
         {
-          UID: accessData.user.UID,//UID do servidor de identidade
-          userName: accessData.user.userName,
-          firstName: accessData.user.firstName,
-          lastName: accessData.user.lastName,
-          email: accessData.user.email,
+          UID: accessData.UID,//UID do servidor de identidade
+          userName: accessData.userName,
+          firstName: accessData.firstName,
+          lastName: accessData.lastName,
+          email: accessData.email,
           tenantUID: "test" //TODO é necessário esse campo?
         }
       );

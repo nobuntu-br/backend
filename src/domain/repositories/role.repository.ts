@@ -4,15 +4,28 @@ import { IDatabaseAdapter } from "../../infra/database/IDatabase.adapter";
 import { IRoleDataBaseModel, Role } from "../entities/role.model";
 import TenantConnection from "../entities/tenantConnection.model";
 import BaseRepository from "./base.repository";
+import { RoleRepositoryMongoose } from "../../infra/database/mongoose/repositories/role.repository";
+import { RoleRepositorySequelize } from "../../infra/database/sequelize/repositories/role.repository";
 
-export default class RoleRepository extends BaseRepository<IRoleDataBaseModel, Role>{
+export interface IRoleRepository {
+  isPublicRoute(method: string, route: string): Promise<boolean>;
+}
 
-  constructor(tenantConnection: TenantConnection){
-    const _adapter : IDatabaseAdapter<IRoleDataBaseModel, Role> = createDbAdapter<IRoleDataBaseModel, Role>(tenantConnection.models!.get("Role"), tenantConnection.databaseType, tenantConnection.connection, Role.fromJson);
+export default class RoleRepository extends BaseRepository<IRoleDataBaseModel, Role> {
+  advancedSearches: IRoleRepository;
+
+  constructor(tenantConnection: TenantConnection) {
+    const _adapter: IDatabaseAdapter<IRoleDataBaseModel, Role> = createDbAdapter<IRoleDataBaseModel, Role>(tenantConnection.models!.get("Role"), tenantConnection.databaseType, tenantConnection.connection, Role.fromJson);
     super(_adapter, tenantConnection);
+
+    if (tenantConnection.databaseType === 'mongodb') {
+      this.advancedSearches = new RoleRepositoryMongoose(this.tenantConnection, this.adapter);
+    } else {
+      this.advancedSearches = new RoleRepositorySequelize(this.tenantConnection, this.adapter);
+    }
   }
 
-  async getUserRoles(userId: number): Promise<Role[]>{
+  async getUserRoles(userId: number): Promise<Role[]> {
     try {
       if (this.adapter.databaseType == 'mongodb') {
         return await this.getUserRolesMongooseImplementation();
@@ -24,7 +37,7 @@ export default class RoleRepository extends BaseRepository<IRoleDataBaseModel, R
     }
   }
 
-  async getUserRolesSequelizeImplementation(userId: number): Promise<Role[]>{
+  async getUserRolesSequelizeImplementation(userId: number): Promise<Role[]> {
     let _roles = await this._tenantConnection.models!.get("Role").findAll({
       include: [
         {
@@ -38,13 +51,13 @@ export default class RoleRepository extends BaseRepository<IRoleDataBaseModel, R
       ],
     });
 
-    let roles : Role[] = [];
+    let roles: Role[] = [];
 
-    if(Array.isArray(_roles) &&  _roles.length == 0){
+    if (Array.isArray(_roles) && _roles.length == 0) {
       return [];
     }
 
-    for(let role of _roles){
+    for (let role of _roles) {
       roles.push({
         id: role.dataValues.id,
         name: role.dataValues.name,

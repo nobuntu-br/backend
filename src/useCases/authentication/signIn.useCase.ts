@@ -27,24 +27,46 @@ export class SignInUseCase {
   ) { }
 
   async execute(input: SignInInputDTO): Promise<SignInOutputDTO> {
+
+    if (checkEmailIsValid(input.email) == false) {
+      throw new Error("Incorrect email format.");
+    };
+
+    let accessData;
+
     try {
+      accessData = await this.identityService.signIn(input.email, input.password);
+    } catch (error: any) {
+      if (error instanceof ValidationError) {
 
-      if (checkEmailIsValid(input.email) == false) {
-        throw new Error("Incorrect email format.");
-      };
+        const user = loginAttempts[input.email];
 
-      const accessData = await this.identityService.signIn(input.email, input.password);
+        if (user != undefined) {
+          user.attempts += 1;
 
-      let user = await this.userRepository.findOne({ UID: accessData.user.UID });
+          if (user.attempts >= 5) {
+            user.blockUntil = Date.now() + 15 * 60 * 1000; // Bloqueia por 15 minutos
+            throw new TooManyRequestsError("Too many signIn attempts. Please try accessing later.");
+          }
+        }
 
-      const tenantUID = process.env.TENANT_ID;
-
-      accessData.user.email = input.email;
-
-      if (tenantUID == undefined) {
-        throw new Error("TENANT_ID environment variables not populed");
+        throw error;
+      } else {
+        throw new UnknownError("Error to signin. Details: " + error);
       }
+    }
 
+    accessData.user.email = input.email;
+
+    const tenantUID = process.env.TENANT_ID;
+
+    if (tenantUID == undefined) {
+      throw new Error("TENANT_ID environment variables not populed");
+    }
+
+    let user = await this.userRepository.findOne({ UID: accessData.user.UID });
+
+    try {
       if (user == null) {
         user = await this.userRepository.create(new User({
           UID: accessData.user.UID,//UID do servidor de identidade
@@ -69,32 +91,21 @@ export class SignInUseCase {
           }
         );
       }
-      const syncUserAccountOnTenantsUseCase: SyncUserAccountOnTenantsUseCase = new SyncUserAccountOnTenantsUseCase();
-      const value = await syncUserAccountOnTenantsUseCase.execute(accessData.user.UID!, accessData);
-
-      accessData.user.id = user.id;
-      //TODO verificar se o usuário está presente no grupo que dá permissão a aplicação para permitir ou não ele de realizar o acesso
-
-      return accessData;
-    } catch (error: any) {
-      if (error instanceof ValidationError) {
-
-        const user = loginAttempts[input.email];
-
-        if(user != undefined){
-          user.attempts += 1;
-
-          if (user.attempts >= 5) {
-            user.blockUntil = Date.now() + 15 * 60 * 1000; // Bloqueia por 15 minutos
-            throw new TooManyRequestsError("Too many signIn attempts. Please try accessing later.");
-          }
-        }
-
-        throw error;
-      } else {
-        throw new UnknownError("Error to signin. Detalhes: " + error);
-      }
-
+    } catch (error) {
+      throw new ValidationError("Signin error. Error to save user on database.");
     }
+
+    try {
+      const syncUserAccountOnTenantsUseCase: SyncUserAccountOnTenantsUseCase = new SyncUserAccountOnTenantsUseCase();
+      const value = await syncUserAccountOnTenantsUseCase.execute(accessData.user.UID!, accessData.user);
+    } catch (error) {
+      throw new UnknownError("Signin error. Error to sync user with aplication tenants. Detail: " + error);
+    }
+
+    accessData.user.id = user.id;
+    //TODO verificar se o usuário está presente no grupo que dá permissão a aplicação para permitir ou não ele de realizar o acesso
+
+    return accessData;
+
   }
 }

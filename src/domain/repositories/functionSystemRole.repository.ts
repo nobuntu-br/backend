@@ -121,7 +121,7 @@ export default class FunctionSystemRoleRepository extends BaseRepository<IFuncti
 
     return false;
   }
-
+/*
   async isPublicRoute(method: string, route: string): Promise<boolean> {
     try {
       if (this.adapter.databaseType == 'mongodb') {
@@ -203,5 +203,5 @@ export default class FunctionSystemRoleRepository extends BaseRepository<IFuncti
 
     return true;
   }
-
+*/
 }
