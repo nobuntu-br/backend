@@ -96,8 +96,6 @@ export async function checkUserAccess(req: Request, res: Response, next: NextFun
  */
 async function isUserHaveAccessToRoute(userId: number, method: string, url: string, databaseConnection: TenantConnection): Promise<boolean | null> {
 
-  console.log("se a rota é pública: ", await isPublicRoute(method, url, databaseConnection));
-
   if (await isUserAdmin(userId, databaseConnection) == true || await isPublicRoute(method, url, databaseConnection) == true) {
     return true;
   }
