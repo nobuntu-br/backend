@@ -11,7 +11,10 @@ export default class FieldFileRepository extends BaseRepository<IFieldFileDataba
     super(_adapter, tenantConnection);
   } 
   
-  async upload(fieldFile: FieldFile): Promise<string> { 
+  async upload(fieldFile: FieldFile): Promise<string> {
+    if(this.tenantConnection.databaseType === 'mongodb') {
+      throw new Error('Upload is not supported for MongoDB');
+    }
     try {
       let files = fieldFile.files;
       fieldFile.files = [];
@@ -20,16 +23,16 @@ export default class FieldFileRepository extends BaseRepository<IFieldFileDataba
             for (let i = 0; i < files.length; i++) {
             files[i].fieldFile = data.id ? data.id : undefined;
           }
-          // this.tenantConnection.models["file"].bulkCreate(files);
-
-          //TODO fazer a verificaçào do "this.adapter.databaseType", se for mongodb, usa a função de bulk do mongoose, se for outros usa a função de bulk do sequelize
+          const fileModel = this.tenantConnection.models?.get("file");
+          if (fileModel) {
+            fileModel.bulkCreate(files);
+          }
 
 
           this.tenantConnection.models?.get("File");
         }
         return data.id ? data.id.toString() : '';
       });
-      throw new Error("Method with error");
     } catch (error) { 
       throw error; 
     } 
