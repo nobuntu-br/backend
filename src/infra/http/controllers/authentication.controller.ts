@@ -83,7 +83,7 @@ export class AuthenticationController {
         httpOnly: true, // Previne acesso pelo JavaScript do lado do cliente
         secure: true,
         sameSite: 'none',
-        domain: acceptedCookieDomains,
+        // domain: acceptedCookieDomains, 
         maxAge: 24 * 60 * 60 * 1000, // 1 dia
       });
 
