@@ -21,7 +21,7 @@ export class GetSecurityTenantConnectionUseCase {
     const tenantCredentialId : number = 0;
 
     const databaseCredential: DatabaseCredential = new DatabaseCredential({
-      name: process.env.SECURITY_TENANT_DATABASE_NAME,
+      name: process.env.SECURITY_TENANT_DATABASE_NAME!.toLowerCase(),
       type: process.env.SECURITY_TENANT_DATABASE_TYPE as DatabaseType,
       username: process.env.SECURITY_TENANT_DATABASE_USERNAME,
       password: process.env.SECURITY_TENANT_DATABASE_PASSWORD,

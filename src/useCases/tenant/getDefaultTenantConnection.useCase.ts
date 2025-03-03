@@ -28,7 +28,7 @@ export class GetDefaultTenantConnectionUseCase {
     }
 
     databaseCredential = new DatabaseCredential({
-      name: process.env.DEFAULT_TENANT_DATABASE_NAME,
+      name: process.env.DEFAULT_TENANT_DATABASE_NAME!.toLowerCase(),
       type: process.env.DEFAULT_TENANT_DATABASE_TYPE as DatabaseType,
       username: process.env.DEFAULT_TENANT_DATABASE_USERNAME,
       password: process.env.DEFAULT_TENANT_DATABASE_PASSWORD,
