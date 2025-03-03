@@ -1,4 +1,4 @@
-FROM node:lts-alpine as img-pedexport-backend
+FROM node:lts-alpine AS img-pedexport-backend
 
 # Etapa 1: Construção
 FROM node:18 AS build
