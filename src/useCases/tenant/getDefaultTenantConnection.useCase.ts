@@ -70,6 +70,8 @@ export class GetDefaultTenantConnectionUseCase {
         databaseCredential,
         false
       );
+
+      //TODO gerar aqui a parte dos registros padrões
     } catch (error) {
 
       let databaseInitializer: DatabaseInitializer;
@@ -85,6 +87,8 @@ export class GetDefaultTenantConnectionUseCase {
         databaseCredential,
         false
       );
+
+      //TODO gerar aqui a parte dos registros padrões
     }
 
     console.log("Realizado conexão com o banco de dados padrão. Responsável por ser o tenant padrão para os usuários.");
