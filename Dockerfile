@@ -18,6 +18,9 @@ COPY . .
 # Compila o código TypeScript para JavaScript (Esse é o diferencial)
 RUN npm run build
 
+# Copia a pasta resources para dist
+RUN cp -r src/resources dist/resources
+
 # Verifica se o diretório /dist foi criado corretamente
 RUN ls -la /app/dist
 
