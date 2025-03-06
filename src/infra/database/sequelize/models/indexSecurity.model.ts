@@ -53,7 +53,11 @@ export default async function setModels(tenantConnection: TenantConnection) {
   user.hasOne(tenant, { foreignKey: "userId" });
   tenant.belongsTo(user, { foreignKey: "userId", as: "user"});
   //Cria as tabelas no banco de dados
-  await sequelizeConnection.sync();
+  await sequelizeConnection.sync({ alter: true }).then(() => {
+    console.log("Banco de dados sincronizado");
+  }).catch((error) => {
+    console.log("Erro ao sincronizar o banco de dados");
+  });
 
   const models = new Map<string, any>();
 
