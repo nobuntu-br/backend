@@ -41,7 +41,11 @@ export default async function setModels(tenantConnection: TenantConnection) {
   role.belongsToMany(componentStructure, {through: componentStructureRole, foreignKey: "roleId", otherKey: "componentStructureId", as: "componentStructure"});
 
   //TODO precisará ser gerado várias linhas como essa abaixo, com o model diferente
-  await sequelizeConnection.sync();
+    await sequelizeConnection.sync({ alter: true }).then(() => {
+    console.log("Banco de dados sincronizado");
+  }).catch((error) => {
+    console.log("Erro ao sincronizar o banco de dados");
+  });
   
   const models = new Map<string, any>();
   
