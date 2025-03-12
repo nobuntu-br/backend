@@ -20,11 +20,11 @@ export default function defineRoute(app: Application) {
 
   router.get('/database-type', [checkUserAccess], controller.getDatabaseType);
   //Get tenant user is admin
-  router.get('/isAdmin/uid/:userUID', [getSecurityTenant], controller.findTenantsUserIsAdmin);
+  router.get('/isAdmin/', [verifyAccess, getSecurityTenant], controller.findTenantsUserIsAdmin);
   //Create a new
-  router.post('/', [getSecurityTenant, ...createNewTenantValidator, validateHeaders], controller.create);
+  router.post('/', [verifyAccess, ...createNewTenantValidator, validateHeaders], controller.create);
   //Find all
-  router.get('/', [ getSecurityTenant, ...findAllTenantValidator, validateHeaders], controller.findAll);
+  router.get('/', [verifyAccess, getSecurityTenant, ...findAllTenantValidator, validateHeaders], controller.findAll);
   //Find count
   router.get('/count', [getSecurityTenant, validateHeaders], controller.getCount);
   //Find Tenant by UserUID

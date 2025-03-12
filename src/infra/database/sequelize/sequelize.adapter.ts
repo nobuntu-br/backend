@@ -61,9 +61,9 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
         limit: limitPerPage,
         offset: offset,
         order: [['createdAt', 'DESC']], // Ordenar por data de criação, por exemplo
-        include: [{ all: true }]
       });
 
+      console.log(this.jsonDataToResources(items));
       return this.jsonDataToResources(items);
 
     } catch (error) {
@@ -74,11 +74,9 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
   async findOne(query: TInterface): Promise<TClass | null> {
     try {
 
-      const item = await this._model.findOne({ where: query as any, 
-        include: [{ all: true }]
-       });
+      const item = await this._model.findOne({ where: query as any });
 
-       if (item == null) {
+      if (item == null) {
         return null;
       }
 
@@ -112,21 +110,17 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
   //TODO Tornar lazy loading
   async findById(id: number): Promise<TClass | null> {
     try {
-      const returnedValue = await this._model.findOne({
-        where: { id: id },
-        include: [
-          {
-            all: true,
-          }
-        ]
-      });
+      const returnedValue = await this._model.findOne({ where: { id: id }, include: [{ all: true }] });
+
       if (returnedValue == null) {
         return null;
       }
 
       this.replaceForeignKeyFieldWithData(returnedValue);
+
       return this.jsonDataToResource(returnedValue);
     } catch (error) {
+
       if (error instanceof NotFoundError) {
         throw error;
       }
@@ -249,7 +243,7 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
 
     // console.log("jsonData: ", jsonData);
 
-    const formattedResults = jsonData.map((record) => record.get({ plain: true }));//onverte o objeto Sequelize em um objeto plano (plain object) que inclui os dataValues do registro principal e das entidades associadas.
+    const formattedResults = jsonData.map((record) => record.get({ plain: true }));//converte o objeto Sequelize em um objeto plano (plain object) que inclui os dataValues do registro principal e das entidades associadas.
 
     const resources: TClass[] = [];
     formattedResults.forEach(
@@ -279,13 +273,14 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
 
         //Se for uma associação de muitos para um
         if (manyAlias?.[2]) {
-          item[manyAlias?.[2]] = item[key];
+          item.dataValues[manyAlias?.[2]] = item[key];
           continue;
         }
 
         //Se for uma associação de um para um
         for (let key2 in item.dataValues) {
           if (alias?.[1] === key2) {
+            console.log("key2: ", key2);
             item.dataValues[key2] = item[key];
           }
         }
@@ -317,6 +312,7 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
           //Se for uma associação de um para um
           for (let key2 in item.dataValues) {
             if (alias?.[1] === key2) {
+              console.log("key2: ", key2);
               item.dataValues[key2] = item[key];
             }
           }

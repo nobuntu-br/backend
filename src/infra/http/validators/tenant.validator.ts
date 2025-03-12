@@ -3,8 +3,7 @@ import { check, param, query } from 'express-validator';
  * Validador de campos
  */
 export const createNewTenantValidator = [
-  //TODO serão gerados com base no mapa mental
-  check('name').notEmpty().withMessage('Name is required'),
+  check('name').notEmpty().withMessage('name is required')
 ]
 
 export const findAllTenantValidator = [

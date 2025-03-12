@@ -15,10 +15,16 @@ export default function defineModel(mongooseConnection: Connection) {
       },
       ownerUserId: {
         type: Number, ref: 'User',
-        required: true,
+        required: false,
       }
     },
     { timestamps: true }
+  );
+
+  schema.index(
+    //Regra para não permitir que um usuário tenha vários tenants com mesmo nome
+    { name: 1, ownerUserId: 1 },
+    { unique: true }
   );
 
   schema.set('toJSON', {

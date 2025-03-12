@@ -8,6 +8,6 @@ export const createNewRoleValidator = [
 ]
 
 export const findAllRoleValidator = [
-  query('page').optional().isNumeric().withMessage('Only digits allowed in title page'),
-  query('limit').optional().isNumeric().withMessage('Only digits allowed in title limit')
+  query('page').optional().isNumeric().withMessage("The field 'page' is invalid format"),
+  query('limit').optional().isNumeric().withMessage("The field 'limit' is invalid format")
 ]

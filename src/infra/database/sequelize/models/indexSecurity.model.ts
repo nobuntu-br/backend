@@ -11,6 +11,7 @@ import databasePermissionModel from "./databasePermission.model";
 import databaseCredentialModel from "./databaseCredential.model";
 import verificationEmailModel from "./verificationEmail.model";
 import TenantConnection from "../../../../domain/entities/tenantConnection.model";
+import UserPasswordResetTokenModel from "./userPasswordResetToken.model";
 /**
  * Define os modelos do banco de dados que serão usados pela parte de controle de acesso aos tenants 
  * @param sequelizeConnection Instância da conexão com o banco de dados usando a biblioteca sequelize
@@ -32,6 +33,7 @@ export default async function setModels(tenantConnection: TenantConnection) {
   const databasePermission = databasePermissionModel(sequelizeConnection);
   const databaseCredential = databaseCredentialModel(sequelizeConnection);
   const verificationEmail = verificationEmailModel(sequelizeConnection);
+  const userPasswordResetToken = UserPasswordResetTokenModel(sequelizeConnection);
 
   //Relação
   user.hasOne(databasePermission, { foreignKey: "userId" });
@@ -50,14 +52,13 @@ export default async function setModels(tenantConnection: TenantConnection) {
   role.belongsToMany(functionSystem, { through: functionSystemRole, foreignKey: "roleId", otherKey: "functionSystemId" });
   functionSystem.belongsToMany(role, { through: functionSystemRole, foreignKey: "functionSystemId", otherKey: "roleId" });
 
-  user.hasOne(tenant, { foreignKey: "userId" });
-  tenant.belongsTo(user, { foreignKey: "userId", as: "user"});
+  user.hasMany(tenant, {foreignKey: "ownerUserId", as: "tenant"});
+  tenant.belongsTo(user, { foreignKey: "ownerUserId", as: "user"});
+
+  user.hasMany(userPasswordResetToken, {foreignKey: "userId", as: "userPasswordResetToken"});
+  userPasswordResetToken.belongsTo(user, { foreignKey: "userId", as: "user"});
   //Cria as tabelas no banco de dados
-  await sequelizeConnection.sync({ alter: true }).then(() => {
-    console.log("Banco de dados sincronizado");
-  }).catch((error) => {
-    console.log("Erro ao sincronizar o banco de dados");
-  });
+  await sequelizeConnection.sync();
 
   const models = new Map<string, any>();
 
@@ -73,6 +74,7 @@ export default async function setModels(tenantConnection: TenantConnection) {
   models.set('DatabaseCredential', databaseCredential);
 
   models.set('VerificationEmail', verificationEmail);
+  models.set('UserPasswordResetToken', userPasswordResetToken);
 
   return models;
 }

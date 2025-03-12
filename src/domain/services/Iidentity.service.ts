@@ -7,6 +7,7 @@ export interface IidentityService {
   getUserGroups(userId: string): Promise<any>;
   refreshToken(refreshToken: string): Promise<RefreshTokenOutputDTO>;
   getUserByEmail(email: string): Promise<IUser>;
+  getUserByMobilePhone(mobilePhone: string): Promise<IUser>;
   createUser(user: IUser): Promise<IUser>;
   signIn(username: string, password: string): Promise<SignInOutputDTO>;
   signOut(accessToken: string, refreshToken: string | null): Promise<any>;

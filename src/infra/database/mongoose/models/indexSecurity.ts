@@ -10,6 +10,7 @@ import databasePermissionModel from "./databasePermission.model";
 import verificationEmailModel from "./verificationEmail.model";
 import counterModel from "./counter.model";
 import TenantConnection from "../../../../domain/entities/tenantConnection.model";
+import UserPasswordResetTokenModel from "./userPasswordResetToken.model";
 
 export default async function setModels(tenantConnection: TenantConnection) {
   const mongooseConnection = tenantConnection.connection;
@@ -28,8 +29,9 @@ export default async function setModels(tenantConnection: TenantConnection) {
   const databaseCredential = databaseCredentialModel(mongooseConnection);
   const databasePermission = databasePermissionModel(mongooseConnection);//Tabela intermediária que informa o acesso de cada usuário para cada tenant usando uma credencial
   const verificationEmail = verificationEmailModel(mongooseConnection);
+  const userPasswordResetToken = UserPasswordResetTokenModel(mongooseConnection);
   const counter = counterModel(mongooseConnection);
-
+  
   const models = new Map<string, any>();
   
   models.set('User', user);
@@ -44,6 +46,8 @@ export default async function setModels(tenantConnection: TenantConnection) {
   models.set('DatabaseCredential', databaseCredential);
 
   models.set('VerificationEmail', verificationEmail);
+  models.set('UserPasswordResetToken', userPasswordResetToken);
+
   models.set('Counter', counter);
 
   return models;

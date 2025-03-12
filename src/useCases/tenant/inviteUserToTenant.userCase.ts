@@ -35,7 +35,7 @@ export class InviteUserToTenantUseCase {
 
   async execute(input: InviteUserToTenantInputDTO): Promise<boolean> {
 
-    if(input.tenantId == 1){
+    if (input.tenantId == 1) {
       throw new ValidationError("It is not possible to invite a user to the default Tenant.");
     }
 
@@ -76,7 +76,14 @@ export class InviteUserToTenantUseCase {
     if (user == null) {
       const invitationToken: string = this.tokenGenerator.generateToken({ tenantId: input.tenantId, databaseCredentialId: input.databaseCredentialId }, 5000);
 
-      await this.emailService.sendEmailWithDefaultEmail({
+      const defaultEmail: string | undefined = process.env.EMAIL_USER;
+
+      if (defaultEmail == undefined) {
+        throw new NotFoundError("Não foi definido email que irá ser quem mandará a mensagem para o usuário");
+      }
+
+      await this.emailService.sendEmail({
+        from: defaultEmail,
         subject: "Você foi convidado para ter acesso a base de dados!",
         text: "O usuário " + invitingUser?.getFullName() + " te convidou para ter acesso a base de dados. Crie uma conta na aplicação: " + this.frontEndURI + "/invitation=" + invitationToken,
         to: input.invitedUserEmail
@@ -113,12 +120,12 @@ export class InviteUserToTenantUseCase {
       let createdDatabasePermission;
 
       try {
-        createdDatabasePermission = databasePermissionRepository.findOne({databaseCredentialId: databaseCredential.id, tenantId: tenant.id, userId: user.id});
+        createdDatabasePermission = databasePermissionRepository.findOne({ databaseCredentialId: databaseCredential.id, tenantId: tenant.id, userId: user.id });
       } catch (error) {
         throw Error("Error to find user permission on database. Detail: " + error);
       }
 
-      if(createdDatabasePermission != null){
+      if (createdDatabasePermission != null) {
         throw new ValidationError("User already has tenant access.");
       }
 
@@ -152,7 +159,14 @@ export class InviteUserToTenantUseCase {
       throw Error("Error to give access to invited user on tenant. Detail: " + error);
     }
 
-    await this.emailService.sendEmailWithDefaultEmail({
+    const defaultEmail: string | undefined = process.env.EMAIL_USER;
+
+    if (defaultEmail == undefined) {
+      throw new NotFoundError("Não foi definido email que irá ser quem mandará a mensagem para o usuário");
+    }
+
+    await this.emailService.sendEmail({
+      from: defaultEmail,
       subject: "Você foi convidado para ter acesso a base de dados!",
       text: "O usuário " + invitingUser?.getFullName() + " te convidou para ter acesso a base de dados. Para acesso a aplicação: " + this.frontEndURI,
       to: input.invitedUserEmail

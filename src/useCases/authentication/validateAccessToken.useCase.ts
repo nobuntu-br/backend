@@ -1,6 +1,7 @@
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt, { JwtPayload, JsonWebTokenError, TokenExpiredError, NotBeforeError } from "jsonwebtoken";
 import jwksClient from "jwks-rsa";
 import { UnauthorizedError } from "../../errors/unauthorized.error";
+import { UnknownError } from "../../errors/unknown.error";
 
 interface ValidateTokenOptions {
   issuer: string; // O emissor esperado do token
@@ -43,14 +44,27 @@ export class ValidateAccessTokenUseCase {
     const publicKey = await this.getSigningKey(keyId, _jwksClient);
 
     // Verifica e decodifica o token
-    const verifiedToken = jwt.verify(token, publicKey, {
-      clockTolerance: 5,
-      issuer: options.issuer, //Compara se o Emissor do token é o correto
-      audience: options.audience,
-      algorithms: [algorithm] //Algoritmo de assinatura do JWT
-    }) as DecodedToken;
-
-    return verifiedToken;
+    try {
+      const verifiedToken = jwt.verify(token, publicKey, {
+        clockTolerance: 5,
+        issuer: options.issuer, //Compara se o Emissor do token é o correto
+        audience: options.audience,
+        algorithms: [algorithm] //Algoritmo de assinatura do JWT
+      }) as DecodedToken;
+    
+      return verifiedToken;
+    } catch (error) {
+      if (error instanceof TokenExpiredError) {
+        throw new UnauthorizedError("Expired token");
+      } else if (error instanceof JsonWebTokenError) {
+        throw new UnauthorizedError("Invalid token");
+      } else if (error instanceof NotBeforeError) {
+        throw new UnauthorizedError("Token is not yet active");
+      } else {
+        throw new UnknownError('Error to verify token');
+      }
+    }
+    
   }
 
   async getSigningKey(kid: string, jwksClient: any): Promise<string>{

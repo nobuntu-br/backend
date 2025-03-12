@@ -38,9 +38,8 @@ export function setRoutes(app: Application) {
 
   //TODO serão gerados esses segmentos pelo mapper
 
-  app.get('/api/',function (req, res) {
+  app.get('/api/',(req, res) => {
     return res.status(200).send("Hello World!");
   });
-
 
 }

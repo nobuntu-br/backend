@@ -8,10 +8,15 @@ import DatabasePermissionRepository from "../../../domain/repositories/databaseP
 import TenantConnection from "../../../domain/entities/tenantConnection.model";
 import TenantRepository from "../../../domain/repositories/tenant.repository";
 import { InviteUserToTenantUseCase } from "../../../useCases/tenant/inviteUserToTenant.userCase";
-import { EmailService } from "../../../domain/services/email.service";
 import { RemoveUserAccessToTenantUseCase } from "../../../useCases/tenant/removeUserAccessToTenant.useCase";
-import { AzureADService } from "../../../domain/services/azureAD.service";
+import { AzureADService } from "../../adapters/azureAD.service";
 import { TokenGenerator } from "../../../utils/tokenGenerator";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import { RegisterTenantUseCase } from "../../../useCases/tenant/registerTenant.useCase";
+import { GetTenantsUserIsAdminUseCase } from "../../../useCases/tenant/getTenantsUserIsAdmin.useCase";
+import { NodemailerAdapter } from "../../adapters/nodeMailer.service";
+import { IEmailService } from "../../../domain/services/Iemail.service";
+import { checkEnvironmentVariableIsEmpty } from "../../../utils/verifiers.util";
 
 export class TenantController {
 
@@ -19,16 +24,17 @@ export class TenantController {
 
     try {
 
-      if (req.body.tenantConnection == undefined) {
-        throw new NotFoundError("Não foi definido tenant para uso.")
+      if (req.body.userUID == undefined) {
+        throw new NotFoundError("Usuário inválido.");
       }
 
+      const registerTenantUseCase: RegisterTenantUseCase = new RegisterTenantUseCase();
+      const response = await registerTenantUseCase.execute({
+        name: req.body.name,
+        userUID: req.body.userUID
+      });
 
-      const tenantRepository: TenantRepository = new TenantRepository(req.body.tenantConnection as TenantConnection);
-      //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<ITenantDatabaseModel, Tenant> = new BaseController(tenantRepository, "Tenant");
-
-      baseController.create(req, res, next);
+      return res.status(200).send(response);
     } catch (error) {
       next(error);
     }
@@ -42,12 +48,15 @@ export class TenantController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
-
       const tenantRepository: TenantRepository = new TenantRepository(req.body.tenantConnection as TenantConnection);
-      //Base Controller é uma classe que já tem implementado todas as funções de CRUD
-      const baseController: BaseController<ITenantDatabaseModel, Tenant> = new BaseController(tenantRepository, "Tenant");
 
-      baseController.findAll(req, res, next);
+      if (req.body.userUID == undefined) {
+        throw new NotFoundError("Usuário inválido.");
+      }
+
+      const response = await tenantRepository.advancedSearches.getTenantsByUserOwner(req.body.userUID);
+
+      return res.status(200).send(response);
     } catch (error) {
       next(error);
     }
@@ -177,17 +186,14 @@ export class TenantController {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
-      // const databasePermissionRepository: DatabasePermissionRepository = new DatabasePermissionRepository(req.body.tenantConnection as TenantConnection);
-      const tenantRepository: TenantRepository = new TenantRepository(req.body.tenantConnection as TenantConnection);
-
-      // const tenantsUserIsAdmin: Tenant[] = await te.findTenantsUserIsAdmin(req.params.userUID);
-      const tenantsUserIsAdmin: ITenantDatabaseModel[] = await tenantRepository.findMany({ownerUserId: Number(req.params.userId)});
-
-      if (tenantsUserIsAdmin.length == 0) {
-        throw new NotFoundError("No tenants were found where this user is an administrator.");
+      if (req.body.userUID == undefined) {
+        throw new NotFoundError("Usuário inválido.");
       }
 
-      return res.status(200).send(tenantsUserIsAdmin);
+      const getTenantsUserIsAdminUseCase: GetTenantsUserIsAdminUseCase = new GetTenantsUserIsAdminUseCase();
+      const tenants = await getTenantsUserIsAdminUseCase.execute({ userUID: req.body.userUID });
+
+      return res.status(200).send(tenants);
     } catch (error) {
       next(error);
     }
@@ -213,11 +219,28 @@ export class TenantController {
 
       const frontEndURI = process.env.FRONTEND_PATH;
 
-      if(!frontEndURI){
+      if (!frontEndURI) {
         throw new NotFoundError("Variaveis ambiente não configuradas.");
       }
 
-      const emailService: EmailService = new EmailService();
+      const emailServerHost: string | undefined = process.env.EMAIL_SERVER_HOST;
+      const emailServerPort: string | undefined = process.env.EMAIL_SERVER_PORT;
+      const emailServerUser: string | undefined = process.env.EMAIL_SERVER_USER;
+      const emailServerPassword: string | undefined = process.env.EMAIL_SERVER_PASSWORD;
+
+      if (emailServerHost == undefined ||
+        emailServerPort == undefined ||
+        emailServerUser == undefined ||
+        emailServerPassword == undefined
+      ) {
+        throw new NotFoundError("Não foi encontrado as credenciais para acessar o servidor de email.")
+      }
+
+      if(isNaN(Number(emailServerPort))){
+        throw new NotFoundError("Formato dos dados de credenciais para acesso no servidor de email estão incorretas.");
+      }
+
+      const emailService: IEmailService = new NodemailerAdapter({host: emailServerHost, port: Number(emailServerPort), emailServerPassword: emailServerPassword, emailServerUser: emailServerUser});
       const azureADService: AzureADService = new AzureADService();
       const tokenGenerator: TokenGenerator = new TokenGenerator();
       const inviteUserToTenantUseCase: InviteUserToTenantUseCase = new InviteUserToTenantUseCase(emailService, azureADService, tokenGenerator, frontEndURI);
@@ -238,7 +261,7 @@ export class TenantController {
     try {
 
       const removeUserAccessToTenantUseCase: RemoveUserAccessToTenantUseCase = new RemoveUserAccessToTenantUseCase();
-      
+
       const response = await removeUserAccessToTenantUseCase.execute({
         removingAccessUserUID: req.body.removingAccessUserUID,
         removedAccessUserId: req.body.removedAccessUserId,

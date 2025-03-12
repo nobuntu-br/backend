@@ -20,23 +20,6 @@ export class TokenService {
     }
   }
 
-  // generateAccessToken(user: User): string {
-  //   return jwt.sign(
-  //     { id: user.id, email: user.email },
-  //     this.accessTokenSecret,
-  //     { expiresIn: '15m' }
-  //   );
-  // }
-
-  // verifyRefreshToken(refreshToken: string): boolean {
-  //   try {
-  //     jwt.verify(refreshToken, this.refreshTokenSecret);
-  //     return true;
-  //   } catch {
-  //     return false;
-  //   }
-  // }
-
   async verifyToken(token: string): Promise<boolean> {
 
     const jwks = await this.getJWKs(this.JWKsURI);

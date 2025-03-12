@@ -14,9 +14,6 @@ export default function defineModel(sequelize: Sequelize) {
     dataBlob: {
       type: DataTypes.BLOB,
     },
-    base64: {
-      type: DataTypes.TEXT,
-    },
   });
   schema.prototype.toJSON = function () {
     const values = Object.assign({}, this.get());

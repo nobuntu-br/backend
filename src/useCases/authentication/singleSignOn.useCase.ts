@@ -50,7 +50,9 @@ export class SingleSignOnUseCase {
           lastName: refreshTokenResponse.user.lastName,
           isAdministrator: false,
           email: refreshTokenResponse.user.email,
-          tenantUID: tenantUID
+          tenantUID: tenantUID,
+          mobilePhone: refreshTokenResponse.user.mobilePhone,
+          preferredLanguage: refreshTokenResponse.user.preferredLanguage
         }));
       } else {
         await this.userRepository.update(
@@ -62,7 +64,9 @@ export class SingleSignOnUseCase {
             lastName: refreshTokenResponse.user.lastName,
             isAdministrator: false,
             email: refreshTokenResponse.user.email,
-            tenantUID: tenantUID
+            tenantUID: tenantUID,
+            mobilePhone: refreshTokenResponse.user.mobilePhone,
+            preferredLanguage: refreshTokenResponse.user.preferredLanguage
           }
         );
       }

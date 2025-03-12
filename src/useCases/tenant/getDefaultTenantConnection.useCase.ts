@@ -28,7 +28,7 @@ export class GetDefaultTenantConnectionUseCase {
     }
 
     databaseCredential = new DatabaseCredential({
-      name: process.env.DEFAULT_TENANT_DATABASE_NAME!.toLowerCase(),
+      name: process.env.DEFAULT_TENANT_DATABASE_NAME,
       type: process.env.DEFAULT_TENANT_DATABASE_TYPE as DatabaseType,
       username: process.env.DEFAULT_TENANT_DATABASE_USERNAME,
       password: process.env.DEFAULT_TENANT_DATABASE_PASSWORD,
@@ -70,8 +70,6 @@ export class GetDefaultTenantConnectionUseCase {
         databaseCredential,
         false
       );
-
-      //TODO gerar aqui a parte dos registros padrões
     } catch (error) {
 
       let databaseInitializer: DatabaseInitializer;
@@ -87,8 +85,6 @@ export class GetDefaultTenantConnectionUseCase {
         databaseCredential,
         false
       );
-
-      //TODO gerar aqui a parte dos registros padrões
     }
 
     console.log("Realizado conexão com o banco de dados padrão. Responsável por ser o tenant padrão para os usuários.");

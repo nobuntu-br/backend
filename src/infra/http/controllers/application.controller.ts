@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { BaseController } from "./base.controller";
 import { GetApplicationFromDirectoryUseCase } from "../../../useCases/application/getApplicationFromDirectory.useCase";
-import { AzureADService } from "../../../domain/services/azureAD.service";
+import { AzureADService } from "../../adapters/azureAD.service";
 
 export class ApplicationController {
 

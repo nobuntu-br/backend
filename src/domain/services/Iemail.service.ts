@@ -1,6 +1,17 @@
-import { IEmailParams } from "./email.service";
+export interface IEmailParams {
+  from?: string;  // O "from" é opcional
+  to: string;
+  subject: string;
+  text: string;
+}
+
+export interface IEmailServerData {
+  host: string, 
+  port: number;
+  emailServerUser: string;
+  emailServerPassword: string;
+}
 
 export interface IEmailService {
-  sendEmailWithDefaultEmail({to, subject, text}: Omit<IEmailParams, 'from'>): Promise<void>;
   sendEmail({from, to, subject, text}: IEmailParams): Promise<void>;
 }

@@ -18,10 +18,10 @@ export class GetSecurityTenantConnectionUseCase {
   * @returns retornar uma instância de conexão com o banco de dados
   */
   async execute(): Promise<TenantConnection> {
-    const tenantCredentialId: number = 0;
+    const tenantCredentialId : number = 0;
 
     const databaseCredential: DatabaseCredential = new DatabaseCredential({
-      name: process.env.SECURITY_TENANT_DATABASE_NAME!.toLowerCase(),
+      name: process.env.SECURITY_TENANT_DATABASE_NAME,
       type: process.env.SECURITY_TENANT_DATABASE_TYPE as DatabaseType,
       username: process.env.SECURITY_TENANT_DATABASE_USERNAME,
       password: process.env.SECURITY_TENANT_DATABASE_PASSWORD,
@@ -46,34 +46,42 @@ export class GetSecurityTenantConnectionUseCase {
 
     const tenantConnectionService: TenantConnectionService = TenantConnectionService.instance;
 
-    let tenantConnection: TenantConnection | null = tenantConnectionService.findOneConnection(tenantCredentialId);
-
-    if (tenantConnection != null) {
-      return tenantConnection;
-    }
-
     try {
-      tenantConnection = await connectToDatabase(databaseCredential, true);
-    } catch (error) {
+
+      let tenantConnection: TenantConnection | null = tenantConnectionService.findOneConnection(tenantCredentialId);
+
+      if (tenantConnection != null) {
+        return tenantConnection;
+      }
+
       let databaseInitializer: DatabaseInitializer;
 
-      if (databaseCredential.type === 'mongodb') {
+      if(databaseCredential.type === 'mongodb'){
         databaseInitializer = new MongooseDatabaseInitializer();
       } else {
         databaseInitializer = new SequelizeDatabaseInitializer();
       }
 
-      await databaseInitializer.createDatabaseIfNotExists(databaseCredential.name!, databaseCredential.username!, databaseCredential.password!, databaseCredential.host!, Number(databaseCredential.port), databaseCredential.type);
-      
-      tenantConnection = await connectToDatabase(databaseCredential, true);
+      try {
+        
+        tenantConnection = await connectToDatabase(databaseCredential, true);
+      } catch (error) {
+        // throw new Error("Erro ao realizar a conexão com o banco de dados Security! Verifique se o banco de dados foi criado. Detail: " + error);
+        //TODO o port tem que ser número, fica mais fácil
+        await databaseInitializer.createDatabaseIfNotExists(databaseCredential.name!, databaseCredential.username!, databaseCredential.password!, databaseCredential.host!, Number(databaseCredential.port), databaseCredential.type);
+        tenantConnection = await connectToDatabase(databaseCredential, true);
+      }
+
+      tenantConnection!.models = await this.getModelsSecurity(databaseCredential.type!, tenantConnection!);
+
+      tenantConnectionService.setOnTenantConnectionPool(tenantCredentialId, tenantConnection!);
+
+      console.log("Connection established with the Security database. Responsible for managing Tenants.");
+      return tenantConnection!;
+
+    } catch (error) {
+      throw new Error("Error to get Security database connection. Details: "+ error);
     }
-
-    tenantConnection!.models = await this.getModelsSecurity(databaseCredential.type!, tenantConnection!);
-
-    tenantConnectionService.setOnTenantConnectionPool(tenantCredentialId, tenantConnection!);
-
-    console.log("Connection established with the Security database. Responsible for managing Tenants.");
-    return tenantConnection!;
   }
 
 

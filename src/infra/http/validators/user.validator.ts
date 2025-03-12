@@ -1,15 +1,15 @@
-import e from 'express';
 import { check, param, query } from 'express-validator';
 /**
  * Validador de campos
  */
 export const createNewUserValidator = [
-  //TODO serão gerados com base no mapa mental
-  check('userName').notEmpty().withMessage('userName is required'),
+  check('email').isEmail().withMessage('email is required'),
   check('firstName').notEmpty().withMessage('firstName is required'),
   check('lastName').notEmpty().withMessage('lastName is required'),
-  check('email').isEmail().withMessage('email is required'),
   check('password').notEmpty().withMessage('password is required'),
+  check('userName').notEmpty().withMessage('userName is required'),
+  // check('mobilePhone'),
+  // check('preferredLanguage'),
 ]
 
 export const findAllUserValidator = [

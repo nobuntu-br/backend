@@ -51,7 +51,7 @@ export class SyncUserAccountOnTenantsUseCase {
     const getDefaultTenantConnectionUseCase: GetDefaultTenantConnectionUseCase = new GetDefaultTenantConnectionUseCase();
     const defaultTenantConnection = await getDefaultTenantConnectionUseCase.execute();
 
-    if(defaultTenantConnection != null){
+    if (defaultTenantConnection != null) {
       try {
         await this.updateUser(defaultTenantConnection, accessData, userUID);
       } catch (error) {
@@ -63,7 +63,7 @@ export class SyncUserAccountOnTenantsUseCase {
   }
 
 
-  async updateUser(tenantConnection: TenantConnection, accessData: any, userUID: string): Promise<void>{
+  async updateUser(tenantConnection: TenantConnection, accessData: any, userUID: string): Promise<void> {
     const userRepository: UserRepository = new UserRepository(tenantConnection);
 
     //Busca usuário
@@ -73,7 +73,7 @@ export class SyncUserAccountOnTenantsUseCase {
 
     let _isAdministrator: boolean = false;
 
-    if(isUserRegistered == false){
+    if (isUserRegistered == false) {
       _isAdministrator = true;
     }
 
@@ -85,7 +85,9 @@ export class SyncUserAccountOnTenantsUseCase {
         lastName: accessData.lastName,
         isAdministrator: _isAdministrator,
         email: accessData.email,
-        tenantUID: "test" //TODO é necessário esse campo?
+        tenantUID: "test", //TODO é necessário esse campo?
+        mobilePhone: accessData.mobilePhone,
+        preferredLanguage: accessData.preferredLanguage
       }));
     } else {
       //Atualiza os dados de usuário que estão no servidor de identidade para o banco de dados de uso
@@ -97,7 +99,9 @@ export class SyncUserAccountOnTenantsUseCase {
           firstName: accessData.firstName,
           lastName: accessData.lastName,
           email: accessData.email,
-          tenantUID: "test" //TODO é necessário esse campo?
+          tenantUID: "test", //TODO é necessário esse campo?
+          mobilePhone: accessData.mobilePhone,
+          preferredLanguage: accessData.preferredLanguage
         }
       );
     }

@@ -1,5 +1,5 @@
 import { IUser } from '../../domain/entities/user.model';
-import { EmailService } from '../../domain/services/email.service';
+import { IEmailService } from '../../domain/services/Iemail.service';
 import { IidentityService } from '../../domain/services/Iidentity.service';
 import { NotFoundError } from '../../errors/notFound.error';
 import { UnknownError } from '../../errors/unknown.error';
@@ -14,7 +14,7 @@ export type SendPasswordResetLinkToEmailInputDTO = {
 export class SendPasswordResetLinkToEmailUseCase {
   constructor(
     private identityService: IidentityService,
-    private emailService: EmailService,
+    private emailService: IEmailService,
     private tokenGenerator: TokenGenerator
   ) { }
 
@@ -43,7 +43,14 @@ export class SendPasswordResetLinkToEmailUseCase {
     const resetPasswordURL = frontEndURL + resetAccountPasswordPath + "?emailVerificationCode=" + resetPasswordToken;
     try {
 
-      await this.emailService.sendEmailWithDefaultEmail({
+      const defaultEmail: string | undefined = process.env.EMAIL_USER;
+
+      if(defaultEmail == undefined){
+        throw new NotFoundError("Não foi definido email que irá ser quem mandará a mensagem para o usuário");
+      }
+
+      await this.emailService.sendEmail({
+        from: defaultEmail,
         subject: "Recuperação de email do serviço " + process.env.APPLICATION_NAME,
         text: "Para alterar a senha da sua conta faça o acesso a esse link: " + resetPasswordURL,
         to: input.email

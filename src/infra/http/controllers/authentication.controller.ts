@@ -2,25 +2,24 @@ import { NextFunction, Request, Response } from "express";
 import { RefreshTokenOutputDTO, RefreshTokenUseCase } from "../../../useCases/authentication/refreshToken.useCase";
 import { NotFoundError } from "../../../errors/notFound.error";
 import { IidentityService } from "../../../domain/services/Iidentity.service";
-import { AzureADService } from "../../../domain/services/azureAD.service";
+import { AzureADService } from "../../adapters/azureAD.service";
 import { SignInOutputDTO, SignInUseCase } from "../../../useCases/authentication/signIn.useCase";
 import { SendVerificationCodeToEmailUseCase } from "../../../useCases/authentication/sendVerificationCodeToEmail.useCase";
 import { ValidateEmailVerificationCodeUseCase } from "../../../useCases/authentication/validateEmailVerificationCode.useCase";
-import { EmailService } from "../../../domain/services/email.service";
 import { ResetUserPasswordUseCase } from "../../../useCases/authentication/resetUserPassword.useCase";
 import { SendPasswordResetLinkToEmailUseCase } from "../../../useCases/user/sendPasswordResetLinkToEmail.useCase";
 import { InviteUserToApplicationUseCase } from "../../../useCases/user/inviteUserToApplication.useCase";
 import { TokenGenerator } from "../../../utils/tokenGenerator";
 import { RegisterUserUseCase } from "../../../useCases/user/registerUser.useCase";
-import { CheckEmailExistUseCase } from "../../../useCases/authentication/checkEmailExist.useCase";
-import { ValidateAccessTokenUseCase } from "../../../useCases/authentication/validateAccessToken.useCase";
+import { CheckUserExistUseCase } from "../../../useCases/authentication/checkUserExist.useCase";
 import { UnauthorizedError } from "../../../errors/unauthorized.error";
 import { SignOutUseCase } from "../../../useCases/authentication/signOut.useCase";
-import DatabasePermissionRepository from "../../../domain/repositories/databasePermission.repository";
 import UserRepository from "../../../domain/repositories/user.repository";
 import VerificationEmailRepository from "../../../domain/repositories/verificationEmail.repository";
 import TenantRepository from "../../../domain/repositories/tenant.repository";
 import { SingleSignOnUseCase } from "../../../useCases/authentication/singleSignOn.useCase";
+import { NodemailerAdapter } from "../../adapters/nodeMailer.service";
+import { IEmailService } from "../../../domain/services/Iemail.service";
 
 export class AuthenticationController {
 
@@ -45,7 +44,9 @@ export class AuthenticationController {
         lastName: req.body.lastName,
         password: req.body.password,
         userName: req.body.userName,
-        invitedTenantsToken: req.body.invitedTenantsToken
+        invitedTenantsToken: req.body.invitedTenantsToken,
+        mobilePhone: req.body.mobilePhone,
+        preferredLanguage: req.body.preferredLanguage
       });
 
       res.status(200).send(user);
@@ -74,7 +75,8 @@ export class AuthenticationController {
         httpOnly: true, // Previne acesso pelo JavaScript do lado do cliente
         secure: true, // garante que o cookie só seja enviado por HTTPS
         sameSite: 'none',
-        // domain: acceptedCookieDomains,
+        path: '/',
+        domain: acceptedCookieDomains,
         maxAge: 10 * 60 * 1000, // 10 minutos (dias * horas * minutos * segundos * milisegundos )
       });
 
@@ -82,7 +84,7 @@ export class AuthenticationController {
         httpOnly: true, // Previne acesso pelo JavaScript do lado do cliente
         secure: true,
         sameSite: 'none',
-        // domain: acceptedCookieDomains, 
+        domain: acceptedCookieDomains,
         maxAge: 24 * 60 * 60 * 1000, // 1 dia
       });
 
@@ -160,7 +162,7 @@ export class AuthenticationController {
           // Extrai o texto após "_"
           const userSessionId = key.split("refreshToken_")[1];
 
-          if(isNaN(Number(refreshToken)) == true){
+          if (isNaN(Number(refreshToken)) == true) {
             refreshTokens.set(userSessionId, refreshToken as string);
           }
         }
@@ -173,7 +175,7 @@ export class AuthenticationController {
       //Define o serviço de servidor de Identidade
       const identityService: IidentityService = new AzureADService();
 
-      let newAccessData : RefreshTokenOutputDTO[] = [];
+      let newAccessData: RefreshTokenOutputDTO[] = [];
 
       const refreshTokenUseCase: RefreshTokenUseCase = new RefreshTokenUseCase(identityService);
 
@@ -202,11 +204,11 @@ export class AuthenticationController {
         });
 
         refreshTokenResponse.user.id = Number(userSessionId);
-        
+
         newAccessData.push(refreshTokenResponse);
       }
 
-      if(newAccessData.length == 0){
+      if (newAccessData.length == 0) {
         throw new UnauthorizedError("Error to refresh token");
       }
 
@@ -238,7 +240,7 @@ export class AuthenticationController {
           // Extrai o texto após "_"
           const userSessionId = key.split("refreshToken_")[1];
 
-          if(isNaN(Number(refreshToken)) == true){
+          if (isNaN(Number(refreshToken)) == true) {
             refreshTokens.set(userSessionId, refreshToken as string);
           }
         }
@@ -249,8 +251,8 @@ export class AuthenticationController {
       //Define o serviço de servidor de Identidade
       const identityService: IidentityService = new AzureADService();
 
-      let newAccessData : RefreshTokenOutputDTO[] = [];
-      
+      let newAccessData: RefreshTokenOutputDTO[] = [];
+
       const userRepository: UserRepository = new UserRepository(req.body.tenantConnection);
       const singleSignOnUseCase: SingleSignOnUseCase = new SingleSignOnUseCase(identityService, userRepository);
 
@@ -279,11 +281,11 @@ export class AuthenticationController {
         });
 
         refreshTokenResponse.user.id = Number(userSessionId);
-        
+
         newAccessData.push(refreshTokenResponse);
       }
 
-      if(newAccessData.length == 0){
+      if (newAccessData.length == 0) {
         throw new UnauthorizedError("Error to refresh token");
       }
 
@@ -300,9 +302,23 @@ export class AuthenticationController {
         throw new NotFoundError("Não foi definido tenant para uso.");
       }
 
+      const emailServerHost: string | undefined = process.env.EMAIL_SERVER_HOST;
+      const emailServerPort: string | undefined = process.env.EMAIL_SERVER_PORT;
+      const emailServerUser: string | undefined = process.env.EMAIL_SERVER_USER;
+      const emailServerPassword: string | undefined = process.env.EMAIL_SERVER_PASSWORD;
+
+      if (emailServerHost == undefined ||
+        emailServerPort == undefined ||
+        emailServerUser == undefined ||
+        emailServerPassword == undefined
+      ) {
+        throw new NotFoundError("Não foi encontrado as credenciais para acessar o servidor de email.")
+      }
+
+      const emailService: IEmailService = new NodemailerAdapter({host: emailServerHost, port: Number(emailServerPort), emailServerPassword: emailServerPassword, emailServerUser: emailServerUser});
       const verificationEmailRepository: VerificationEmailRepository = new VerificationEmailRepository(req.body.tenantConnection);
       const azureADService: AzureADService = new AzureADService();
-      const sendVerificationCodeUseCase: SendVerificationCodeToEmailUseCase = new SendVerificationCodeToEmailUseCase(verificationEmailRepository, azureADService);
+      const sendVerificationCodeUseCase: SendVerificationCodeToEmailUseCase = new SendVerificationCodeToEmailUseCase(verificationEmailRepository, azureADService, emailService);
       const result = await sendVerificationCodeUseCase.execute(req.body);
 
       return res.status(200).send(result);
@@ -334,8 +350,20 @@ export class AuthenticationController {
   async sendPasswordResetLinkToEmail(req: Request, res: Response, next: NextFunction) {
     try {
 
+      const emailServerHost: string | undefined = process.env.EMAIL_SERVER_HOST;
+      const emailServerPort: string | undefined = process.env.EMAIL_SERVER_PORT;
+      const emailServerUser: string | undefined = process.env.EMAIL_SERVER_USER;
+      const emailServerPassword: string | undefined = process.env.EMAIL_SERVER_PASSWORD;
+
+      if (emailServerHost == undefined ||
+        emailServerPort == undefined ||
+        emailServerUser == undefined ||
+        emailServerPassword == undefined
+      ) {
+        throw new NotFoundError("Não foi encontrado as credenciais para acessar o servidor de email.")
+      }
       //Definir o servico de email que será usado
-      const emailService: EmailService = new EmailService();
+      const emailService: IEmailService = new NodemailerAdapter({host: emailServerHost, port: Number(emailServerPort), emailServerPassword: emailServerPassword, emailServerUser: emailServerUser});
       const tokenGenerator: TokenGenerator = new TokenGenerator();
       const azureADService: AzureADService = new AzureADService();
       const sendPasswordResetLinkToEmailUseCase: SendPasswordResetLinkToEmailUseCase = new SendPasswordResetLinkToEmailUseCase(azureADService, emailService, tokenGenerator);
@@ -372,9 +400,23 @@ export class AuthenticationController {
       if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
+
+      const emailServerHost: string | undefined = process.env.EMAIL_SERVER_HOST;
+      const emailServerPort: string | undefined = process.env.EMAIL_SERVER_PORT;
+      const emailServerUser: string | undefined = process.env.EMAIL_SERVER_USER;
+      const emailServerPassword: string | undefined = process.env.EMAIL_SERVER_PASSWORD;
+
+      if (emailServerHost == undefined ||
+        emailServerPort == undefined ||
+        emailServerUser == undefined ||
+        emailServerPassword == undefined
+      ) {
+        throw new NotFoundError("Não foi encontrado as credenciais para acessar o servidor de email.")
+      }
+      //Definir o servico de email que será usado
+      const emailService: IEmailService = new NodemailerAdapter({host: emailServerHost, port: Number(emailServerPort), emailServerPassword: emailServerPassword, emailServerUser: emailServerUser});
       const userRepository: UserRepository = new UserRepository(req.body.tenantConnection);
       //Definir o servico de email que será usado
-      const emailService: EmailService = new EmailService();
       //Serviço de geração de token
       const tokenGenerator = new TokenGenerator();
       const tenantRepository = new TenantRepository(req.body.tenantConnection);
@@ -394,15 +436,15 @@ export class AuthenticationController {
     }
   }
 
-  async checkEmailExist(req: Request, res: Response, next: NextFunction) {
+  async checkUserExist(req: Request, res: Response, next: NextFunction) {
     try {
       if (req.body.tenantConnection == undefined) {
         throw new NotFoundError("Não foi definido tenant para uso.")
       }
 
       const azureADService: AzureADService = new AzureADService();
-      const checkEmailExistUseCase: CheckEmailExistUseCase = new CheckEmailExistUseCase(azureADService);
-      const emailIsValid = await checkEmailExistUseCase.execute(req.body);
+      const checkUserExistUseCase: CheckUserExistUseCase = new CheckUserExistUseCase(azureADService);
+      const emailIsValid = await checkUserExistUseCase.execute(req.body);
 
       return res.status(200).send(emailIsValid);
     } catch (error) {

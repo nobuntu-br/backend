@@ -3,8 +3,8 @@ import { NotFoundError } from "../../errors/notFound.error";
 import { ValidationError } from "../../errors/validation.error";
 import { SignInOutputDTO } from "../../useCases/authentication/signIn.useCase";
 import { GetUserProfilePhotoOutputDTO } from "../../useCases/user/getUserProfilePhoto.useCase";
-import { IUser } from "../entities/user.model";
-import { IidentityService } from "./Iidentity.service";
+import { IUser } from "../../domain/entities/user.model";
+import { IidentityService } from "../../domain/services/Iidentity.service";
 
 export interface IAzureAdUser {
   businessPhones: string[];
@@ -136,14 +136,14 @@ export class AzureADService implements IidentityService {
       });
 
       // Realiza a requisição no servidor da Azure para obter o novo access token
-      const tokenResponse = await axios.post(tokenEndpoint, urlSearchParams.toString(), {
+      const response = await axios.post(tokenEndpoint, urlSearchParams.toString(), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       });
 
       //Informações detalhadas do perfil do usuário autenticado.
-      const userData = this.parseJwt(tokenResponse.data.access_token);
+      const userData = this.parseJwt(response.data.access_token);
 
       const accessData: SignInOutputDTO = {
         user: {
@@ -152,15 +152,17 @@ export class AzureADService implements IidentityService {
           userName: userData.name,
           firstName: userData.given_name,
           lastName: userData.family_name,
-          email: ""
+          email: "",
+          mobilePhone: userData.mobilePhone,
+          preferredLanguage: userData.preferredLanguage
         },
         tokens: {
-          accessToken: tokenResponse.data.access_token,
-          refreshToken: tokenResponse.data.refresh_token,
-          tokenType: tokenResponse.data.token_type,
-          expiresIn: tokenResponse.data.expires_in,
-          expiresOn: tokenResponse.data.expires_on,
-          refreshTokenExpiresIn: tokenResponse.data.refresh_token_expires_in
+          accessToken: response.data.access_token,
+          refreshToken: response.data.refresh_token,
+          tokenType: response.data.token_type,
+          expiresIn: response.data.expires_in,
+          expiresOn: response.data.expires_on,
+          refreshTokenExpiresIn: response.data.refresh_token_expires_in
         }
       }
 
@@ -181,7 +183,7 @@ export class AzureADService implements IidentityService {
       const accessToken: string = await this.getAccessToken();
 
       // Buscar o usuário pelo e-mail usando filtro, incluindo otherMails
-      const userResponse = await axios.get(this.graphAPIUrl + `v1.0/users?$filter=mail eq '${email}' or userPrincipalName eq '${email}' or otherMails/any(x:x eq '${email}')`, {
+      const response = await axios.get(this.graphAPIUrl + `v1.0/users?$filter=mail eq '${email}' or userPrincipalName eq '${email}' or otherMails/any(x:x eq '${email}')`, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json'
@@ -189,15 +191,17 @@ export class AzureADService implements IidentityService {
       });
 
       //TODO tem casos que retorna mais de um, isso não pode ocorrer, ver isso na Azure.
-      if (userResponse.data.value.length > 0 && userResponse.data.value[0] != null) {
+      if (response.data.value.length > 0 && response.data.value[0] != null) {
 
         return {
-          email: email,
-          firstName: userResponse.data.value[0].givenName,
-          lastName: userResponse.data.value[0].surname,
-          UID: userResponse.data.value[0].id,
-          userName: userResponse.data.value[0].displayName,
-          tenantUID: this.tenantID
+          email: response.data.mobilePhone,
+          firstName: response.data.value[0].givenName,
+          lastName: response.data.value[0].surname,
+          UID: response.data.value[0].id,
+          userName: response.data.value[0].displayName,
+          tenantUID: this.tenantID,
+          mobilePhone: response.data.mobilePhone,
+          preferredLanguage: response.data.preferredLanguage
         }
       }
 
@@ -209,6 +213,32 @@ export class AzureADService implements IidentityService {
 
   }
 
+  async getUserByMobilePhone(mobilePhone: string): Promise<IUser> {
+    try {
+      mobilePhone = mobilePhone.replace(/\D/g, "") // Remove caracteres não numéricos
+      const accessToken: string = await this.getAccessToken();
+
+      // Buscar o usuário com a API do Microsoft Graph pelo número de telefone usando filtro, incluindo otherMails
+      const users = await axios.get(this.graphAPIUrl + `v1.0/users?`, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (users.data.value.length < 0 && users.data.value[0] == null) {
+        throw new NotFoundError("Users not found!");
+      }
+
+      console.log("usuários obtidos na busca pelo celular: ", users.data);
+
+      return users.data.find((user: any) => user.mobilePhone === mobilePhone);
+
+    } catch (error: any) {
+      throw error;
+    }
+  }
+
   async createUser(user: IUser): Promise<IUser> {
 
     try {
@@ -217,6 +247,17 @@ export class AzureADService implements IidentityService {
       const accessToken: string = await this.getAccessToken();
 
       const domainName: string = await this.getDomainName(accessToken);
+      
+      let _userPrincipalName = "";
+      let _mail = "";
+      let _mobilePhone = "";
+      if(user.email != null || user.email != undefined){
+        _userPrincipalName = this.getUsernameFromEmail(user.email!) + "@" + this.domainName;//Define o acesso com uso do e-mail
+        _mail = user.email;
+      } else {
+        _userPrincipalName = user.mobilePhone.replace(/\D/g, "") + "@" + this.domainName;//Define o acesso com uso do número do celular
+        _mobilePhone = user.mobilePhone.replace(/\D/g, "") // Remove caracteres não numéricos
+      }
 
       const _user = {
         accountEnabled: true,
@@ -224,9 +265,9 @@ export class AzureADService implements IidentityService {
         givenName: user.firstName,
         surname: user.lastName,
         mailNickname: this.getUsernameFromEmail(user.email!),
-        userPrincipalName: this.getUsernameFromEmail(user.email!) + "@" + this.domainName,//TODO tem que ser dominio do azure AD
+        userPrincipalName: _userPrincipalName,
         passwordProfile: {
-          forceChangePasswordNextSignIn: false,//Aqui estava como verdadeiro
+          forceChangePasswordNextSignIn: false,
           password: user.password
         },
         //Como pode ser usado um domíno que não seja da Azure, teria que criar contra e associar ao dominio externo
@@ -237,10 +278,11 @@ export class AzureADService implements IidentityService {
             issuerAssignedId: user.email
           }
         ],
-        mail: user.email
+        mail: _mail,
+        mobilePhone: _mobilePhone
       };
       // Requisição para criar o usuário no Azure AD
-      const createUserResponse = await axios.post(graphAPIUrl, _user, {
+      const response = await axios.post(graphAPIUrl, _user, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json'
@@ -248,11 +290,13 @@ export class AzureADService implements IidentityService {
       });
 
       return {
-        email: createUserResponse.data.mail,
-        firstName: createUserResponse.data.givenName,
-        lastName: createUserResponse.data.surname,
-        UID: createUserResponse.data.id,
-        userName: createUserResponse.data.displayName,
+        email: response.data.mail,
+        firstName: response.data.givenName,
+        lastName: response.data.surname,
+        UID: response.data.id,
+        userName: response.data.displayName,
+        mobilePhone: response.data.mobilePhone,
+        preferredLanguage: response.data.preferredLanguage
       }
     } catch (error: any) {
       console.dir(error, { depth: null });
@@ -290,7 +334,9 @@ export class AzureADService implements IidentityService {
           userName: userData.name,
           firstName: userData.given_name,
           lastName: userData.family_name,
-          email: ""
+          email: userData.mail,
+          mobilePhone: userData.mobilePhone,
+          preferredLanguage: userData.preferredLanguage
         },
         tokens: {
           accessToken: signInResponse.data.access_token,
@@ -364,11 +410,11 @@ export class AzureADService implements IidentityService {
   async resetUserPassword(email: string, newPassword: string): Promise<IUser> {
 
     const accessToken: string = await this.getAccessToken();
-    let userResponse;
+    let response;
 
     try {
       // Endpoint da Microsoft Graph API para buscar o usuário pelo e-mail
-      userResponse = await axios.get(
+      response = await axios.get(
         `https://graph.microsoft.com/v1.0/users?$filter=mail eq '${email}'`,
         {
           headers: {
@@ -382,11 +428,11 @@ export class AzureADService implements IidentityService {
     }
 
     // Verifica se encontrou o usuário
-    if (!userResponse.data || userResponse.data.value.length === 0) {
+    if (!response.data || response.data.value.length === 0) {
       throw new NotFoundError("User not found to change password.");
     }
 
-    const userId = userResponse.data.value[0].id; // Obtém o ID do usuário
+    const userId = response.data.value[0].id; // Obtém o ID do usuário
 
     try {
       // Requisição para alterar a senha do usuário
@@ -412,11 +458,13 @@ export class AzureADService implements IidentityService {
 
     return {
       email: email,
-      firstName: userResponse.data.value[0].givenName,
-      lastName: userResponse.data.value[0].surname,
-      UID: userResponse.data.value[0].id,
-      userName: userResponse.data.value[0].displayName,
-      tenantUID: this.tenantID
+      firstName: response.data.value[0].givenName,
+      lastName: response.data.value[0].surname,
+      UID: response.data.value[0].id,
+      userName: response.data.value[0].displayName,
+      tenantUID: this.tenantID,
+      mobilePhone: response.data.mobilePhone,
+      preferredLanguage: response.data.preferredLanguage
     }
     /*
         try {
@@ -513,7 +561,7 @@ export class AzureADService implements IidentityService {
       const accessToken: string = await this.getAccessToken();
 
       // Requisição para obter imagem de perfil do usuário no servidor da Azure
-      const userResponse = await axios.get(this.graphAPIUrl + "v1.0/users/" + userUID + "/photo/", {
+      const response = await axios.get(this.graphAPIUrl + "v1.0/users/" + userUID + "/photo/", {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json'
@@ -521,7 +569,7 @@ export class AzureADService implements IidentityService {
       });
 
       //TODO terminar essa parte para enviar o blob para o frontend
-      console.dir(userResponse.data, { depth: null });
+      console.dir(response.data, { depth: null });
 
       return { imageUrl: "ddd" };
 

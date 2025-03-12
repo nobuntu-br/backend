@@ -92,7 +92,7 @@ export async function connectTenant(databaseCredential: DatabaseCredential, decr
     const tenantConnectionService: TenantConnectionService = TenantConnectionService.instance;
     tenantConnectionService.setOnTenantConnectionPool(databaseCredential.id!, tenantConnection);
 
-    console.log("Database: " + databaseCredential.id! + ". Database type: " + tenantConnection.databaseType + " connect!");
+    // console.log("Database: " + databaseCredential.id! + ". Database type: " + tenantConnection.databaseType + " connect!");
 
     return tenantConnection;
 

@@ -75,7 +75,9 @@ export class SignInUseCase {
           lastName: accessData.user.lastName,
           isAdministrator: false,
           email: accessData.user.email,
-          tenantUID: tenantUID
+          tenantUID: tenantUID,
+          mobilePhone: accessData.user.mobilePhone,
+          preferredLanguage: accessData.user.preferredLanguage
         }));
       } else {
         await this.userRepository.update(
@@ -87,7 +89,9 @@ export class SignInUseCase {
             lastName: accessData.user.lastName,
             isAdministrator: false,
             email: accessData.user.email,
-            tenantUID: tenantUID
+            tenantUID: tenantUID,
+            mobilePhone: accessData.user.mobilePhone,
+            preferredLanguage: accessData.user.preferredLanguage
           }
         );
       }

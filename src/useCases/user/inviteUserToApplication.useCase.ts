@@ -1,10 +1,10 @@
 import { InsufficientPermissionError } from "../../errors/insufficientPermission.error";
 import { NotFoundError } from "../../errors/notFound.error";
-import { EmailService } from "../../domain/services/email.service";
 import { TokenGenerator } from "../../utils/tokenGenerator";
 import { ITenantDatabaseModel } from "../../domain/entities/tenant.model";
 import UserRepository from "../../domain/repositories/user.repository";
 import TenantRepository from "../../domain/repositories/tenant.repository";
+import { IEmailService } from "../../domain/services/Iemail.service";
 
 export type InviteUserToApplicationInputDTO = {
   invitingUserId: number;
@@ -19,7 +19,7 @@ export class InviteUserToApplicationUseCase {
   private applicationWebSignUpPath: string;
 
   constructor(
-    private emailService: EmailService,
+    private emailService: IEmailService,
     private userRepository: UserRepository,
     private tokenGenerator: TokenGenerator,
     private tenantRepository: TenantRepository
@@ -77,7 +77,14 @@ export class InviteUserToApplicationUseCase {
     const inviteLink: string = this.applicationWebURL + this.applicationWebSignUpPath + "/invitedToken:" + token;
 
     try {
-      await this.emailService.sendEmailWithDefaultEmail({
+      const defaultEmail: string | undefined = process.env.EMAIL_USER;
+
+      if(defaultEmail == undefined){
+        throw new NotFoundError("Não foi definido email que irá ser quem mandará a mensagem para o usuário");
+      }
+
+      await this.emailService.sendEmail({
+        from: defaultEmail,
         to: input.invitedUserEmail,
         subject: "Invite to application " + this.applicationName,
         text: "Você foi convidado para usar a aplicação X pelo usuário de email: " + input.invitingUserEmail +

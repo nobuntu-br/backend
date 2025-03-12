@@ -2,13 +2,13 @@ import { NextFunction, Request, Response } from "express";
 import { BaseController } from "./base.controller";
 import { NotFoundError } from "../../../errors/notFound.error";
 import { IidentityService } from "../../../domain/services/Iidentity.service";
-import { AzureADService } from "../../../domain/services/azureAD.service";
+import { AzureADService } from "../../adapters/azureAD.service";
 import { GetUserProfilePhotoUseCase } from "../../../useCases/user/getUserProfilePhoto.useCase";
 import { UpdateUserProfilePhotoUseCase } from "../../../useCases/user/updateUserProfilePhoto.UseCase";
 import { UnauthorizedError } from "../../../errors/unauthorized.error";
 import { GetUserGroupsUseCase } from "../../../useCases/user/getUserGroups.useCase";
 import UserRepository from "../../../domain/repositories/user.repository";
-import { IUser, User } from "../../../domain/entities/user.model";
+import { IUser, IUserDatabaseModel, User } from "../../../domain/entities/user.model";
 
 
 export class UserController {
@@ -21,7 +21,7 @@ export class UserController {
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
       const userRepository: UserRepository = new UserRepository(req.body.tenantConnection);
-      const baseController: BaseController<IUser, User> = new BaseController(userRepository, "User");
+      const baseController: BaseController<IUserDatabaseModel, User> = new BaseController(userRepository, "User");
 
       baseController.findAll(req, res, next);
     } catch (error) {
@@ -37,7 +37,7 @@ export class UserController {
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
       const userRepository: UserRepository = new UserRepository(req.body.tenantConnection);
-      const baseController: BaseController<IUser, User> = new BaseController(userRepository, "User");
+      const baseController: BaseController<IUserDatabaseModel, User> = new BaseController(userRepository, "User");
 
       baseController.findById(req, res, next);
     } catch (error) {
@@ -53,7 +53,7 @@ export class UserController {
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
       const userRepository: UserRepository = new UserRepository(req.body.tenantConnection);
-      const baseController: BaseController<IUser, User> = new BaseController(userRepository, "User");
+      const baseController: BaseController<IUserDatabaseModel, User> = new BaseController(userRepository, "User");
 
       baseController.getCount(req, res, next);
     } catch (error) {
@@ -69,7 +69,7 @@ export class UserController {
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
       const userRepository: UserRepository = new UserRepository(req.body.tenantConnection);
-      const baseController: BaseController<IUser, User> = new BaseController(userRepository, "User");
+      const baseController: BaseController<IUserDatabaseModel, User> = new BaseController(userRepository, "User");
 
       baseController.update(req, res, next);
     } catch (error) {
@@ -85,7 +85,7 @@ export class UserController {
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
       const userRepository: UserRepository = new UserRepository(req.body.tenantConnection);
-      const baseController: BaseController<IUser, User> = new BaseController(userRepository, "User");
+      const baseController: BaseController<IUserDatabaseModel, User> = new BaseController(userRepository, "User");
 
       baseController.delete(req, res, next);
     } catch (error) {
@@ -101,7 +101,7 @@ export class UserController {
       }
       //O Service será criado com base no tipo de banco de dados e o model usado
       const userRepository: UserRepository = new UserRepository(req.body.tenantConnection);
-      const baseController: BaseController<IUser, User> = new BaseController(userRepository, "User");
+      const baseController: BaseController<IUserDatabaseModel, User> = new BaseController(userRepository, "User");
 
       baseController.deleteAll(req, res, next);
     } catch (error) {

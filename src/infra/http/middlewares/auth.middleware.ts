@@ -3,9 +3,9 @@ import { UnauthorizedError } from "../../../errors/unauthorized.error";
 import { errorHandler } from "./errorHandler.middleware";
 import { ValidateAccessTokenUseCase } from "../../../useCases/authentication/validateAccessToken.useCase";
 import { checkEnvironmentVariableIsEmpty } from "../../../utils/verifiers.util";
-
+import jwt, { JwtPayload } from "jsonwebtoken";
 /**
- * Verifica se o usuário foi cadastrado de fato no servidor de identidade
+ * Valida o token de acesso do usuário registrado no servidor de identidade
  */
 export async function verifyAccess(req: Request, res: Response, next: NextFunction): Promise<void> {
 
@@ -53,10 +53,13 @@ export async function verifyAccess(req: Request, res: Response, next: NextFuncti
       audience: clientId
     });
 
+    // Decodifica o token sem verificar a assinatura
+    const decoded = jwt.decode(accessToken) as JwtPayload;
+
+    req.body.userUID = decoded.sub!; 
+
     next();
   } catch (error: any) {
-
-    console.log(error);
-    res.status(500).json({ message: "Error to authentication.", details: error || "Identificador de tenant a ser usado na operação não é válido" });
+    res.status(500).send(error);
   }
 }

@@ -40,7 +40,7 @@ export default function defineRoute(app: Application) {
 
   router.post('/invite-user', [getSecurityTenant, ...inviteUserValidator, validateHeaders], controller.inviteUser)
 
-  router.post('/check-email-exist', [getSecurityTenant, ...checkEmailExistValidator, validateHeaders], controller.checkEmailExist);
+  router.post('/check-user-exist', [getSecurityTenant, ...checkEmailExistValidator, validateHeaders], controller.checkUserExist);
 
   app.use('/api/authentication', router);
 } 

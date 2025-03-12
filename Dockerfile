@@ -1,4 +1,4 @@
-FROM node:lts-alpine AS img-pedexport-backend
+FROM node:lts-alpine as img-pedexport-backend
 
 # Etapa 1: Construção
 FROM node:18 AS build
@@ -17,9 +17,6 @@ COPY . .
 
 # Compila o código TypeScript para JavaScript (Esse é o diferencial)
 RUN npm run build
-
-# Copia a pasta resources para dist
-RUN cp -r src/resources dist/resources
 
 # Verifica se o diretório /dist foi criado corretamente
 RUN ls -la /app/dist

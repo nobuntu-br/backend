@@ -1,19 +1,10 @@
 import nodemailer, { Transporter } from 'nodemailer';
-import { IEmailAdapter } from './iemail.adapter';
-import { NotFoundError } from '../errors/notFound.error';
-
-interface IEmailServerData {
-  host: string, 
-  port: number;
-  user: string;
-  emailServerUser: string;
-  emailServerPassword: string;
-}
+import { IEmailParams, IEmailServerData, IEmailService } from '../../domain/services/Iemail.service';
 
 /**
  * Implementação das funcionalidades de envio de e-mail com uso da biblioteca NodeMailer
  */
-export class NodemailerAdapter implements IEmailAdapter {
+export class NodemailerAdapter implements IEmailService {
   private transporter: Transporter;
 
   constructor(emailServerData: IEmailServerData) {
@@ -36,7 +27,7 @@ export class NodemailerAdapter implements IEmailAdapter {
     }
   }
 
-  async sendMail(from: string, to: string, subject: string, text: string): Promise<void> {
+  async sendEmail({ from, to, subject, text }: IEmailParams): Promise<void> {
     try {
       await this.transporter.sendMail({
         from: from,
@@ -49,4 +40,5 @@ export class NodemailerAdapter implements IEmailAdapter {
     }
     
   }
+  
 }

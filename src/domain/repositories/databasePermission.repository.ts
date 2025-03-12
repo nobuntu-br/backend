@@ -6,12 +6,26 @@ import { DatabasePermissionDetailOutputDTO } from "../../useCases/tenant/getUser
 import { IDatabasePermissionDatabaseModel, DatabasePermission } from "../entities/databasePermission.model";
 import TenantConnection from "../entities/tenantConnection.model";
 import BaseRepository from "./base.repository";
+import { DatabasePermissionRepositoryMongoose } from "../../infra/database/mongoose/repositories/databasePermission.repository";
+import { DatabasePermissionRepositorySequelize } from "../../infra/database/sequelize/repositories/databasePermission.repository";
+import { IUser } from "../entities/user.model";
+
+export interface IDatabasePermissionRepository {
+  getUsersWithTenantAccess(tenantId: number, ownerUserId: number): Promise<IUser[]>;
+}
 
 export default class DatabasePermissionRepository extends BaseRepository<IDatabasePermissionDatabaseModel, DatabasePermission> {
+  advancedSearches: IDatabasePermissionRepository;
 
   constructor(tenantConnection: TenantConnection) {
     const _adapter: IDatabaseAdapter<IDatabasePermissionDatabaseModel, DatabasePermission> = createDbAdapter<IDatabasePermissionDatabaseModel, DatabasePermission>(tenantConnection.models!.get("DatabasePermission"), tenantConnection.databaseType, tenantConnection.connection, DatabasePermission.fromJson);
     super(_adapter, tenantConnection);
+
+    if (tenantConnection.databaseType === 'mongodb') {
+      this.advancedSearches = new DatabasePermissionRepositoryMongoose(this.tenantConnection, this.adapter);
+    } else {
+      this.advancedSearches = new DatabasePermissionRepositorySequelize(this.tenantConnection, this.adapter);
+    }
   }
 
   async getTenantsUserHasAccess(UserUID: string): Promise<DatabasePermissionDetailOutputDTO[]> {
@@ -185,7 +199,7 @@ export default class DatabasePermissionRepository extends BaseRepository<IDataba
         const userTenants = await this._tenantConnection.models!.get("DatabasePermission").findAll({
           include: [
             {
-              as:"tenant",
+              as: "tenant",
               model: this._tenantConnection.models!.get("Tenant"),
               required: true,
             },
@@ -239,7 +253,7 @@ export default class DatabasePermissionRepository extends BaseRepository<IDataba
   }
 
   async findDatabaseCredentialByUserUIDSequelizeImplementation(userUID: string): Promise<DatabasePermission[]> {
-    let databasePermissions = await this.adapter.findManyWithEagerLoading({userUID: userUID});
+    let databasePermissions = await this.adapter.findManyWithEagerLoading({ userUID: userUID });
 
     return databasePermissions;
   }
@@ -250,10 +264,10 @@ export default class DatabasePermissionRepository extends BaseRepository<IDataba
 
   //TODO
 
-  async getDatabaseCredentialByTenantId(tenantId: number){
+  async getDatabaseCredentialByTenantId(tenantId: number) {
     //Cada databaseCredential é associado a um tenant, entào tem que ir com base no Id do tenant e Id do dono do tenant
-    const data : IDatabasePermissionDatabaseModel[] = await this.adapter.findMany({tenantId: tenantId});
+    const data: IDatabasePermissionDatabaseModel[] = await this.adapter.findMany({ tenantId: tenantId });
 
-    
+
   }
 }

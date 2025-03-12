@@ -2,7 +2,8 @@ import { Application, Router } from 'express';
 import { DatabaseCredentialController } from '../controllers/databaseCredential.controller';
 import { getSecurityTenant } from '../middlewares/tenant.middleware';
 import validateHeaders from '../validators/index.validator';
-import { createNewDatabaseCredentialValidator, findAllDatabaseCredentialValidator } from '../validators/databaseCredential.validator';
+import { createNewDatabaseCredentialValidator, findAllDatabaseCredentialValidator, getDatabaseCredentialByTenantId } from '../validators/databaseCredential.validator';
+import { verifyAccess } from '../middlewares/auth.middleware';
 
 /**
  * Irá definir as rotas da entidade
@@ -13,11 +14,13 @@ export default function defineRoute(app: Application) {
   const router: Router = Router();
 
   //Create a new
-  router.post('/', [getSecurityTenant, ...createNewDatabaseCredentialValidator, validateHeaders], controller.create);
+  router.post('/', [getSecurityTenant, ...createNewDatabaseCredentialValidator, validateHeaders, verifyAccess], controller.create);
   //Find all
-  router.get('/', [getSecurityTenant, ...findAllDatabaseCredentialValidator, validateHeaders], controller.findAll);
+  // router.get('/', [getSecurityTenant, ...findAllDatabaseCredentialValidator, validateHeaders], controller.findAll);
   //Find count
-  router.get('/count', controller.getCount);
+  // router.get('/count', controller.getCount);
+
+  router.get('/tenant/:id', [getSecurityTenant, ...getDatabaseCredentialByTenantId , validateHeaders, verifyAccess], controller.findByTenantId);
   //Find by id
   router.get('/:id', controller.findById);
   //Update

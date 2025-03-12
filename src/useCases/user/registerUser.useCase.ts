@@ -10,12 +10,14 @@ import { JwtPayload } from "jsonwebtoken";
 import { RegisterTenantPermissionUseCase } from "../tenant/registerTenantPermission.useCase";
 
 export type signupInputDTO = {
-  userName: string;
+  email: string;
   firstName: string;
   lastName: string;
-  email: string;
   password: string;
-  invitedTenantsToken: string
+  userName: string;
+  invitedTenantsToken: string;
+  mobilePhone: string;
+  preferredLanguage: string;
 }
 
 export class RegisterUserUseCase {
@@ -31,6 +33,8 @@ export class RegisterUserUseCase {
 
     console.log(input);
 
+    //Verificar se tem email ou numero de telefone para verificar se eles são válidos e manda para funçào do Azure
+
     if (checkEmailIsValid(input.email) == false) {
       throw new ValidationError("Email is invalid.");
     };
@@ -40,7 +44,7 @@ export class RegisterUserUseCase {
     try {
       user = await this.identityService.getUserByEmail(input.email);
     } catch (error) {
-      
+
     }
 
     if (user != null) {
@@ -60,7 +64,9 @@ export class RegisterUserUseCase {
         firstName: input.firstName,
         lastName: input.lastName,
         userName: input.userName,
-        password: input.password
+        password: input.password,
+        mobilePhone: input.mobilePhone,
+        preferredLanguage: input.preferredLanguage
       });
     } catch (error) {
       throw new Error("Error to register user on identity server.");
@@ -89,18 +95,20 @@ export class RegisterUserUseCase {
         lastName: input.lastName,
         isAdministrator: userWillBeAdministrator,
         email: input.email,
-        tenantUID: tenantUID
+        tenantUID: tenantUID,
+        mobilePhone: input.mobilePhone,
+        preferredLanguage: input.preferredLanguage
       }));
 
-      
+
     } catch (error) {
-      throw new Error("Error to create user. Details: "+ error);
+      throw new Error("Error to create user. Details: " + error);
     }
 
     if (input.invitedTenantsToken != null && input.invitedTenantsToken != undefined && input.invitedTenantsToken != "") {
       //Validar JWT e pegar o payload (dados contidos dentro do JWT)
       const data = this.tokenGenerator.verifyToken(input.invitedTenantsToken) as JwtPayload;
-      
+
       const registerTenantPermissionUseCase: RegisterTenantPermissionUseCase = new RegisterTenantPermissionUseCase();
       registerTenantPermissionUseCase.execute({
         databaseCredentialId: data.databaseCredentialId,

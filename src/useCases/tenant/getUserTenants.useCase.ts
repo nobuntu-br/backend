@@ -15,6 +15,9 @@ export type DatabasePermissionDetailOutputDTO = {
   isAdmin?: boolean;
 }
 
+/**
+ * Obtem os dados de Tenants no qual o usuário tem acesso
+ */
 export class GetUserTenantsUseCase {
   constructor(
     private databasePermissionRepository: DatabasePermissionRepository,
