@@ -56,29 +56,16 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
   //TODO arrumar isso
   async findAll(limitPerPage: number, offset: number): Promise<TClass[]> {
     try {
-
+      
       const items = await this._model.findAll({
         limit: limitPerPage,
         offset: offset,
-        order: [['createdAt', 'DESC']]
+        order: [['createdAt', 'DESC']], // Ordenar por data de criação, por exemplo
+        include: [{ all: true }]
       });
-  
-      const associations = Object.keys(this._model.associations);
-  
-      for (const item of items) {
-        for (const assoc of associations) {
-          const loader = item[`get${assoc}`];
-          if (typeof loader === 'function') {
-            item.dataValues[assoc] = await loader.call(item);
-          }
-        }
-      }
-  
-      this.replaceForeignKeysFieldWithData(items);
-  
+      
       return this.jsonDataToResources(items);
-
-
+      
     } catch (error) {
       throw new UnknownError("Error to find all data using sequelize. Detail: " + error);
     }
