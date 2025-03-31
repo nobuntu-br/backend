@@ -56,16 +56,15 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
   //TODO arrumar isso
   async findAll(limitPerPage: number, offset: number): Promise<TClass[]> {
     try {
-
+      
       const items = await this._model.findAll({
         limit: limitPerPage,
         offset: offset,
         order: [['createdAt', 'DESC']], // Ordenar por data de criação, por exemplo
       });
-
-      console.log(this.jsonDataToResources(items));
+      
       return this.jsonDataToResources(items);
-
+      
     } catch (error) {
       throw new UnknownError("Error to find all data using sequelize. Detail: " + error);
     }
@@ -443,18 +442,30 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
 
   async findAllWithAagerLoading(limitPerPage: number, offset: number): Promise<TClass[]> {
     try {
-
+      // Passo 1: Buscar apenas a entidade principal sem as associações
       const items = await this._model.findAll({
         limit: limitPerPage,
         offset: offset,
-        order: [['createdAt', 'DESC']], // Ordenar por data de criação, por exemplo
-        include: [{ all: true }]
+        order: [['createdAt', 'DESC']]
       });
-
+  
+      // Passo 2: Carregar dinamicamente todas as associações em cada item
+      const associations = Object.keys(this._model.associations);
+  
+      for (const item of items) {
+        for (const assoc of associations) {
+          const loader = item[`get${assoc}`];
+          if (typeof loader === 'function') {
+            item.dataValues[assoc] = await loader.call(item);
+          }
+        }
+      }
+  
+      // Passo 3: Tratar os campos de alias se necessário
       this.replaceForeignKeysFieldWithData(items);
-
+  
       return this.jsonDataToResources(items);
-
+  
     } catch (error) {
       throw new UnknownError("Error to find all data using sequelize. Detail: " + error);
     }
