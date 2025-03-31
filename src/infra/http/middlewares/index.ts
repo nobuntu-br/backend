@@ -20,8 +20,25 @@ export function setMiddlewaresBeforeRoutes(app: Application){
 
   app.use(cookieParser());
 
+  app.use((req, res, next) => {
+    if (req.path.includes("xmlrpc")) {
+      return res.status(403).json({ message: "Access denied!" });
+    }
+    next();
+  });
+  
+
 }
 
 export function setMiddlewaresAfterRoutes(app: Application){
   app.use(errorHandler);
+
+  app.use((req, res, next) => {
+    res.setHeader(
+      "Content-Security-Policy",
+      "default-src 'self'; script-src 'self' https://apis.google.com; object-src 'none';"
+    );
+    next();
+  });
+  
 }
