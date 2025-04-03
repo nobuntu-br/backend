@@ -18,7 +18,7 @@ export default class FunctionSystemRoleRepository extends BaseRepository<IFuncti
     const userRoleRepository: UserRoleRepository = new UserRoleRepository(this.tenantConnection);
 
     //Obtem as roles do usuário
-    let roles = await userRoleRepository.findMany({ userId: userId });
+    let roles = await userRoleRepository.findMany({ userId: userId }, 10, 1);
 
     let roleIds = roles.map(role => role.roleId!);
 

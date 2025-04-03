@@ -36,7 +36,7 @@ export class GetTenantsUserIsAdminUseCase {
     let tenants : ITenantDatabaseModel[] = [];
 
     try {
-      tenants = await tenantRepository.findMany({ownerUserId: user.id});
+      tenants = await tenantRepository.findMany({ownerUserId: user.id}, 50, 1);
     } catch (error) {
       throw new UnknownError("Error to get Tenants. Erro to find tenant by userUID.");
     }

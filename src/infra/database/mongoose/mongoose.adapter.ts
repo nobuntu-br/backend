@@ -42,9 +42,9 @@ export class MongooseAdapter<TInterface, TClass> implements IDatabaseAdapter<TIn
 
   }
 
-  async findAll(limitPerPage: number, offset: number): Promise<TClass[]> {
+  async findAll(pageSize: number, offset: number): Promise<TClass[]> {
     try {
-      const returnedValues = await this._model.find({}).skip(offset).limit(limitPerPage);
+      const returnedValues = await this._model.find({}).skip(offset).limit(pageSize);
 
       return this.jsonDataToResources(returnedValues);
     } catch (error) {
@@ -75,7 +75,7 @@ export class MongooseAdapter<TInterface, TClass> implements IDatabaseAdapter<TIn
     }
   }
 
-  async findMany(query: TInterface): Promise<TInterface[]> {
+  async findMany(query: TInterface, pageSize: number, offset: number): Promise<TInterface[]> {
 
     //TODO verificar na query se tem um "id" para tornar um "_id";
 
@@ -282,7 +282,7 @@ export class MongooseAdapter<TInterface, TClass> implements IDatabaseAdapter<TIn
   }
 
   //TODO procurar a função de varredura das classes que são relacionadas para preencher o populate
-  async findAllWithAagerLoading(limitPerPage: number, offset: number): Promise<TClass[]>{
+  async findAllWithAagerLoading(pageSize: number, offset: number): Promise<TClass[]>{
     throw new Error("Method not implemented");
   }
 

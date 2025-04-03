@@ -57,7 +57,7 @@ export class InviteUserToApplicationUseCase {
     var tenants: ITenantDatabaseModel[];
     try {
       // tenants = await this.databasePermissionRepository.findTenantsUserIsAdmin(input.invitingUserUID);
-      tenants = await this.tenantRepository.findMany({ownerUserId: input.invitingUserId})
+      tenants = await this.tenantRepository.findMany({ownerUserId: input.invitingUserId}, 10, 1)
     } catch (error) {
       throw new NotFoundError("Inviting UserUID is invalid");
     }

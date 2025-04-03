@@ -40,11 +40,9 @@ export class BaseController<TInterface, TClass> implements IBaseController {
       //Obtem a página
       const page: number = parseInt(req.query.page as string) || 1;
       //Obtem a quantidade limite de itens por página
-      const limitItems: number = parseInt(req.query.limit as string) || 100;
+      const pageSize: number = parseInt(req.query.limit as string) || 100;
 
-      const startIndex = (page - 1) * limitItems;
-
-      const data = await this.repository.findAllWithAagerLoading(limitItems, startIndex);
+      const data = await this.repository.findAllWithAagerLoading(pageSize, page);
       return res.status(200).send(data);
     } catch (err) {
       return res.status(500).send({ message: err || "Algum erro desconhecido ocorreu ao buscar "+this.entityName+"." });

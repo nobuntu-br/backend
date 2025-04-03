@@ -253,7 +253,7 @@ export default class DatabasePermissionRepository extends BaseRepository<IDataba
   }
 
   async findDatabaseCredentialByUserUIDSequelizeImplementation(userUID: string): Promise<DatabasePermission[]> {
-    let databasePermissions = await this.adapter.findManyWithEagerLoading({ userUID: userUID });
+    let databasePermissions = await this.adapter.findManyWithEagerLoading({ userUID: userUID }, 50, 1);
 
     return databasePermissions;
   }
@@ -266,7 +266,7 @@ export default class DatabasePermissionRepository extends BaseRepository<IDataba
 
   async getDatabaseCredentialByTenantId(tenantId: number) {
     //Cada databaseCredential é associado a um tenant, entào tem que ir com base no Id do tenant e Id do dono do tenant
-    const data: IDatabasePermissionDatabaseModel[] = await this.adapter.findMany({ tenantId: tenantId });
+    const data: IDatabasePermissionDatabaseModel[] = await this.adapter.findMany({ tenantId: tenantId }, 50, 1);
 
 
   }

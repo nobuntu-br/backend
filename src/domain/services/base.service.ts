@@ -30,8 +30,8 @@ export default class BaseService<TInterface, TClass> implements IBaseService<TIn
     return this.repository.create(data);
   }
 
-  findAll(limitPerPage: number, offset: number): Promise<TClass[] | null> {
-    return this.repository.findAll(limitPerPage, offset);
+  findAll(pageSize: number, offset: number): Promise<TClass[] | null> {
+    return this.repository.findAll(pageSize, offset);
   }
 
   async findOne(query: TInterface): Promise<TClass> {
@@ -44,8 +44,8 @@ export default class BaseService<TInterface, TClass> implements IBaseService<TIn
     return returnedValue;
   }
 
-  findMany(query: TInterface): Promise<TInterface[]> {
-    return this.repository.findMany(query);
+  findMany(query: TInterface, pageSize: number, offset: number): Promise<TInterface[]> {
+    return this.repository.findMany(query, pageSize, offset);
   }
 
   async findById(id: number): Promise<TClass> {

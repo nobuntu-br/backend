@@ -74,10 +74,10 @@ export class AuthenticationController {
       res.cookie('accessToken_' + result.user.id, 'Bearer ' + result.tokens.accessToken, {
         httpOnly: true, // Previne acesso pelo JavaScript do lado do cliente
         secure: true, // garante que o cookie só seja enviado por HTTPS
-        sameSite: 'none',
+        sameSite: 'none',// "none" permite que os cookies sejam enviados para qualquer domínio. 
         path: '/',
-        domain: acceptedCookieDomains,
-        maxAge: 10 * 60 * 1000, // 10 minutos (dias * horas * minutos * segundos * milisegundos )
+        domain: acceptedCookieDomains,// Define qual domínio poderá ser enviado o cookie
+        maxAge: 10 * 60 * 1000, // 10 minutos (dias * horas * minutos * segundos * milisegundos)
       });
 
       res.cookie('refreshToken_' + result.user.id, result.tokens.refreshToken, {

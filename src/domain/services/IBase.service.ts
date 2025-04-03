@@ -6,9 +6,9 @@ export interface IBaseService<TInterface, TClass> {
   readonly databaseType: string;
 
   create(data: TInterface): Promise<TClass>;
-  findAll(limitPerPage: number, offset: number): Promise<TClass[] | null>;
+  findAll(pageSize: number, page: number): Promise<TClass[] | null>;
   findOne(query: TInterface): Promise<TClass>;
-  findMany(query: TInterface): Promise<TInterface[]>;
+  findMany(query: TInterface, pageSize: number, page: number): Promise<TInterface[]>;
   findById(id: number): Promise<TClass>;
   getCount(): Promise<number>;
   update(id: number, data: Object): Promise<TClass>;

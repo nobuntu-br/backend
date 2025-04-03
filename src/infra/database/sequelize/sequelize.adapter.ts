@@ -54,11 +54,13 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
   }
 
   //TODO arrumar isso
-  async findAll(limitPerPage: number, offset: number): Promise<TClass[]> {
+  async findAll(pageSize: number, page: number): Promise<TClass[]> {
     try {
+
+      const offset = (page - 1) * pageSize;
       
       const items = await this._model.findAll({
-        limit: limitPerPage,
+        limit: pageSize,
         offset: offset,
         order: [['createdAt', 'DESC']], // Ordenar por data de criação, por exemplo
       });
@@ -90,16 +92,25 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
     }
   }
 
-  async findMany(query: TInterface): Promise<TInterface[]> {
+  async findMany(query: TInterface, pageSize: number, page: number): Promise<TInterface[]> {
     try {
-      const item = await this._model.findAll({ where: query!, order: [['createdAt', 'DESC']] });
+      //const item = await this._model.findAll({ where: query!, order: [['createdAt', 'DESC']] });
 
-      if (item == null) {
+      const offset = (page - 1) * pageSize;
+
+      const items = await this._model.findAll({
+        where: query!,
+        limit: pageSize,
+        offset: offset,
+        order: [['createdAt', 'DESC']], // Ordenar por data de criação, por exemplo
+      });
+
+      if (items == null) {
         return [];
       }
 
       // return this.jsonDataToResources(item);
-      return item;
+      return items;
     } catch (error) {
       throw new UnknownError("Error to find many entities to database using sequelize.");
     }
@@ -440,11 +451,11 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
 
   }
 
-  async findAllWithAagerLoading(limitPerPage: number, offset: number): Promise<TClass[]> {
+  async findAllWithAagerLoading(pageSize: number, offset: number): Promise<TClass[]> {
     try {
       // Passo 1: Buscar apenas a entidade principal sem as associações
       const items = await this._model.findAll({
-        limit: limitPerPage,
+        limit: pageSize,
         offset: offset,
         order: [['createdAt', 'DESC']]
       });

@@ -26,17 +26,17 @@ export function setMiddlewaresBeforeRoutes(app: Application){
     }
     next();
   });
-  
 
 }
 
 export function setMiddlewaresAfterRoutes(app: Application){
   app.use(errorHandler);
 
+  // CSP no cabeçário
   app.use((req, res, next) => {
     res.setHeader(
       "Content-Security-Policy",
-      "default-src 'self'; script-src 'self' https://apis.google.com; object-src 'none';"
+      "default-src 'self'; script-src 'self'; object-src 'none'; img-src 'self';"
     );
     next();
   });

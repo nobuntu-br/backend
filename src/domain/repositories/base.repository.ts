@@ -22,16 +22,16 @@ export default abstract class BaseRepository<TInterface, TClass> implements IBas
     return this.adapter.create(data);
   }
 
-  findAll(limitPerPage: number, offset: number): Promise<TClass[]> {
-    return this.adapter.findAll(limitPerPage, offset);
+  findAll(pageSize: number, page: number): Promise<TClass[]> {
+    return this.adapter.findAll(pageSize, page);
   }
 
   findOne(query: TInterface): Promise<TClass | null> {
     return this.adapter.findOne(query);
   }
 
-  findMany(query: TInterface): Promise<TInterface[]> {
-    return this.adapter.findMany(query);
+  findMany(query: TInterface, pageSize: number, page: number): Promise<TInterface[]> {
+    return this.adapter.findMany(query, pageSize, page);
   }
 
   findById(id: number): Promise<TClass | null> {
@@ -90,16 +90,16 @@ export default abstract class BaseRepository<TInterface, TClass> implements IBas
     return this.adapter.deleteWithTransaction(id, transaction);
   }
 
-  findAllWithAagerLoading(limitPerPage: number, offset: number): Promise<TClass[]> {
-    return this.adapter.findAllWithAagerLoading(limitPerPage, offset);
+  findAllWithAagerLoading(pageSize: number, page: number): Promise<TClass[]> {
+    return this.adapter.findAllWithAagerLoading(pageSize, page);
   }
 
   findOneWithEagerLoading(query: TInterface): Promise<TClass | null> {
     return this.adapter.findOneWithEagerLoading(query);
   }
 
-  findManyWithEagerLoading(query: TInterface): Promise<TClass[]> {
-    return this.adapter.findManyWithEagerLoading(query);
+  findManyWithEagerLoading(query: TInterface, pageSize: number, page: number): Promise<TClass[]> {
+    return this.adapter.findManyWithEagerLoading(query, pageSize, page);
   }
 
   findByIdWithEagerLoading(id: number): Promise<TClass | null> {
