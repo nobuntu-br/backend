@@ -11,6 +11,10 @@ export default function defineRoute(app: Application) {
 
   // Retrieve all estrutura_orcamento 
   router.get('/', [checkUserAccess, validateHeaders], controller.findAll);
+
+  // Retrieve all fieldFile with files by id
+  router.get('/files/:id', [checkUserAccess], controller.findAllFilesById);
+
   // Retrieve cout estrutura_orcamento
   router.get('/count', [checkUserAccess], controller.getCount);
   // Retrieve a single FieldFile with id 

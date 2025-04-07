@@ -38,4 +38,24 @@ export default class FieldFileRepository extends BaseRepository<IFieldFileDataba
     } 
   }
 
+  async findAllFilesById(id: number): Promise<FieldFile> {
+    try {
+      const fieldFile = await this.adapter.findById(id);
+
+      if (!fieldFile) {
+        throw new Error(`FieldFile with id ${id} not found`);
+      }
+
+      const fileModel = this.tenantConnection.models?.get("File");
+
+      if (fileModel) {
+        const files = await fileModel.findAll({ where: { fieldFile: id } });
+        fieldFile.files = files;
+      }
+      return fieldFile;
+    } catch (error) {
+      throw error;
+    }
+  }
+
 }
