@@ -19,16 +19,14 @@ export class BaseController<TInterface, TClass> implements IBaseController {
    * @param res Resposta da requisição
    * @returns Retorna um Object ou null
    */
-  public async create(req: Request, res: Response, next: NextFunction): Promise<Object | null> {
+  public async create(req: Request, res: Response, next: NextFunction) {
     try {
-      const data = await this.repository.create(req.body);
-
-      return res.status(200).send(data);
-    } catch (err) {
-      return res.status(500).send({ message: "Ocorreu um erro de servidor ao tentar salvar "+this.entityName+"." });
+      const result = await this.repository.create(req.body);
+      res.status(201).json(result);
+    } catch (error) {
+      next(error); 
     }
   }
-
   /**
    * Obtem todos os registros da entidade
    * @param req Dados da requisição
