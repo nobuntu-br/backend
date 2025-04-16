@@ -8,6 +8,7 @@ import { GetSecurityTenantConnectionUseCase } from "../../useCases/tenant/getSec
 import { DatabaseCredential } from "../../domain/entities/databaseCredential.model";
 import TenantConnection from "../../domain/entities/tenantConnection.model";
 import DatabaseCredentialRepository from "../../domain/repositories/databaseCredential.repository";
+import registerMenu from "../../utils/registerMenu.util";
 
 /**
  * Obtem a instância de conexão com o banco de dados de acordo com o tenant
@@ -87,6 +88,12 @@ export async function connectTenant(databaseCredential: DatabaseCredential, decr
       await saveRoutes(tenantConnection);
     } catch (error) {
       throw new Error("Error to Save Routes on tenant Database. Detail: "+ error);
+    }
+
+    try{
+      await registerMenu(tenantConnection);
+    } catch (error) {
+      throw new Error("Error to Save Menu on tenant Database. Detail: "+ error);
     }
 
     const tenantConnectionService: TenantConnectionService = TenantConnectionService.instance;
