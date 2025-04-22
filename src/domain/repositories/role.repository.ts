@@ -38,17 +38,20 @@ export default class RoleRepository extends BaseRepository<IRoleDataBaseModel, R
   }
 
   async getUserRolesSequelizeImplementation(userId: number): Promise<Role[]> {
+    console.log("getUserRolesSequelizeImplementation", userId);
+    let userRoles = await this._tenantConnection.models!.get("UserRole").findAll({
+      where: {
+      userId: userId
+      },
+      include: [{all: true}]
+    });
+
+    let roleIds = userRoles.map((userRole: any) => userRole.roleId);
+
     let _roles = await this._tenantConnection.models!.get("Role").findAll({
-      include: [
-        {
-          model: this._tenantConnection.models!.get("User"),
-          as: "user",
-          required: true,
-          where: {
-            id: userId
-          }
-        },
-      ],
+      where: {
+      id: roleIds
+      },
     });
 
     let roles: Role[] = [];
@@ -61,7 +64,6 @@ export default class RoleRepository extends BaseRepository<IRoleDataBaseModel, R
       roles.push({
         id: role.dataValues.id,
         name: role.dataValues.name,
-        updatedAt: role.dataValues.updatedAt
       });
     }
 

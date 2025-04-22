@@ -109,6 +109,24 @@ export class RoleController {
     }
   }
 
+  async findAllByUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      if (req.body.tenantConnection == undefined) {
+        throw new NotFoundError("Não foi definido tenant para uso.")
+      }
+
+      
+      const roleRepository: RoleRepository = new RoleRepository(req.body.tenantConnection as TenantConnection);
+
+      const userId = parseInt(req.query.userId as string || "0");
+      res.status(200).json(await roleRepository.getUserRoles(userId));
+    }
+    catch (error) {
+      next(error);
+    }
+  }
+
+
   async deleteAll(req: Request, res: Response, next: NextFunction) {
     try {
       if (req.body.tenantConnection == undefined) {

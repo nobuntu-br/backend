@@ -13,6 +13,8 @@ export default function defineRoute(app: Application){
   
   //Create a new
   router.post('/', [checkUserAccess, ...createNewRoleValidator, validateHeaders], controller.create);
+  //Find all by user
+  router.get('/user', [checkUserAccess], controller.findAllByUser);
   //Find all
   router.get('/', [...findAllRoleValidator, validateHeaders], controller.findAll);
   //Find count
