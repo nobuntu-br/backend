@@ -42,6 +42,9 @@ function readMenus(menuPath: string): IMenu[] {
         const menuData: IMenu[] = [];
     
         for (let fileIndex = 0; fileIndex < files.length; fileIndex++) {
+            if(files[fileIndex].endsWith('.json') === false) {
+                continue;
+            }
             const file = files[fileIndex];
             const content = fs.readFileSync(path.join(fullPath, file), 'utf8');
 
