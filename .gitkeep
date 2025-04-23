@@ -1,3 +1,0 @@
-mkdir src/resources
-mkdir src/resources/menu
-touch resources/.gitkeep menu/.gitkeep
