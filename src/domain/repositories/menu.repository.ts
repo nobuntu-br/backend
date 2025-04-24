@@ -3,6 +3,7 @@ import { IDatabaseAdapter } from "../../infra/database/IDatabase.adapter";
 import TenantConnection from "../entities/tenantConnection.model";
 import BaseRepository from "./base.repository";
 import { IMenuDatabaseModel, Menu } from "../entities/menuConfig";
+import { where } from "sequelize";
 
 export default class MenuRepository extends BaseRepository<IMenuDatabaseModel, Menu>{ 
 
@@ -29,7 +30,6 @@ export default class MenuRepository extends BaseRepository<IMenuDatabaseModel, M
       menu.dataValues.itens = this.construirSubMenu(menu.dataValues.menuItems, null);
       menu.dataValues.config = menu.dataValues.menuConfig;
     });
-    console.log(menus);
 
     return menus;
   }
@@ -68,13 +68,12 @@ export default class MenuRepository extends BaseRepository<IMenuDatabaseModel, M
       id: menu.dataValues.id, // adiciona o id do menu
       roleName: roleMenus.dataValues.name // adiciona o nome da role relacionada ao menu
     }));
-    console.log(await Promise.all(menus) as any[]);
+
     return await Promise.all(menus) as Menu[];
 
   } 
 
   async getMenuById(menuId: number): Promise<Menu[] | null> {
-    console.log(menuId);
     let menu = await this.tenantConnection.models!.get("Menu").findOne({
       where: { id: menuId },
       include: [
@@ -97,6 +96,34 @@ export default class MenuRepository extends BaseRepository<IMenuDatabaseModel, M
     
     return [menu];
   }
+
+  async getDefaultMenu(): Promise<Menu[]> {
+    let menus = await this.tenantConnection.models!.get("Menu").findAll({
+      include: [
+      {
+        model: this.tenantConnection.models!.get("MenuItem"),
+        as: "menuItems", // deve ser exatamente o mesmo alias definido na associação
+      },
+      {
+        model: this.tenantConnection.models!.get("MenuConfig"),
+        as: "menuConfig", // caso a associação use esse alias
+        required: true, // garante que só trará menus com menuConfig associado
+        where: { defaultMenu: true } // filtra apenas os menus cujo menuConfig tenha defaultMenu = true
+      }
+      ]
+    });
+    let defaultMenus = menus.map((menu: any) => {
+      return {
+          ...menu.dataValues,
+          itens: this.construirSubMenu(menu.dataValues.menuItems, null),
+          config: menu.dataValues.menuConfig
+        };
+      });
+
+      return defaultMenus;
+    };
+
+    
 
   private construirSubMenu(menuItens: any[], parentId: number | null): any[] {
     return menuItens.filter(item => item.dataValues.subMenuId === parentId).map(item => {

@@ -38,7 +38,6 @@ export default class RoleRepository extends BaseRepository<IRoleDataBaseModel, R
   }
 
   async getUserRolesSequelizeImplementation(userId: number): Promise<Role[]> {
-    console.log("getUserRolesSequelizeImplementation", userId);
     let userRoles = await this._tenantConnection.models!.get("UserRole").findAll({
       where: {
       userId: userId

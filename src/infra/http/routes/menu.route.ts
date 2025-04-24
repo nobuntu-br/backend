@@ -9,7 +9,7 @@ export default function defineRoute(app: Application) {
 
   const menuController: MenuController = new MenuController(); 
 
-  router.get('/default-menu',[checkUserAccess], menuController.getAll); 
+  router.get('/default-menu',[checkUserAccess], menuController.getDefaultMenu); 
 
   router.get('/menu-by-role',[checkUserAccess], menuController.getAllByRole);
 

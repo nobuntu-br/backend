@@ -14,6 +14,10 @@ const schema = sequelize.define('menuConfig', {
             type: DataTypes.DATE,
             field: 'modified',
         },  
+    defaultMenu: {
+            type: DataTypes.BOOLEAN, 
+            field: 'defaultMenu', 
+        },
 }); 
 
   schema.prototype.toJSON = function() { 

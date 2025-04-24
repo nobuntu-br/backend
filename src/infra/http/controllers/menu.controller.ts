@@ -5,7 +5,7 @@ import TenantConnection from "../../../domain/entities/tenantConnection.model";
 
 export class MenuController { 
 
-      async getAll(req: Request, res: Response, next: NextFunction){ 
+      async  getAll(req: Request, res: Response, next: NextFunction){ 
         try {             
           if (req.body.tenantConnection == undefined) { 
             throw new NotFoundError("Não foi definido tenant para uso.");
@@ -21,16 +21,31 @@ export class MenuController {
         } 
       } 
 
+      async getDefaultMenu(req: Request, res: Response, next: NextFunction){
+        try {
+          if (req.body.tenantConnection == undefined) { 
+            throw new NotFoundError("Não foi definido tenant para uso.");
+          } 
+
+          const menuRepository : MenuRepository = new MenuRepository(req.body.tenantConnection as TenantConnection);
+
+          const menus = await menuRepository.getDefaultMenu(); 
+          res.status(200).json(menus);
+        }
+        catch (error) {
+          console.log(error);
+          next(error);
+        }
+      }
+
       async getAllByRole(req: Request, res: Response, next: NextFunction){
         try {             
           if (req.body.tenantConnection == undefined) { 
             throw new NotFoundError("Não foi definido tenant para uso.");
           } 
-          
           const menuRepository : MenuRepository = new MenuRepository(req.body.tenantConnection as TenantConnection);
 
           const roleId = parseInt(req.query.roleId as string);
-
           if(!roleId) {
             throw new NotFoundError("roleId não foi informado.");
           }
@@ -38,9 +53,8 @@ export class MenuController {
           if (isNaN(roleId)) {
             throw new NotFoundError("roleId não é um número válido.");
           }
-
+          console.log(roleId);
           const menus = await menuRepository.getMenuByRole(roleId); //TODO: Trocar para pegar o role do usuário logado
-
           res.status(200).json(menus);
         } catch (error) { 
           console.log(error);
