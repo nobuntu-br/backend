@@ -1,13 +1,13 @@
 import { connectTenant } from "../../infra/database/database.config";
-import { DatabaseCredential } from "../../domain/entities/databaseCredential.model";
-import { DatabasePermission } from "../../domain/entities/databasePermission.model";
-import { User } from "../../domain/entities/user.model";
-import DatabasePermissionRepository from "../../domain/repositories/databasePermission.repository";
-import UserRepository from "../../domain/repositories/user.repository";
+import DatabasePermissionRepository from "../../domain/repositories/fixes/databasePermission.repository";
+import UserRepository from "../../domain/repositories/fixes/user.repository";
 import { TenantConnectionService } from "../../domain/services/tenantConnection.service";
 import { GetSecurityTenantConnectionUseCase } from "../tenant/getSecurityTenantConnection.useCase";
 import { GetDefaultTenantConnectionUseCase } from "../tenant/getDefaultTenantConnection.useCase";
-import TenantConnection from "../../domain/entities/tenantConnection.model";
+import { DatabaseCredential } from "../../domain/entities/fixes/databaseCredential.model";
+import { DatabasePermission } from "../../domain/entities/fixes/databasePermission.model";
+import TenantConnection from "../../domain/entities/fixes/tenantConnection.model";
+import { User } from "../../domain/entities/fixes/user.model";
 
 /**
  * Realizar o cadastro ou atualização dos dados do usuário em todos os bancos de dados que ele tem acesso

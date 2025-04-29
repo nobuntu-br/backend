@@ -1,5 +1,5 @@
-import { IUser } from "../../domain/entities/user.model";
-import { IUserAccessData } from "../../domain/entities/userAcessData.model";
+import { IUser } from "../../domain/entities/fixes/user.model";
+import { IUserAccessData } from "../../domain/entities/fixes/userAcessData.model";
 import { IidentityService } from "../../domain/services/Iidentity.service";
 
 type RefreshTokenInputDTO = {

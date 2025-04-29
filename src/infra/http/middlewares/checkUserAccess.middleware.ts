@@ -5,10 +5,10 @@ import { getTenantConnection } from "../../database/database.config";
 import { InsufficientPermissionError } from "../../../errors/insufficientPermission.error";
 import { errorHandler } from "./errorHandler.middleware";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import TenantConnection from "../../../domain/entities/tenantConnection.model";
-import FunctionSystemRoleRepository from "../../../domain/repositories/functionSystemRole.repository";
-import UserRepository from "../../../domain/repositories/user.repository";
-import RoleRepository from "../../../domain/repositories/role.repository";
+import TenantConnection from "../../../domain/entities/fixes/tenantConnection.model";
+import FunctionSystemRoleRepository from "../../../domain/repositories/fixes/functionSystemRole.repository";
+import UserRepository from "../../../domain/repositories/fixes/user.repository";
+import RoleRepository from "../../../domain/repositories/fixes/role.repository";
 
 /**
  * Middleware criado para:

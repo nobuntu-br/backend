@@ -1,5 +1,5 @@
-import TenantConnection from "../domain/entities/tenantConnection.model";
-import FunctionSystemRepository from "../domain/repositories/functionSystem.repository";
+import TenantConnection from "../domain/entities/fixes/tenantConnection.model";
+import FunctionSystemRepository from "../domain/repositories/fixes/functionSystem.repository";
 
 const fs = require('fs-extra');
 const path = require('node:path');

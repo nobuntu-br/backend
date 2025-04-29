@@ -2,12 +2,12 @@ import { IidentityService } from "../../domain/services/Iidentity.service";
 import { ValidationError } from "../../errors/validation.error";
 import { UnknownError } from "../../errors/unknown.error";
 import { SyncUserAccountOnTenantsUseCase } from "./syncUserAccountOnTenants.useCase";
-import { IUser, User } from "../../domain/entities/user.model";
-import { IUserAccessData } from "../../domain/entities/userAcessData.model";
-import UserRepository from "../../domain/repositories/user.repository";
+import UserRepository from "../../domain/repositories/fixes/user.repository";
 import { checkEmailIsValid } from "../../utils/verifiers.util";
 import { TooManyRequestsError } from "../../errors/tooManyRequests.error";
 import { loginAttempts } from "../../infra/http/middlewares/signInRateLimiter.middleware";
+import { IUser, User } from "../../domain/entities/fixes/user.model";
+import { IUserAccessData } from "../../domain/entities/fixes/userAcessData.model";
 
 export type SignInInputDTO = {
   email: string;

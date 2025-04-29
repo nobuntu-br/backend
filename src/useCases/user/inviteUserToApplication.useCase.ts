@@ -2,9 +2,9 @@ import { InsufficientPermissionError } from "../../errors/insufficientPermission
 import { NotFoundError } from "../../errors/notFound.error";
 import { EmailService } from "../../domain/services/email.service";
 import { TokenGenerator } from "../../utils/tokenGenerator";
-import { ITenantDatabaseModel } from "../../domain/entities/tenant.model";
-import UserRepository from "../../domain/repositories/user.repository";
-import TenantRepository from "../../domain/repositories/tenant.repository";
+import { ITenantDatabaseModel } from "../../domain/entities/fixes/tenant.model";
+import UserRepository from "../../domain/repositories/fixes/user.repository";
+import TenantRepository from "../../domain/repositories/fixes/tenant.repository";
 
 export type InviteUserToApplicationInputDTO = {
   invitingUserId: number;

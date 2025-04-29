@@ -1,6 +1,5 @@
-import TenantConnection from "../domain/entities/tenantConnection.model";
-import BaseRepository from "../domain/repositories/base.repository";
-import { NotFoundError } from "../errors/notFound.error";
+import TenantConnection from "../domain/entities/fixes/tenantConnection.model";
+import BaseRepository from "../domain/repositories/fixes/base.repository";
 import { UnknownError } from "../errors/unknown.error";
 const fs = require('fs-extra');
 const path = require('node:path');

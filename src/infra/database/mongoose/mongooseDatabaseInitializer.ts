@@ -1,4 +1,4 @@
-import { DatabaseInitializer } from "../../../domain/repositories/databaseInitializer";
+import { DatabaseInitializer } from "../../../domain/repositories/fixes/databaseInitializer";
 import { DatabaseType } from "../createDb.adapter";
 
 export class MongooseDatabaseInitializer implements DatabaseInitializer {

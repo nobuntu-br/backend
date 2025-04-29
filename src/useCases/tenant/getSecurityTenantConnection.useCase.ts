@@ -4,11 +4,11 @@ import { TenantConnectionService } from "../../domain/services/tenantConnection.
 import { getEnvironmentNumber } from "../../utils/environmentGetters.util";
 import getMongooseSecurityModels from "../../infra/database/mongoose/models/indexSecurity";
 import getSequelizeSecurityModels from "../../infra/database/sequelize/models/indexSecurity.model";
-import { DatabaseInitializer } from "../../domain/repositories/databaseInitializer";
 import { SequelizeDatabaseInitializer } from "../../infra/database/sequelize/sequelizeDatabaseInitializer";
-import TenantConnection from "../../domain/entities/tenantConnection.model";
-import { DatabaseCredential } from "../../domain/entities/databaseCredential.model";
 import { MongooseDatabaseInitializer } from "../../infra/database/mongoose/mongooseDatabaseInitializer";
+import { DatabaseCredential } from "../../domain/entities/fixes/databaseCredential.model";
+import TenantConnection from "../../domain/entities/fixes/tenantConnection.model";
+import { DatabaseInitializer } from "../../domain/repositories/fixes/databaseInitializer";
 
 export class GetSecurityTenantConnectionUseCase {
   constructor() { }

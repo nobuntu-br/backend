@@ -5,10 +5,10 @@ import { saveRoutes } from "../../utils/registerRoutes.util";
 import { connectToDatabase } from "./databaseConnection.config";
 import { decryptDatabasePassword } from "../../utils/crypto.util";
 import { GetSecurityTenantConnectionUseCase } from "../../useCases/tenant/getSecurityTenantConnection.useCase";
-import { DatabaseCredential } from "../../domain/entities/databaseCredential.model";
-import TenantConnection from "../../domain/entities/tenantConnection.model";
-import DatabaseCredentialRepository from "../../domain/repositories/databaseCredential.repository";
+import DatabaseCredentialRepository from "../../domain/repositories/fixes/databaseCredential.repository";
 import registerMenu from "../../utils/registerMenu.util";
+import { DatabaseCredential } from "../../domain/entities/fixes/databaseCredential.model";
+import TenantConnection from "../../domain/entities/fixes/tenantConnection.model";
 
 /**
  * Obtem a instância de conexão com o banco de dados de acordo com o tenant

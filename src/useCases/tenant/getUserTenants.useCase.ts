@@ -1,5 +1,4 @@
-import { DatabasePermission } from "../../domain/entities/databasePermission.model";
-import DatabasePermissionRepository from "../../domain/repositories/databasePermission.repository";
+import DatabasePermissionRepository from "../../domain/repositories/fixes/databasePermission.repository";
 import { NotFoundError } from "../../errors/notFound.error";
 
 export type DatabasePermissionDetailOutputDTO = {

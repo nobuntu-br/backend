@@ -1,4 +1,4 @@
-import TenantConnection from "../../domain/entities/tenantConnection.model";
+import TenantConnection from "../../domain/entities/fixes/tenantConnection.model";
 import { TenantConnectionService } from "../../domain/services/tenantConnection.service";
 
 export async function disconnectDatabase(tenantConnection: TenantConnection){

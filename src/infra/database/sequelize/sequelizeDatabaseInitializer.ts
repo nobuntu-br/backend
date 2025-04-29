@@ -1,5 +1,5 @@
 import { Dialect, Sequelize } from "sequelize";
-import { DatabaseInitializer } from "../../../domain/repositories/databaseInitializer";
+import { DatabaseInitializer } from "../../../domain/repositories/fixes/databaseInitializer";
 import { DatabaseType } from "../createDb.adapter";
 
 export class SequelizeDatabaseInitializer implements DatabaseInitializer {

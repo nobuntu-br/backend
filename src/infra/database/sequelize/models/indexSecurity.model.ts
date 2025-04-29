@@ -1,15 +1,15 @@
 import { Sequelize } from "sequelize";
 
 //TODO precisará ser gerada as importações
-import userModel from "./user.model";
-import roleModel from "./role.model";
-import userRoleModel from "./userRole.model";
-import functionSystemModel from "./functionSystem.model";
-import functionSystemRoleModel from "./functionSystemRole.model";
-import tenantModel from "./tenant.model";
-import databasePermissionModel from "./databasePermission.model";
-import databaseCredentialModel from "./databaseCredential.model";
-import verificationEmailModel from "./verificationEmail.model";
+import userModel from "./fixes/user.model";
+import roleModel from "./fixes/role.model";
+import userRoleModel from "./fixes/userRole.model";
+import functionSystemModel from "./fixes/functionSystem.model";
+import functionSystemRoleModel from "./fixes/functionSystemRole.model";
+import tenantModel from "./fixes/tenant.model";
+import databasePermissionModel from "./fixes/databasePermission.model";
+import databaseCredentialModel from "./fixes/databaseCredential.model";
+import verificationEmailModel from "./fixes/verificationEmail.model";
 import TenantConnection from "../../../../domain/entities/tenantConnection.model";
 /**
  * Define os modelos do banco de dados que serão usados pela parte de controle de acesso aos tenants 

@@ -1,6 +1,6 @@
-import { IUser } from '../../domain/entities/user.model';
-import { VerificationEmail } from '../../domain/entities/verificationEmail.model';
-import VerificationEmailRepository from '../../domain/repositories/verificationEmail.repository';
+import { IUser } from '../../domain/entities/fixes/user.model';
+import { VerificationEmail } from '../../domain/entities/fixes/verificationEmail.model';
+import VerificationEmailRepository from '../../domain/repositories/fixes/verificationEmail.repository';
 import { EmailService } from '../../domain/services/email.service';
 import { IidentityService } from '../../domain/services/Iidentity.service';
 import { ConflictError } from '../../errors/confict.error';

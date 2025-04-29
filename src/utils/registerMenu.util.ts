@@ -1,9 +1,9 @@
-import { IMenu, IMenuDatabaseModel } from "../domain/entities/menuConfig";
-import { IMenuItem, IMenuItemDatabaseModel } from "../domain/entities/menuItem.model";
-import TenantConnection from "../domain/entities/tenantConnection.model";
-import MenuRepository from "../domain/repositories/menu.repository";
-import MenuConfigRepository from "../domain/repositories/menuConfig.repository";
-import MenuItemRepository from "../domain/repositories/menuItem.repository";
+import { IMenu, IMenuDatabaseModel } from "../domain/entities/fixes/menuConfig";
+import { IMenuItem } from "../domain/entities/fixes/menuItem.model";
+import TenantConnection from "../domain/entities/fixes/tenantConnection.model";
+import MenuRepository from "../domain/repositories/fixes/menu.repository";
+import MenuConfigRepository from "../domain/repositories/fixes/menuConfig.repository";
+import MenuItemRepository from "../domain/repositories/fixes/menuItem.repository";
 
 /**
  * Registra no banco de dados o menu gerado

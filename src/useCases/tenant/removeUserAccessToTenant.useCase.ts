@@ -1,10 +1,8 @@
-import { DatabasePermission } from "../../domain/entities/databasePermission.model";
-import TenantConnection from "../../domain/entities/tenantConnection.model";
-import { User } from "../../domain/entities/user.model";
-import DatabaseCredentialRepository from "../../domain/repositories/databaseCredential.repository";
-import DatabasePermissionRepository from "../../domain/repositories/databasePermission.repository";
-import TenantRepository from "../../domain/repositories/tenant.repository";
-import UserRepository from "../../domain/repositories/user.repository";
+import { DatabasePermission } from "../../domain/entities/fixes/databasePermission.model";
+import TenantConnection from "../../domain/entities/fixes/tenantConnection.model";
+import { User } from "../../domain/entities/fixes/user.model";
+import DatabasePermissionRepository from "../../domain/repositories/fixes/databasePermission.repository";
+import UserRepository from "../../domain/repositories/fixes/user.repository";
 import { NotFoundError } from "../../errors/notFound.error";
 import { GetSecurityTenantConnectionUseCase } from "./getSecurityTenantConnection.useCase";
 

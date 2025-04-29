@@ -1,4 +1,4 @@
-import { IUser } from "../../domain/entities/user.model";
+import { IUser } from "../../domain/entities/fixes/user.model";
 import { IidentityService } from "../../domain/services/Iidentity.service";
 import { checkEmailIsValid } from "../../utils/verifiers.util";
 

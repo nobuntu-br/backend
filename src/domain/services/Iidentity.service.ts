@@ -1,6 +1,6 @@
 import { RefreshTokenOutputDTO } from "../../useCases/authentication/refreshToken.useCase";
 import { SignInOutputDTO } from "../../useCases/authentication/signIn.useCase";
-import { IUser } from "../entities/user.model";
+import { IUser } from "../entities/fixes/user.model";
 
 export interface IidentityService {
   getAccessToken(): Promise<string>;

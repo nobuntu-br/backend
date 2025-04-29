@@ -1,4 +1,4 @@
-import { IUser } from '../../domain/entities/user.model';
+import { IUser } from '../../domain/entities/fixes/user.model';
 import { EmailService } from '../../domain/services/email.service';
 import { IidentityService } from '../../domain/services/Iidentity.service';
 import { NotFoundError } from '../../errors/notFound.error';

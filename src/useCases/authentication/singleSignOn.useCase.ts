@@ -1,6 +1,6 @@
-import { IUser, User } from "../../domain/entities/user.model";
-import { IUserAccessData } from "../../domain/entities/userAcessData.model";
-import UserRepository from "../../domain/repositories/user.repository";
+import { IUser, User } from "../../domain/entities/fixes/user.model";
+import { IUserAccessData } from "../../domain/entities/fixes/userAcessData.model";
+import UserRepository from "../../domain/repositories/fixes/user.repository";
 import { IidentityService } from "../../domain/services/Iidentity.service";
 import { UnknownError } from "../../errors/unknown.error";
 import { ValidationError } from "../../errors/validation.error";

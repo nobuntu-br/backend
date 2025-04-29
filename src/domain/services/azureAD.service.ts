@@ -3,7 +3,7 @@ import { NotFoundError } from "../../errors/notFound.error";
 import { ValidationError } from "../../errors/validation.error";
 import { SignInOutputDTO } from "../../useCases/authentication/signIn.useCase";
 import { GetUserProfilePhotoOutputDTO } from "../../useCases/user/getUserProfilePhoto.useCase";
-import { IUser } from "../entities/user.model";
+import { IUser } from "../entities/fixes/user.model";
 import { IidentityService } from "./Iidentity.service";
 
 export interface IAzureAdUser {

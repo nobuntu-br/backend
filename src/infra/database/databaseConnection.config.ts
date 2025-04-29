@@ -1,7 +1,7 @@
 import mongoose, { Connection } from 'mongoose';
 import { Dialect, Sequelize } from 'sequelize';
-import { IDatabaseCredential } from '../../domain/entities/databaseCredential.model';
-import TenantConnection from '../../domain/entities/tenantConnection.model';
+import { IDatabaseCredential } from '../../domain/entities/fixes/databaseCredential.model';
+import TenantConnection from '../../domain/entities/fixes/tenantConnection.model';
 
 /**
  * Realiza a conexão com o banco de dados definido

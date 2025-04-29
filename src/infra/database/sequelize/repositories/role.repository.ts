@@ -1,6 +1,6 @@
 import { IRoleDataBaseModel, Role } from "../../../../domain/entities/role.model";
 import TenantConnection from "../../../../domain/entities/tenantConnection.model";
-import { IRoleRepository } from "../../../../domain/repositories/role.repository";
+import { IRoleRepository } from "../../../../domain/repositories/fixes/role.repository";
 import { IDatabaseAdapter } from "../../IDatabase.adapter";
 
 export class RoleRepositorySequelize implements IRoleRepository {

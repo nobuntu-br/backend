@@ -1,9 +1,9 @@
 import { NotFoundError } from "../../errors/notFound.error";
 import { IidentityService } from "../../domain/services/Iidentity.service";
 import { TokenGenerator } from "../../utils/tokenGenerator";
-import { IUser, User } from "../../domain/entities/user.model";
-import UserRepository from "../../domain/repositories/user.repository";
-import VerificationEmailRepository from "../../domain/repositories/verificationEmail.repository";
+import { IUser, User } from "../../domain/entities/fixes/user.model";
+import UserRepository from "../../domain/repositories/fixes/user.repository";
+import VerificationEmailRepository from "../../domain/repositories/fixes/verificationEmail.repository";
 import { checkEmailIsValid } from "../../utils/verifiers.util";
 import { ValidationError } from "../../errors/validation.error";
 import { JwtPayload } from "jsonwebtoken";

@@ -3,12 +3,12 @@ import { connectTenant } from "../../infra/database/database.config";
 import { TenantConnectionService } from "../../domain/services/tenantConnection.service";
 import { getEnvironmentNumber } from "../../utils/environmentGetters.util";
 import { RegisterDefaultTenantUseCase } from "./registerDefaultTenant.useCase";
-import { DatabaseCredential } from "../../domain/entities/databaseCredential.model";
-import TenantConnection from "../../domain/entities/tenantConnection.model";
-import { DatabaseInitializer } from "../../domain/repositories/databaseInitializer";
+import { DatabaseInitializer } from "../../domain/repositories/fixes/databaseInitializer";
 import { MongooseDatabaseInitializer } from "../../infra/database/mongoose/mongooseDatabaseInitializer";
 import { SequelizeDatabaseInitializer } from "../../infra/database/sequelize/sequelizeDatabaseInitializer";
 import { checkEnvironmentVariableIsEmpty } from "../../utils/verifiers.util";
+import { DatabaseCredential } from "../../domain/entities/fixes/databaseCredential.model";
+import TenantConnection from "../../domain/entities/fixes/tenantConnection.model";
 
 export class GetDefaultTenantConnectionUseCase {
   constructor() { }

@@ -1,5 +1,5 @@
-import { DatabasePermission } from '../../domain/entities/databasePermission.model';
-import DatabasePermissionRepository from '../../domain/repositories/databasePermission.repository';
+import { DatabasePermission } from '../../domain/entities/fixes/databasePermission.model';
+import DatabasePermissionRepository from '../../domain/repositories/fixes/databasePermission.repository';
 import { UnknownError } from '../../errors/unknown.error';
 
 export class DeleteTenantPermissionUseCase {

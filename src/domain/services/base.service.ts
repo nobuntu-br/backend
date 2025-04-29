@@ -1,8 +1,8 @@
 import { DatabaseType } from "../../infra/database/createDb.adapter";
 import { NotFoundError } from "../../errors/notFound.error";
-import { IBaseRepository } from "../repositories/ibase.repository";
+import { IBaseRepository } from "../repositories/fixes/ibase.repository";
 import { IBaseService } from "./IBase.service";
-import TenantConnection from "../entities/tenantConnection.model";
+import TenantConnection from "../entities/fixes/tenantConnection.model";
 
 export default class BaseService<TInterface, TClass> implements IBaseService<TInterface, TClass> {
   _databaseType: DatabaseType;

@@ -1,6 +1,6 @@
 import { DatabaseCredential, IDatabaseCredentialDatabaseModel } from "../../../../domain/entities/databaseCredential.model";
 import TenantConnection from "../../../../domain/entities/tenantConnection.model";
-import { IDatabaseCredentialRepository } from "../../../../domain/repositories/databaseCredential.repository";
+import { IDatabaseCredentialRepository } from "../../../../domain/repositories/fixes/databaseCredential.repository";
 import { IDatabaseAdapter } from "../../IDatabase.adapter";
 
 export class DatabaseCredentialRepositorySequelize implements IDatabaseCredentialRepository {

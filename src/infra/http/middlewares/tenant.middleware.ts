@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { getTenantConnection } from "../../database/database.config";
 import { GetSecurityTenantConnectionUseCase } from "../../../useCases/tenant/getSecurityTenantConnection.useCase";
-import TenantConnection from "../../../domain/entities/tenantConnection.model";
+import TenantConnection from "../../../domain/entities/fixes/tenantConnection.model";
 var jwt = require('jsonwebtoken');
 
 declare global {

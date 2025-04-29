@@ -1,11 +1,10 @@
-import { DatabasePermission } from "../../domain/entities/databasePermission.model";
-import { ITenant } from "../../domain/entities/tenant.model";
-import TenantConnection from "../../domain/entities/tenantConnection.model";
-import { IUser, User } from "../../domain/entities/user.model";
-import DatabaseCredentialRepository from "../../domain/repositories/databaseCredential.repository";
-import DatabasePermissionRepository from "../../domain/repositories/databasePermission.repository";
-import TenantRepository from "../../domain/repositories/tenant.repository";
-import UserRepository from "../../domain/repositories/user.repository";
+import { ITenant } from "../../domain/entities/fixes/tenant.model";
+import TenantConnection from "../../domain/entities/fixes/tenantConnection.model";
+import { IUser, User } from "../../domain/entities/fixes/user.model";
+import DatabaseCredentialRepository from "../../domain/repositories/fixes/databaseCredential.repository";
+import DatabasePermissionRepository from "../../domain/repositories/fixes/databasePermission.repository";
+import TenantRepository from "../../domain/repositories/fixes/tenant.repository";
+import UserRepository from "../../domain/repositories/fixes/user.repository";
 import { IEmailService } from "../../domain/services/Iemail.service";
 import { IidentityService } from "../../domain/services/Iidentity.service";
 import { TenantConnectionService } from "../../domain/services/tenantConnection.service";

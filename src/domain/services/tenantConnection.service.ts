@@ -1,5 +1,5 @@
 import { DatabasePermissionDetailOutputDTO } from "../../useCases/tenant/getUserTenants.useCase";
-import TenantConnection from "../entities/tenantConnection.model";
+import TenantConnection from "../entities/fixes/tenantConnection.model";
 
 export class TenantConnectionService {
   private static _instance: TenantConnectionService;

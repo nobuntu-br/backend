@@ -1,9 +1,9 @@
-import DatabasePermissionRepository from "../repositories/databasePermission.repository";
+import DatabasePermissionRepository from "../repositories/fixes/databasePermission.repository";
 import { DatabasePermissionDetailOutputDTO } from "../../useCases/tenant/getUserTenants.useCase";
 import BaseService from "./base.service";
 import { TenantConnectionService } from "./tenantConnection.service";
-import { IDatabasePermissionDatabaseModel, DatabasePermission } from "../entities/databasePermission.model";
-import TenantConnection from "../entities/tenantConnection.model";
+import { IDatabasePermissionDatabaseModel, DatabasePermission } from "../entities/fixes/databasePermission.model";
+import TenantConnection from "../entities/fixes/tenantConnection.model";
 
 export default class DatabasePermissionService extends BaseService<IDatabasePermissionDatabaseModel, DatabasePermission> {
   private databasePermissionRepository: DatabasePermissionRepository;
