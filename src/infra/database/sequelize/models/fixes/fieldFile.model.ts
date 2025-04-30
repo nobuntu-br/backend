@@ -1,7 +1,7 @@
 import { Sequelize, DataTypes } from "sequelize";
 
 export default function defineModel(sequelize: Sequelize) {
-  const schema = sequelize.define('FieldFile', {
+  const schema = sequelize.define('NfFieldFile', {
     fieldType: {
       type: DataTypes.STRING,
       field: 'fieldType'

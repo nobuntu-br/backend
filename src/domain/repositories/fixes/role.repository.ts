@@ -15,7 +15,7 @@ export default class RoleRepository extends BaseRepository<IRoleDataBaseModel, R
   advancedSearches: IRoleRepository;
 
   constructor(tenantConnection: TenantConnection) {
-    const _adapter: IDatabaseAdapter<IRoleDataBaseModel, Role> = createDbAdapter<IRoleDataBaseModel, Role>(tenantConnection.models!.get("Role"), tenantConnection.databaseType, tenantConnection.connection, Role.fromJson);
+    const _adapter: IDatabaseAdapter<IRoleDataBaseModel, Role> = createDbAdapter<IRoleDataBaseModel, Role>(tenantConnection.models!.get("nfRole"), tenantConnection.databaseType, tenantConnection.connection, Role.fromJson);
     super(_adapter, tenantConnection);
 
     if (tenantConnection.databaseType === 'mongodb') {
@@ -38,7 +38,7 @@ export default class RoleRepository extends BaseRepository<IRoleDataBaseModel, R
   }
 
   async getUserRolesSequelizeImplementation(userId: number): Promise<Role[]> {
-    let userRoles = await this._tenantConnection.models!.get("UserRole").findAll({
+    let userRoles = await this._tenantConnection.models!.get("nfUserRole").findAll({
       where: {
       userId: userId
       },
@@ -47,7 +47,7 @@ export default class RoleRepository extends BaseRepository<IRoleDataBaseModel, R
 
     let roleIds = userRoles.map((userRole: any) => userRole.roleId);
 
-    let _roles = await this._tenantConnection.models!.get("Role").findAll({
+    let _roles = await this._tenantConnection.models!.get("nfRole").findAll({
       where: {
       id: roleIds
       },

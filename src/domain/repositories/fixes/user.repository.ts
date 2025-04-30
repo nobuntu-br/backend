@@ -8,7 +8,7 @@ import { IUserDatabaseModel, User } from "../../entities/fixes/user.model";
 export default class UserRepository extends BaseRepository<IUserDatabaseModel, User> {
 
   constructor(tenantConnection: TenantConnection) {
-    const _adapter: IDatabaseAdapter<IUserDatabaseModel, User> = createDbAdapter<IUserDatabaseModel, User>(tenantConnection.models!.get("User"), tenantConnection.databaseType, tenantConnection.connection, User.fromJson);
+    const _adapter: IDatabaseAdapter<IUserDatabaseModel, User> = createDbAdapter<IUserDatabaseModel, User>(tenantConnection.models!.get("nfUser"), tenantConnection.databaseType, tenantConnection.connection, User.fromJson);
     super(_adapter, tenantConnection);
   }
 

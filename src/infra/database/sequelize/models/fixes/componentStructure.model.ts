@@ -1,7 +1,7 @@
 import { DataTypes, Sequelize } from "sequelize";
 
 export default function defineModel(sequelize: Sequelize){
-  const schema = sequelize.define('ComponentStructure', {
+  const schema = sequelize.define('NfComponentStructure', {
     structure: {
       type: DataTypes.TEXT,
       allowNull: false,

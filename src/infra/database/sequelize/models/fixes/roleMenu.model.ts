@@ -1,7 +1,7 @@
 import { Sequelize } from "sequelize"; 
 
 export default function defineModel(sequelize: Sequelize){ 
-const schema = sequelize.define('roleMenu', { 
+const schema = sequelize.define('NfroleMenu', { 
     
 }); 
 

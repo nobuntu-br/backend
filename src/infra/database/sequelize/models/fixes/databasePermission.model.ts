@@ -1,7 +1,7 @@
 import { DataTypes, Sequelize } from "sequelize";
 
 export default function defineModel(sequelize: Sequelize){
-  const schema = sequelize.define('DatabasePermission', {
+  const schema = sequelize.define('NfDatabasePermission', {
     userId: {
       type: DataTypes.INTEGER,
       references: {

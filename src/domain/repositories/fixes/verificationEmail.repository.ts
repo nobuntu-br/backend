@@ -7,7 +7,7 @@ import BaseRepository from "./base.repository";
 export default class VerificationEmailRepository extends BaseRepository<IVerificationEmailDatabaseModel, VerificationEmail> {
 
   constructor(tenantConnection: TenantConnection) {
-    const _adapter: IDatabaseAdapter<IVerificationEmailDatabaseModel, VerificationEmail> = createDbAdapter<IVerificationEmailDatabaseModel, VerificationEmail>(tenantConnection.models!.get("VerificationEmail"), tenantConnection.databaseType, tenantConnection.connection, VerificationEmail.fromJson);
+    const _adapter: IDatabaseAdapter<IVerificationEmailDatabaseModel, VerificationEmail> = createDbAdapter<IVerificationEmailDatabaseModel, VerificationEmail>(tenantConnection.models!.get("nfVerificationEmail"), tenantConnection.databaseType, tenantConnection.connection, VerificationEmail.fromJson);
     super(_adapter, tenantConnection);
   }
 

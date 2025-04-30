@@ -14,7 +14,7 @@ export default class DatabaseCredentialRepository extends BaseRepository<IDataba
   advancedSearches: IDatabaseCredentialRepository;
 
   constructor(tenantConnection: TenantConnection) {
-    const _adapter: IDatabaseAdapter<IDatabaseCredentialDatabaseModel, DatabaseCredential> = createDbAdapter<IDatabaseCredentialDatabaseModel, DatabaseCredential>(tenantConnection.models!.get("DatabaseCredential"), tenantConnection.databaseType, tenantConnection.connection, DatabaseCredential.fromJson);
+    const _adapter: IDatabaseAdapter<IDatabaseCredentialDatabaseModel, DatabaseCredential> = createDbAdapter<IDatabaseCredentialDatabaseModel, DatabaseCredential>(tenantConnection.models!.get("nfDatabaseCredential"), tenantConnection.databaseType, tenantConnection.connection, DatabaseCredential.fromJson);
     super(_adapter, tenantConnection);
 
     if (tenantConnection.databaseType === 'mongodb') {

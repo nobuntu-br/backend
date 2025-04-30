@@ -7,7 +7,7 @@ import BaseRepository from "./base.repository";
 export default class MenuConfigRepository extends BaseRepository<IMenuConfigDatabaseModel, MenuConfig>{ 
 
   constructor(tenantConnection: TenantConnection){ 
-    const _adapter : IDatabaseAdapter<IMenuConfigDatabaseModel, MenuConfig> = createDbAdapter<IMenuConfigDatabaseModel, MenuConfig>(tenantConnection.models!.get("MenuConfig"), tenantConnection.databaseType, tenantConnection.connection, MenuConfig.fromJson);
+    const _adapter : IDatabaseAdapter<IMenuConfigDatabaseModel, MenuConfig> = createDbAdapter<IMenuConfigDatabaseModel, MenuConfig>(tenantConnection.models!.get("nfMenuConfig"), tenantConnection.databaseType, tenantConnection.connection, MenuConfig.fromJson);
     super(_adapter, tenantConnection); 
   } 
 

@@ -10,7 +10,7 @@ import TenantConnection from "../../entities/fixes/tenantConnection.model";
 export default class DatabasePermissionRepository extends BaseRepository<IDatabasePermissionDatabaseModel, DatabasePermission> {
 
   constructor(tenantConnection: TenantConnection) {
-    const _adapter: IDatabaseAdapter<IDatabasePermissionDatabaseModel, DatabasePermission> = createDbAdapter<IDatabasePermissionDatabaseModel, DatabasePermission>(tenantConnection.models!.get("DatabasePermission"), tenantConnection.databaseType, tenantConnection.connection, DatabasePermission.fromJson);
+    const _adapter: IDatabaseAdapter<IDatabasePermissionDatabaseModel, DatabasePermission> = createDbAdapter<IDatabasePermissionDatabaseModel, DatabasePermission>(tenantConnection.models!.get("nfDatabasePermission"), tenantConnection.databaseType, tenantConnection.connection, DatabasePermission.fromJson);
     super(_adapter, tenantConnection);
   }
 
@@ -75,7 +75,7 @@ export default class DatabasePermissionRepository extends BaseRepository<IDataba
 
         let _userTenants: DatabasePermissionDetailOutputDTO[] = [];
 
-        const userTenants = await this._tenantConnection.models!.get("DatabasePermission").findAll({
+        const userTenants = await this._tenantConnection.models!.get("nfDatabasePermission").findAll({
           where: {
             userUID: {
               [Op.or]: [UserUID, null],
@@ -84,7 +84,7 @@ export default class DatabasePermissionRepository extends BaseRepository<IDataba
           include: [
             {
               as: "tenant",
-              model: this._tenantConnection.models!.get("Tenant"),
+              model: this._tenantConnection.models!.get("nfTenant"),
               required: true,
             },
           ],
@@ -182,11 +182,11 @@ export default class DatabasePermissionRepository extends BaseRepository<IDataba
 
         let _userTenants: DatabasePermissionDetailOutputDTO[] = [];
 
-        const userTenants = await this._tenantConnection.models!.get("DatabasePermission").findAll({
+        const userTenants = await this._tenantConnection.models!.get("nfDatabasePermission").findAll({
           include: [
             {
               as:"tenant",
-              model: this._tenantConnection.models!.get("Tenant"),
+              model: this._tenantConnection.models!.get("nfTenant"),
               required: true,
             },
           ],

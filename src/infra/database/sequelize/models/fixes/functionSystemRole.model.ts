@@ -1,7 +1,7 @@
 import { Sequelize, DataTypes } from "sequelize";
 
 export default function defineModel(sequelize: Sequelize) {
-  const schema = sequelize.define('FunctionSystemRole', {
+  const schema = sequelize.define('NfFunctionSystemRole', {
     roleId: {
       type: DataTypes.INTEGER,
       references: {

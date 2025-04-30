@@ -1,7 +1,7 @@
 import { DataTypes, Sequelize } from "sequelize"; 
 
 export default function defineModel(sequelize: Sequelize){ 
-  const schema = sequelize.define('menuItem', { 
+  const schema = sequelize.define('NfmenuItem', { 
       name: {
         type: DataTypes.STRING, 
         field: 'name', 

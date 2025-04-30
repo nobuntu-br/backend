@@ -7,7 +7,7 @@ import TenantConnection from "../../entities/fixes/tenantConnection.model";
 export default class FileRepository extends BaseRepository<IFileDatabaseModel, File>{ 
 
   constructor(tenantConnection: TenantConnection){ 
-    const _adapter : IDatabaseAdapter<IFileDatabaseModel, File> = createDbAdapter<IFileDatabaseModel, File>(tenantConnection.models!.get("File"), tenantConnection.databaseType, tenantConnection.connection, File.fromJson);
+    const _adapter : IDatabaseAdapter<IFileDatabaseModel, File> = createDbAdapter<IFileDatabaseModel, File>(tenantConnection.models!.get("nfFile"), tenantConnection.databaseType, tenantConnection.connection, File.fromJson);
     super(_adapter, tenantConnection); 
   } 
 

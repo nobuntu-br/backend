@@ -7,14 +7,14 @@ export class RoleRepositorySequelize implements IRoleRepository {
   constructor(private tenantConnection: TenantConnection, private adapter: IDatabaseAdapter<IRoleDataBaseModel, Role>) {}
 
   async isPublicRoute(method: string, route: string): Promise<boolean> {
-    const isPublicRoute = await this.tenantConnection.models!.get("FunctionSystem").findAll({
+    const isPublicRoute = await this.tenantConnection.models!.get("nfFunctionSystem").findAll({
       where: {
         route: route,
         method: method
       },
       include: [
         {
-          model: this.tenantConnection.models!.get("Role"),
+          model: this.tenantConnection.models!.get("nfRole"),
           as: "role",
           required: true,
           where: {

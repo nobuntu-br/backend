@@ -8,19 +8,19 @@ import { where } from "sequelize";
 export default class MenuRepository extends BaseRepository<IMenuDatabaseModel, Menu>{ 
 
   constructor(tenantConnection: TenantConnection) { 
-    const _adapter : IDatabaseAdapter<IMenuDatabaseModel, Menu> = createDbAdapter<IMenuDatabaseModel, Menu>(tenantConnection.models!.get("Menu"), tenantConnection.databaseType, tenantConnection.connection, Menu.fromJson);
+    const _adapter : IDatabaseAdapter<IMenuDatabaseModel, Menu> = createDbAdapter<IMenuDatabaseModel, Menu>(tenantConnection.models!.get("nfMenu"), tenantConnection.databaseType, tenantConnection.connection, Menu.fromJson);
     super(_adapter, tenantConnection); 
   } 
 
   async getAllMenus(): Promise<Menu[]> {
-    const menus = await this.tenantConnection.models!.get("Menu").findAll({
+    const menus = await this.tenantConnection.models!.get("nfMenu").findAll({
       include: [
         {
-          model: this.tenantConnection.models!.get("MenuItem"),
+          model: this.tenantConnection.models!.get("nfMenuItem"),
           as: "menuItems", // deve ser exatamente o mesmo alias definido na associação
         },
         {
-          model: this.tenantConnection.models!.get("MenuConfig"),
+          model: this.tenantConnection.models!.get("nfMenuConfig"),
           as: "menuConfig" // caso a associação use esse alias
         }
       ]
@@ -35,9 +35,9 @@ export default class MenuRepository extends BaseRepository<IMenuDatabaseModel, M
   }
 
   async joinMenuWithItensAndConfig(): Promise<Menu[]>{
-    const menus = await this.tenantConnection.models!.get("Menu").findAll();
-    const menuItens = await this.tenantConnection.models!.get("MenuItem").findAll();
-    const menuConfigs = await this.tenantConnection.models!.get("MenuConfig").findAll();
+    const menus = await this.tenantConnection.models!.get("nfMenu").findAll();
+    const menuItens = await this.tenantConnection.models!.get("nfMenuItem").findAll();
+    const menuConfigs = await this.tenantConnection.models!.get("nfMenuConfig").findAll();
 
     const itensComSubMenu = this.construirSubMenu(menuItens, null);
 
@@ -51,11 +51,11 @@ export default class MenuRepository extends BaseRepository<IMenuDatabaseModel, M
   }
 
   async getMenuByRole(roleId: number): Promise<Menu[]>{
-    const roleMenus = await this.tenantConnection.models!.get("Role").findOne({
+    const roleMenus = await this.tenantConnection.models!.get("nfRole").findOne({
       where: { id: roleId },
       include: [
         {
-          model: this.tenantConnection.models!.get("Menu"),
+          model: this.tenantConnection.models!.get("nfMenu"),
           as: 'menus', // use o alias definido na associação
           through: { attributes: [] } // opcional: para não trazer os atributos da tabela intermediária
           
@@ -74,15 +74,15 @@ export default class MenuRepository extends BaseRepository<IMenuDatabaseModel, M
   } 
 
   async getMenuById(menuId: number): Promise<Menu[] | null> {
-    let menu = await this.tenantConnection.models!.get("Menu").findOne({
+    let menu = await this.tenantConnection.models!.get("nfMenu").findOne({
       where: { id: menuId },
       include: [
         {
-          model: this.tenantConnection.models!.get("MenuItem"),
+          model: this.tenantConnection.models!.get("nfMenuItem"),
           as: "menuItems", // deve ser exatamente o mesmo alias definido na associação
         },
         {
-          model: this.tenantConnection.models!.get("MenuConfig"),
+          model: this.tenantConnection.models!.get("nfMenuConfig"),
           as: "menuConfig" // caso a associação use esse alias
         }
       ]
@@ -98,14 +98,14 @@ export default class MenuRepository extends BaseRepository<IMenuDatabaseModel, M
   }
 
   async getDefaultMenu(): Promise<Menu[]> {
-    let menus = await this.tenantConnection.models!.get("Menu").findAll({
+    let menus = await this.tenantConnection.models!.get("nfMenu").findAll({
       include: [
       {
-        model: this.tenantConnection.models!.get("MenuItem"),
+        model: this.tenantConnection.models!.get("nfMenuItem"),
         as: "menuItems", // deve ser exatamente o mesmo alias definido na associação
       },
       {
-        model: this.tenantConnection.models!.get("MenuConfig"),
+        model: this.tenantConnection.models!.get("nfMenuConfig"),
         as: "menuConfig", // caso a associação use esse alias
         required: true, // garante que só trará menus com menuConfig associado
         where: { defaultMenu: true } // filtra apenas os menus cujo menuConfig tenha defaultMenu = true

@@ -1,7 +1,7 @@
 import { DataTypes, Sequelize } from "sequelize";
 
 export default function defineModel(sequelize: Sequelize) {
-  const schema = sequelize.define('DatabaseCredential', {
+  const schema = sequelize.define('NfDatabaseCredential', {
     name: {
       type: DataTypes.STRING(100),
       allowNull: false,

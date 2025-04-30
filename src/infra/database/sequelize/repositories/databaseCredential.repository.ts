@@ -7,18 +7,18 @@ export class DatabaseCredentialRepositorySequelize implements IDatabaseCredentia
   constructor(private tenantConnection: TenantConnection, private adapter: IDatabaseAdapter<IDatabaseCredentialDatabaseModel, DatabaseCredential>) {}
   
   async getDatabaseCredentialByTenantId(tenantId: number): Promise<DatabaseCredential[]> {
-    const data = await this.tenantConnection.models!.get("DatabasePermission").findAll({
+    const data = await this.tenantConnection.models!.get("nfDatabasePermission").findAll({
       where: {
         tenantId: tenantId
       },
       include: [
         {
-          model: this.tenantConnection.models!.get("DatabaseCredential"),
+          model: this.tenantConnection.models!.get("nfDatabaseCredential"),
           as: "databaseCredential",
           required: true,
         },
         {
-          model: this.tenantConnection.models!.get("user"),
+          model: this.tenantConnection.models!.get("nfuser"),
           as: "user",
           required: true
         }

@@ -8,7 +8,7 @@ import BaseRepository from "./base.repository";
 export default class FieldFileRepository extends BaseRepository<IFieldFileDatabaseModel, FieldFile>{ 
 
   constructor(tenantConnection: TenantConnection){ 
-    const _adapter : IDatabaseAdapter<IFieldFileDatabaseModel, FieldFile> = createDbAdapter<IFieldFileDatabaseModel, FieldFile>(tenantConnection.models!.get("FieldFile"), tenantConnection.databaseType, tenantConnection.connection, FieldFile.fromJson);
+    const _adapter : IDatabaseAdapter<IFieldFileDatabaseModel, FieldFile> = createDbAdapter<IFieldFileDatabaseModel, FieldFile>(tenantConnection.models!.get("nfFieldFile"), tenantConnection.databaseType, tenantConnection.connection, FieldFile.fromJson);
     super(_adapter, tenantConnection);
   } 
   
@@ -24,13 +24,13 @@ export default class FieldFileRepository extends BaseRepository<IFieldFileDataba
             for (let i = 0; i < files.length; i++) {
             files[i].fieldFile = data.id ? data.id : undefined;
           }
-          const fileModel = this.tenantConnection.models?.get("file");
+          const fileModel = this.tenantConnection.models?.get("nffile");
           if (fileModel) {
             fileModel.bulkCreate(files);
           }
 
 
-          this.tenantConnection.models?.get("File");
+          this.tenantConnection.models?.get("nfFile");
         }
         return data.id ? data.id.toString() : '';
       });

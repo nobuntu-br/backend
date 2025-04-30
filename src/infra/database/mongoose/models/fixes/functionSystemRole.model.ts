@@ -38,9 +38,9 @@ export default function defineModel(mongooseConnection: Connection) {
 
   schema.pre('save', async function (next) {
     if (!this.isNew) return next();
-    this._id = await updateCounter(mongooseConnection, "FunctionSystemRole");
+    this._id = await updateCounter(mongooseConnection, "NfFunctionSystemRole");
     next();
   });
 
-  return mongooseConnection.model('FunctionSystemRole', schema);
+  return mongooseConnection.model('NfFunctionSystemRole', schema);
 };

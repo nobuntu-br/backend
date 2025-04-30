@@ -8,7 +8,7 @@ export default class FunctionSystemRepository extends BaseRepository<IFunctionSy
   private databaseModels: any;
 
   constructor(tenantConnection: TenantConnection) {
-    const _adapter: IDatabaseAdapter<IFunctionSystemDatabaseModel, FunctionSystem> = createDbAdapter<IFunctionSystemDatabaseModel, FunctionSystem>(tenantConnection.models!.get("FunctionSystem"), tenantConnection.databaseType, tenantConnection.connection, FunctionSystem.fromJson);
+    const _adapter: IDatabaseAdapter<IFunctionSystemDatabaseModel, FunctionSystem> = createDbAdapter<IFunctionSystemDatabaseModel, FunctionSystem>(tenantConnection.models!.get("nfFunctionSystem"), tenantConnection.databaseType, tenantConnection.connection, FunctionSystem.fromJson);
     super(_adapter, tenantConnection);
     this.databaseModels = tenantConnection.models;
   }

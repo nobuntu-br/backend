@@ -9,7 +9,7 @@ import UserRoleRepository from "./userRole.repository";
 export default class FunctionSystemRoleRepository extends BaseRepository<IFunctionSystemRoleDatabaseModel, FunctionSystemRole> {
 
   constructor(tenantConnection: TenantConnection) {
-    const _adapter: IDatabaseAdapter<IFunctionSystemRoleDatabaseModel, FunctionSystemRole> = createDbAdapter<IFunctionSystemRoleDatabaseModel, FunctionSystemRole>(tenantConnection.models!.get("FunctionSystemRole"), tenantConnection.databaseType, tenantConnection.connection, FunctionSystemRole.fromJson);
+    const _adapter: IDatabaseAdapter<IFunctionSystemRoleDatabaseModel, FunctionSystemRole> = createDbAdapter<IFunctionSystemRoleDatabaseModel, FunctionSystemRole>(tenantConnection.models!.get("nfFunctionSystemRole"), tenantConnection.databaseType, tenantConnection.connection, FunctionSystemRole.fromJson);
     super(_adapter, tenantConnection);
   }
 
@@ -42,7 +42,7 @@ export default class FunctionSystemRoleRepository extends BaseRepository<IFuncti
       return false;
     }
 
-    const routeUserHaveAccess = await this._tenantConnection.models!.get("Role").findAll({
+    const routeUserHaveAccess = await this._tenantConnection.models!.get("nfRole").findAll({
       where: {
         id: {
           [Op.in]: roleIds,
@@ -50,7 +50,7 @@ export default class FunctionSystemRoleRepository extends BaseRepository<IFuncti
       },
       include: [
         {
-          model: this._tenantConnection.models!.get("FunctionSystem"),
+          model: this._tenantConnection.models!.get("nfFunctionSystem"),
           as: "functionSystem",
           required: true,
           where: {
@@ -113,7 +113,7 @@ export default class FunctionSystemRoleRepository extends BaseRepository<IFuncti
       }
     ];
 
-    const role: IFunctionSystemRoleDatabaseModel[] = await this._tenantConnection.models!.get("FunctionSystemRole").aggregate(checkUserHaveAccessToRouteByUserId);
+    const role: IFunctionSystemRoleDatabaseModel[] = await this._tenantConnection.models!.get("nfFunctionSystemRole").aggregate(checkUserHaveAccessToRouteByUserId);
 
     if (role.length > 0) {
       return true;
@@ -180,14 +180,14 @@ export default class FunctionSystemRoleRepository extends BaseRepository<IFuncti
   }
 
   async isPublicRouteSequelizeImplementation(method: string, route: string) {
-    const isPublicRoute = await this._tenantConnection.models!.get("FunctionSystem").findAll({
+    const isPublicRoute = await this._tenantConnection.models!.get("nfFunctionSystem").findAll({
       where: {
         route: route,
         method: method
       },
       include: [
         {
-          model: this._tenantConnection.models!.get("Role"),
+          model: this._tenantConnection.models!.get("nfRole"),
           as: "role",
           required: true,
           where: {

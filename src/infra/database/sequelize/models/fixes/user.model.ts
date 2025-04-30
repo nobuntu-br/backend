@@ -1,7 +1,7 @@
 import { DataTypes, Sequelize } from "sequelize";
 
 export default function defineModel(sequelize: Sequelize){
-  const schema = sequelize.define('User', {
+  const schema = sequelize.define('NfUser', {
     UID: {
       type: DataTypes.STRING,
       allowNull: false,

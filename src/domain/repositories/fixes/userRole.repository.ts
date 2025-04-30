@@ -7,7 +7,7 @@ import BaseRepository from "./base.repository";
 export default class UserRoleRepository extends BaseRepository<IUserRoleDatabaseModel, UserRole> {
 
   constructor(tenantConnection: TenantConnection) {
-    const _adapter: IDatabaseAdapter<IUserRoleDatabaseModel, UserRole> = createDbAdapter<IUserRoleDatabaseModel, UserRole>(tenantConnection.models!.get("UserRole"), tenantConnection.databaseType, tenantConnection.connection, UserRole.fromJson);
+    const _adapter: IDatabaseAdapter<IUserRoleDatabaseModel, UserRole> = createDbAdapter<IUserRoleDatabaseModel, UserRole>(tenantConnection.models!.get("nfUserRole"), tenantConnection.databaseType, tenantConnection.connection, UserRole.fromJson);
     super(_adapter, tenantConnection);
   }
 }  

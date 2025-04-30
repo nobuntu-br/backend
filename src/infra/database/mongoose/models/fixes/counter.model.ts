@@ -35,7 +35,7 @@ export default function defineModel(mongooseConnection: Connection) {
     }
   });
 
-  return mongooseConnection.model('Counter', schema);
+  return mongooseConnection.model('NfCounter', schema);
 };
 
 

@@ -10,7 +10,7 @@ import RoleRepository from "./role.repository";
 export default class ComponentStructureRepository extends BaseRepository<IComponentStructureDatabaseModel, ComponentStructure> {
 
   constructor(tenantConnection: TenantConnection) {
-    const _adapter: IDatabaseAdapter<IComponentStructureDatabaseModel, ComponentStructure> = createDbAdapter<IComponentStructureDatabaseModel, ComponentStructure>(tenantConnection.models!.get("ComponentStructure"), tenantConnection.databaseType, tenantConnection.connection, ComponentStructure.fromJson);
+    const _adapter: IDatabaseAdapter<IComponentStructureDatabaseModel, ComponentStructure> = createDbAdapter<IComponentStructureDatabaseModel, ComponentStructure>(tenantConnection.models!.get("nfComponentStructure"), tenantConnection.databaseType, tenantConnection.connection, ComponentStructure.fromJson);
     super(_adapter, tenantConnection);
   }
 
@@ -42,13 +42,13 @@ export default class ComponentStructureRepository extends BaseRepository<ICompon
       return null;
     }
 
-    const _componentStructure = await this._tenantConnection.models!.get("ComponentStructure").findAll({
+    const _componentStructure = await this._tenantConnection.models!.get("nfComponentStructure").findAll({
       where: {
         componentName: componentName
       },
       include: [
         {
-          model: this._tenantConnection.models!.get("Role"),
+          model: this._tenantConnection.models!.get("nfRole"),
           as: "role",
           required: true,
           where: {
@@ -99,7 +99,7 @@ export default class ComponentStructureRepository extends BaseRepository<ICompon
       },
     ];
 
-    const componentStructure = await this._tenantConnection.models!.get("ComponentStructureRole").aggregate(componentStructureQuery);
+    const componentStructure = await this._tenantConnection.models!.get("nfComponentStructureRole").aggregate(componentStructureQuery);
 
     console.log("componentStructure retornado no mongoose: ", componentStructure);
 

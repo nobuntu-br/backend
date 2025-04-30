@@ -40,9 +40,9 @@ export default function defineModel(mongooseConnection: Connection) {
 
   schema.pre('save', async function (next) {
     if (!this.isNew) return next();
-    this._id = await updateCounter(mongooseConnection, "ComponentStructure");
+    this._id = await updateCounter(mongooseConnection, "NfComponentStructure");
     next();
   });
 
-  return mongooseConnection.model('ComponentStructure', schema);
+  return mongooseConnection.model('NfComponentStructure', schema);
 };

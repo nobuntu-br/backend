@@ -54,7 +54,7 @@ export default function defineModel(mongooseConnection: Connection) {
   schema.pre('save', async function (next) {
     if (!this.isNew) return next();
   
-    this._id = await updateCounter(mongooseConnection, "Operation");
+    this._id = await updateCounter(mongooseConnection, "NfOperation");
     next();
   });
 

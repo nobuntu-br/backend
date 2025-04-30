@@ -1,7 +1,7 @@
 import { DataTypes, Sequelize } from "sequelize"; 
 
 export default function defineModel(sequelize: Sequelize){ 
-  const schema = sequelize.define('menu', { 
+  const schema = sequelize.define('Nfmenu', { 
     fileName: {
       type: DataTypes.STRING
     }
