@@ -1,5 +1,5 @@
-import { DatabaseCredential, IDatabaseCredentialDatabaseModel } from "../../../../domain/entities/databaseCredential.model";
-import TenantConnection from "../../../../domain/entities/tenantConnection.model";
+import { DatabaseCredential, IDatabaseCredentialDatabaseModel } from "../../../../domain/entities/fixes/databaseCredential.model";
+import TenantConnection from "../../../../domain/entities/fixes/tenantConnection.model";
 import { IDatabaseCredentialRepository } from "../../../../domain/repositories/fixes/databaseCredential.repository";
 import { IDatabaseAdapter } from "../../IDatabase.adapter";
 

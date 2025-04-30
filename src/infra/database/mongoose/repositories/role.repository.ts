@@ -1,5 +1,5 @@
-import { IRoleDataBaseModel, Role } from "../../../../domain/entities/role.model";
-import TenantConnection from "../../../../domain/entities/tenantConnection.model";
+import { IRoleDataBaseModel, Role } from "../../../../domain/entities/fixes/role.model";
+import TenantConnection from "../../../../domain/entities/fixes/tenantConnection.model";
 import { IRoleRepository } from "../../../../domain/repositories/fixes/role.repository";
 import { IDatabaseAdapter } from "../../IDatabase.adapter";
 

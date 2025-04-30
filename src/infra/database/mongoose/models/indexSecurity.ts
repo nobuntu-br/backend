@@ -1,15 +1,15 @@
 import { Connection, Model, Mongoose } from "mongoose";
-import userModel from "./user.model";
-import roleModel from "./role.model";
-import functionSystemModel from "./functionSystem.model";
-import functionSystemRoleModel from "./functionSystemRole.model";
-import userRoleModel from "./userRole.model";
-import tenantModel from "./tenant.model";
-import databaseCredentialModel from "./databaseCredential.model";
-import databasePermissionModel from "./databasePermission.model";
-import verificationEmailModel from "./verificationEmail.model";
-import counterModel from "./counter.model";
-import TenantConnection from "../../../../domain/entities/tenantConnection.model";
+import userModel from "./fixes/user.model";
+import roleModel from "./fixes/role.model";
+import functionSystemModel from "./fixes/functionSystem.model";
+import functionSystemRoleModel from "./fixes/functionSystemRole.model";
+import userRoleModel from "./fixes/userRole.model";
+import tenantModel from "./fixes/tenant.model";
+import databaseCredentialModel from "./fixes/databaseCredential.model";
+import databasePermissionModel from "./fixes/databasePermission.model";
+import verificationEmailModel from "./fixes/verificationEmail.model";
+import counterModel from "./fixes/counter.model";
+import TenantConnection from "../../../../domain/entities/fixes/tenantConnection.model";
 
 export default async function setModels(tenantConnection: TenantConnection) {
   const mongooseConnection = tenantConnection.connection;

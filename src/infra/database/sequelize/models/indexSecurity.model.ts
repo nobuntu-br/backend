@@ -10,7 +10,7 @@ import tenantModel from "./fixes/tenant.model";
 import databasePermissionModel from "./fixes/databasePermission.model";
 import databaseCredentialModel from "./fixes/databaseCredential.model";
 import verificationEmailModel from "./fixes/verificationEmail.model";
-import TenantConnection from "../../../../domain/entities/tenantConnection.model";
+import TenantConnection from "../../../../domain/entities/fixes/tenantConnection.model";
 /**
  * Define os modelos do banco de dados que serão usados pela parte de controle de acesso aos tenants 
  * @param sequelizeConnection Instância da conexão com o banco de dados usando a biblioteca sequelize
