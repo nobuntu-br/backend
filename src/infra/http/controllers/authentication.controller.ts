@@ -75,7 +75,7 @@ export class AuthenticationController {
         secure: true, // garante que o cookie só seja enviado por HTTPS
         sameSite: 'none',
         // domain: acceptedCookieDomains,
-        maxAge: 10 * 60 * 1000, // 10 minutos (dias * horas * minutos * segundos * milisegundos )
+        maxAge: 60 * 60 * 1000, // 1 hora (horas * minutos * segundos * milisegundos)
       });
 
       res.cookie('refreshToken_' + result.user.id, result.tokens.refreshToken, {
