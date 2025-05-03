@@ -134,4 +134,30 @@ export class FieldFileController {
     }
   }
 
+  async findAllFilesById(req: Request, res: Response, next: NextFunction) {
+    try {
+      if (req.body.tenantConnection == undefined) {
+        throw new NotFoundError("Não foi definido tenant para uso.");
+      }
+      //O Service será criado com base no tipo de banco de dados e o model usado 
+      const fieldFileRepository: FieldFileRepository = new FieldFileRepository(req.body.tenantConnection as TenantConnection);
+
+      const fieldFileId = parseInt(req.params.id, 10);
+
+      if(!fieldFileId) {
+        throw new Error("ID não fornecido ou inválido");
+      }
+
+      if (isNaN(fieldFileId)) {
+        throw new Error("Invalid fieldFile ID");
+      }
+
+      const fieldFileWithFiles = await fieldFileRepository.findAllFilesById(fieldFileId);
+
+      return res.status(200).json(fieldFileWithFiles);
+    } catch (error) {
+      next(error);
+    }
+  }
+
 }

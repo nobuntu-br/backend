@@ -1,4 +1,4 @@
-import { Dialect, ModelStatic, Sequelize, Transaction } from "sequelize";
+import { Association, BelongsTo, Dialect, HasMany, HasOne, Model, ModelStatic, Sequelize, Transaction } from "sequelize";
 import { IDatabaseAdapter } from "../IDatabase.adapter";
 import findDataByCustomQuery from "../../../utils/sequelize/customQuery.util";
 import { FilterValue } from "../../../utils/mongoose/customQuery.util";
@@ -33,39 +33,175 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
     return this._databaseConnection;
   }
 
-  async create(data: TInterface): Promise<TClass> {
+  async create(data: TInterface, options?: { transaction?: Transaction }): Promise<TClass> {
+    let transaction = options?.transaction;
+    const isRootTransaction = !transaction;
+
     try {
-      const newItem = await this._model.create(data!);
-      return this.jsonDataToResource(newItem);
-
-    } catch (error: any) {
-      // Manipula erros específicos
-      if (error.name === 'SequelizeUniqueConstraintError') {
-        throw new Error("Error to save data usign sequelize. One data is unique. Detail: " + error);
+      if (isRootTransaction) {
+        transaction = await this._databaseConnection.transaction();
       }
 
-      if (error.name === 'SequelizeValidationError') {
-        // Para erros de validação, você pode retornar detalhes específicos
-        throw new Error("Validation Error on save data using Sequelize. Detail: " + error);
+      if(!transaction){
+        throw new Error("Transaction not found");
       }
 
-      throw new UnknownError("Error to save data using Sequelize. Detail: " + error);
+      // Processa associações BelongsTo primeiro
+      const processedData = await this.processBelongsToAssociations(data, transaction);
+
+      // Cria o registro principal
+      const newItem = await this._model.create(processedData, { transaction });
+
+      // Processa associações HasMany e HasOne
+      await this.processHasAssociations(data, newItem, transaction);
+
+      if (isRootTransaction) {
+        await transaction.commit();
+      }
+
+      return this.jsonDataToResourceFn(newItem.get({ plain: true }));
+    } catch (error) {
+      if (isRootTransaction && transaction) {
+        await transaction.rollback();
+      }
+      this.handleSequelizeError(error);
     }
   }
+
+  private parseAlias(alias: string): { foreignKey: string; relatedModel: string } | null {
+    const ALIAS_PREFIX = 'ALIAS';
+    if (!alias.startsWith(ALIAS_PREFIX)) return null;
+    
+    const parts = alias.split(ALIAS_PREFIX).filter(p => p);
+    if (parts.length !== 2) return null;
+    
+    return {
+      foreignKey: parts[0].toLowerCase(),
+      relatedModel: parts[1]
+    };
+  }
+
+  private async processBelongsToAssociations(data: any, transaction: Transaction): Promise<any> {
+    const processedData = { ...data };
+    const belongsToAssociations = Object.values(this._model.associations).filter(
+      (association: Association) => association.associationType === 'BelongsTo'
+    ) as BelongsTo[];
+
+    for (const association of belongsToAssociations) {
+      const aliasInfo = this.parseAlias(association.as);
+      if (!aliasInfo) continue;
+      
+      const { foreignKey } = aliasInfo;
+      if (processedData[foreignKey]) {
+        const foreignModel = association.target;
+        const adapter = this.createAdapterForModel(foreignModel);
+        
+        const created = await adapter.create(processedData[foreignKey], { transaction });
+        processedData[foreignKey] = (created as any).id;
+        // delete processedData[foreignKey];
+      }
+    }
+
+    return processedData;
+  }
+
+  private async processHasAssociations(
+    originalData: any,
+    parentInstance: Model,
+    transaction: Transaction
+  ): Promise<void> {
+    const hasAssociations = Object.values(this._model.associations).filter(
+      (association: Association) => ['HasMany', 'HasOne'].includes(association.associationType)
+    ) as (HasMany | HasOne)[];
+    for (const association of hasAssociations) {
+      const aliasInfo = this.parseAlias(association.as);
+      if (!aliasInfo) continue;
+
+      const { foreignKey, relatedModel } = aliasInfo;
+      const foreignKeyName = foreignKey.charAt(0).toUpperCase() + foreignKey.slice(1);
+      const relatedModelName = relatedModel.charAt(0).toUpperCase() + relatedModel.slice(1);
+      const associationData = originalData[foreignKeyName] || originalData[foreignKey];
+      if (associationData) {
+        const foreignModel = association.target;
+        const adapter = this.createAdapterForModel(foreignModel);
+
+        const parentId = parentInstance.get('id');
+        console.log("relatedModelName: ", relatedModelName);
+        if (association.associationType === 'HasMany' && Array.isArray(associationData)) {
+          for (const item of associationData) {
+            console.log("item: ", item);
+            await adapter.create({ ...item, [relatedModelName]: parentId }, { transaction });
+            //Caso for arquivos
+            if(relatedModelName === "FieldFile"){
+              await adapter.create({ ...item, fieldFile: parentId }, { transaction });
+            }
+          }
+        } else if (association.associationType === 'HasOne') {
+          await adapter.create({ ...associationData, [foreignKeyName]: parentId }, { transaction });
+        }
+      }
+    }
+  }
+
+  private createAdapterForModel(model: ModelStatic<any>): SequelizeAdapter<any, any> {
+    return new SequelizeAdapter(
+      model,
+      this._databaseType,
+      this._databaseConnection,
+      this.jsonDataToResourceFn
+    );
+  }
+
+  private handleSequelizeError(error: any): never {
+    // console.log("Error: ", error);
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      throw new Error(`Unique constraint error: ${error.errors.map((e: any) => e.message).join(', ')}`);
+    }
+
+    if (error.name === 'SequelizeValidationError') {
+      throw new Error(`Validation error: ${error.errors.map((e: any) => e.message).join(', ')}`);
+    }
+
+    if (error.name === 'SequelizeForeignKeyConstraintError') {
+      throw new Error(`Foreign key constraint error: ${error.message}`);
+    }
+
+    throw new Error(`Database error: ${error.message}`);
+  }
+
+  // async create(data: TInterface): Promise<TClass> {
+  //   try {
+  //     const newItem = await this._model.create(data!);
+  //     return this.jsonDataToResource(newItem);
+
+  //   } catch (error: any) {
+  //     // Manipula erros específicos
+  //     if (error.name === 'SequelizeUniqueConstraintError') {
+  //       throw new Error("Error to save data usign sequelize. One data is unique. Detail: " + error);
+  //     }
+
+  //     if (error.name === 'SequelizeValidationError') {
+  //       // Para erros de validação, você pode retornar detalhes específicos
+  //       throw new Error("Validation Error on save data using Sequelize. Detail: " + error);
+  //     }
+
+  //     throw new UnknownError("Error to save data using Sequelize. Detail: " + error);
+  //   }
+  // }
 
   //TODO arrumar isso
   async findAll(limitPerPage: number, offset: number): Promise<TClass[]> {
     try {
-      
+
       const items = await this._model.findAll({
         limit: limitPerPage,
         offset: offset,
         order: [['createdAt', 'DESC']], // Ordenar por data de criação, por exemplo
         include: [{ all: true }]
       });
-      
+
       return this.jsonDataToResources(items);
-      
+
     } catch (error) {
       throw new UnknownError("Error to find all data using sequelize. Detail: " + error);
     }
@@ -231,7 +367,7 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
 
   async findCustom(filterValues: FilterValue[], filterConditions: string[], model: ModelStatic<any>): Promise<TClass[] | null> {
     try {
-      const items = await findDataByCustomQuery(filterValues, filterConditions, this._model);
+      const items = await findDataByCustomQuery(filterValues, filterConditions, model);
 
       this.replaceForeignKeysFieldWithData(items);
 
@@ -447,30 +583,18 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
 
   async findAllWithAagerLoading(limitPerPage: number, offset: number): Promise<TClass[]> {
     try {
-      // Passo 1: Buscar apenas a entidade principal sem as associações
+
       const items = await this._model.findAll({
         limit: limitPerPage,
         offset: offset,
-        order: [['createdAt', 'DESC']]
+        order: [['createdAt', 'DESC']], // Ordenar por data de criação, por exemplo
+        include: [{ all: true }]
       });
-  
-      // Passo 2: Carregar dinamicamente todas as associações em cada item
-      const associations = Object.keys(this._model.associations);
-  
-      for (const item of items) {
-        for (const assoc of associations) {
-          const loader = item[`get${assoc}`];
-          if (typeof loader === 'function') {
-            item.dataValues[assoc] = await loader.call(item);
-          }
-        }
-      }
-  
-      // Passo 3: Tratar os campos de alias se necessário
+
       this.replaceForeignKeysFieldWithData(items);
-  
+
       return this.jsonDataToResources(items);
-  
+
     } catch (error) {
       throw new UnknownError("Error to find all data using sequelize. Detail: " + error);
     }
