@@ -367,7 +367,7 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
 
   async findCustom(filterValues: FilterValue[], filterConditions: string[], model: ModelStatic<any>): Promise<TClass[] | null> {
     try {
-      const items = await findDataByCustomQuery(filterValues, filterConditions, model);
+      const items = await findDataByCustomQuery(filterValues, filterConditions, this._model);
 
       this.replaceForeignKeysFieldWithData(items);
 
