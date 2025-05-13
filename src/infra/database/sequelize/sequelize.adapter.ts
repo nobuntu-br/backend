@@ -76,7 +76,7 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
     if (parts.length !== 2) return null;
     
     return {
-      foreignKey: parts[0].toLowerCase(),
+      foreignKey: parts[0],
       relatedModel: parts[1]
     };
   }
@@ -86,13 +86,15 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
     const belongsToAssociations = Object.values(this._model.associations).filter(
       (association: Association) => association.associationType === 'BelongsTo'
     ) as BelongsTo[];
-
     for (const association of belongsToAssociations) {
       const aliasInfo = this.parseAlias(association.as);
       if (!aliasInfo) continue;
-      
+
       const { foreignKey } = aliasInfo;
       if (processedData[foreignKey]) {
+        if(typeof processedData[foreignKey] !== 'object'){
+          continue;
+        }
         const foreignModel = association.target;
         const adapter = this.createAdapterForModel(foreignModel);
         
@@ -113,7 +115,8 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
     const hasAssociations = Object.values(this._model.associations).filter(
       (association: Association) => ['HasMany', 'HasOne'].includes(association.associationType)
     ) as (HasMany | HasOne)[];
-    for (const association of hasAssociations) {
+    try{
+      for (const association of hasAssociations) {
       const aliasInfo = this.parseAlias(association.as);
       if (!aliasInfo) continue;
 
@@ -126,10 +129,8 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
         const adapter = this.createAdapterForModel(foreignModel);
 
         const parentId = parentInstance.get('id');
-        console.log("relatedModelName: ", relatedModelName);
         if (association.associationType === 'HasMany' && Array.isArray(associationData)) {
           for (const item of associationData) {
-            console.log("item: ", item);
             await adapter.create({ ...item, [relatedModelName]: parentId }, { transaction });
             //Caso for arquivos
             if(relatedModelName === "FieldFile"){
@@ -141,6 +142,10 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
         }
       }
     }
+    } catch(error){
+      throw new UnknownError("Error in class SequelizeAdapter. Detail: " + error);
+    }
+    
   }
 
   private createAdapterForModel(model: ModelStatic<any>): SequelizeAdapter<any, any> {
@@ -153,7 +158,6 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
   }
 
   private handleSequelizeError(error: any): never {
-    // console.log("Error: ", error);
     if (error.name === 'SequelizeUniqueConstraintError') {
       throw new Error(`Unique constraint error: ${error.errors.map((e: any) => e.message).join(', ')}`);
     }
@@ -168,26 +172,6 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
 
     throw new Error(`Database error: ${error.message}`);
   }
-
-  // async create(data: TInterface): Promise<TClass> {
-  //   try {
-  //     const newItem = await this._model.create(data!);
-  //     return this.jsonDataToResource(newItem);
-
-  //   } catch (error: any) {
-  //     // Manipula erros específicos
-  //     if (error.name === 'SequelizeUniqueConstraintError') {
-  //       throw new Error("Error to save data usign sequelize. One data is unique. Detail: " + error);
-  //     }
-
-  //     if (error.name === 'SequelizeValidationError') {
-  //       // Para erros de validação, você pode retornar detalhes específicos
-  //       throw new Error("Validation Error on save data using Sequelize. Detail: " + error);
-  //     }
-
-  //     throw new UnknownError("Error to save data using Sequelize. Detail: " + error);
-  //   }
-  // }
 
   //TODO arrumar isso
   async findAll(limitPerPage: number, offset: number): Promise<TClass[]> {
@@ -382,8 +366,6 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
   }
 
   protected jsonDataToResources(jsonData: any[]): TClass[] {
-
-    // console.log("jsonData: ", jsonData);
 
     const formattedResults = jsonData.map((record) => record.get({ plain: true }));//onverte o objeto Sequelize em um objeto plano (plain object) que inclui os dataValues do registro principal e das entidades associadas.
 
@@ -623,18 +605,10 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
     try {
 
       const returnedValue = await this._model.findAll({ where: query!, order: [['createdAt', 'DESC']], include: [{ all: true }] });
-      // const returnedValue = await this._model.findAll({ where: { id: id }, include: [{ all: true }] });
 
       if (returnedValue == null) {
         return [];
       }
-
-      // console.log("resultados não formatados: ", returnedValue);
-
-      
-
-      // console.log("resultado formatados: ", formattedResults);
-      // this.replaceForeignKeyFieldWithData(returnedValue);//TODO não precisa disso mais!
 
       return this.jsonDataToResources(returnedValue);
     } catch (error) {
