@@ -95,12 +95,20 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
         if(typeof processedData[foreignKey] !== 'object'){
           continue;
         }
-        const foreignModel = association.target;
-        const adapter = this.createAdapterForModel(foreignModel);
-        
-        const created = await adapter.create(processedData[foreignKey], { transaction });
-        processedData[foreignKey] = (created as any).id;
-        // delete processedData[foreignKey];
+        if (processedData[foreignKey].id) {
+          const foreignModel = association.target;
+          const adapter = this.createAdapterForModel(foreignModel);
+          
+          const created = await adapter.update(processedData[foreignKey], { transaction });
+          processedData[foreignKey] = (created as any).id;
+          continue;
+        } else {
+          const foreignModel = association.target;
+          const adapter = this.createAdapterForModel(foreignModel);
+      
+          const created = await adapter.create(processedData[foreignKey], { transaction });
+          processedData[foreignKey] = (created as any).id;
+        }
       }
     }
 
@@ -131,13 +139,25 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
         const parentId = parentInstance.get('id');
         if (association.associationType === 'HasMany' && Array.isArray(associationData)) {
           for (const item of associationData) {
+            if (item.id) {
+              await adapter.update(item.id, { ...item, [relatedModelName]: parentId }, { transaction });
+              continue;
+            }
             await adapter.create({ ...item, [relatedModelName]: parentId }, { transaction });
             //Caso for arquivos
             if(relatedModelName === "FieldFile"){
+              if(item.id){
+                await adapter.update(item.id, { ...item, fieldFile: parentId }, { transaction });
+                continue;
+              }
               await adapter.create({ ...item, fieldFile: parentId }, { transaction });
             }
           }
         } else if (association.associationType === 'HasOne') {
+          if (associationData.id) {
+            await adapter.update(associationData.id, { ...associationData, [foreignKeyName]: parentId }, { transaction });
+            continue;
+          }
           await adapter.create({ ...associationData, [foreignKeyName]: parentId }, { transaction });
         }
       }
@@ -265,25 +285,46 @@ export class SequelizeAdapter<TInterface, TClass> implements IDatabaseAdapter<TI
 
   }
 
-  async update(id: number, data: Object): Promise<TClass | null> {
+  async update(id: number, data: Object, options?: {transaction?: Transaction}): Promise<TClass | null> {
+    let transaction = options?.transaction;
+    const isRootTransaction = !transaction;
+
     try {
-
-      //Irá obter a quantidade de linhas alteradas
-      var [affectedCount] = await this._model.update(data, {
-        where: {
-          id: this.databaseType == "mongodb" ? id : Number(id),
-        },
-      });
-
-      //Se nenhum registro foi atualizado
-      if (affectedCount == 0) {
-        return null;
+      //Verifica se é a transação raiz (a primeira transação)
+      if (isRootTransaction) {
+        transaction = await this._databaseConnection.transaction();
       }
+
+      // Verifica se a transação foi criada
+      if(!transaction){
+        throw new Error("Transaction not found");
+      }
+
+      // Processa associações BelongsTo primeiro
+      const processedData = await this.processBelongsToAssociations(data, transaction);
+
+      // Edita o registro principal
+      const updatedItem = await this._model.update(processedData, { where: { 
+        id: this.databaseType == "mongodb" ? id : Number(id),
+       }, 
+       transaction 
+      });     
 
       //A opção de retornar o registro editado da função update só funciona pra msql e postgres, então na dúvida eu prefiro pesquisar novamente o registro pra não dar problemas (sei que duas buscas não é o ideial mas, o ambiente é complexo).
       const returnedValue = await this._model.findOne({ where: { id: id } });
 
-      return this.jsonDataToResource(returnedValue);
+      if (returnedValue == null) {
+        return null;
+      }
+
+      // Processa associações HasMany e HasOne
+      await this.processHasAssociations(data, returnedValue, transaction);
+
+      if (isRootTransaction) {
+        await transaction.commit();
+      }
+
+      return this.jsonDataToResource(returnedValue.get({ plain: true }));
     } catch (error) {
 
       if (error instanceof NotFoundError) {
